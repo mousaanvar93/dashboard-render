@@ -66,7 +66,7 @@
       opacity: 0.95;
     }
 
-    /* XRATES panel (UPDATED) */
+    /* XRATES panel */
     .xpanel {
       border: 10px solid white;
       background: black;
@@ -103,7 +103,7 @@
       padding: 10px 12px;
       border-radius: 14px;
       font-size: clamp(14px, 2.2vw, 24px);
-      line-height: 1.1;
+      line-height: 1.15;
       overflow: hidden;
     }
 
@@ -118,6 +118,7 @@
       white-space: nowrap;
     }
 
+    /* Default (desktop): pill single line */
     .xtype {
       font-weight: 800;
       padding: 8px 12px;
@@ -128,7 +129,33 @@
       max-width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
-      white-space: nowrap;
+      white-space: nowrap;     /* desktop: one line */
+    }
+
+    /* ✅ MOBILE FIX: allow 2 lines for TYPE so full text shows */
+    @media (max-width: 600px) {
+      .page {
+        grid-template-rows: 68% 32%; /* give top a bit more, bottom still fits 10 */
+      }
+
+      .xrow {
+        grid-template-columns: 70px 1fr; /* more room for type */
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: 12px;
+        font-size: 14px;
+      }
+
+      .xtype {
+        white-space: normal;     /* allow wrapping */
+        overflow: hidden;        /* still no overflow outside row */
+        text-overflow: clip;     /* no "..." */
+        border-radius: 14px;     /* nicer for multi-line */
+        line-height: 1.15;
+        display: block;          /* allow wrap properly */
+        padding: 6px 10px;
+        max-height: 2.4em;       /* roughly 2 lines */
+      }
     }
   </style>
 </head>
@@ -194,15 +221,11 @@
 
       const items = Array.isArray(data.items) ? data.items : [];
 
-      // Ensure exactly 10 boxes (fill blanks if fewer)
+      // Ensure exactly 10 boxes
       const padded = items.slice(0, 10);
       while (padded.length < 10) padded.push({ rate: "", type: "" });
 
-      // Put first 5 on LEFT column, next 5 on RIGHT column
-      // With CSS grid row-major, to get column-first ordering we place items in this order:
-      // row1: left0, right5
-      // row2: left1, right6
-      // ...
+      // First 5 left, next 5 right, arranged row-wise
       const ordered = [];
       for (let i = 0; i < 5; i++) {
         ordered.push({ ...padded[i], _col: "left" });
@@ -230,11 +253,9 @@
     }
   }
 
-  // Start
   updateSquares();
   updateXrates();
 
-  // UI refresh (backend caching keeps it cheap)
   setInterval(updateSquares, 5000);
   setInterval(updateXrates, 15000);
 </script>
