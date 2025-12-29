@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dashboard</title>
+
   <style>
     html, body {
       margin: 0;
@@ -24,7 +25,6 @@
       z-index: 5;
     }
 
-    /* Layout: top (squares) + bottom (xrates) */
     .page {
       height: 100%;
       display: grid;
@@ -34,13 +34,16 @@
       box-sizing: border-box;
     }
 
-    /* 4 Squares (UNCHANGED) */
+    /* =======================
+       TOP 4 BOXES
+    ======================== */
     .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr 1fr;
       gap: 10px;
     }
+
     .quad {
       border: 10px solid white;
       background: black;
@@ -50,6 +53,7 @@
       justify-content: center;
       overflow: hidden;
     }
+
     .value {
       font-weight: 800;
       font-size: clamp(24px, 9vw, 110px);
@@ -57,6 +61,7 @@
       line-height: 1;
       padding: 10px;
     }
+
     .tag {
       position: absolute;
       right: 18px;
@@ -66,33 +71,32 @@
       opacity: 0.95;
     }
 
-    /* XRATES panel */
+    /* =======================
+       XRATES CONTAINER
+    ======================== */
     .xpanel {
       border: 10px solid white;
       background: black;
-      padding: 12px;
+      padding: 10px;
       box-sizing: border-box;
-      overflow: hidden; /* no scrolling */
       display: grid;
       grid-template-rows: auto 1fr;
-      gap: 8px;
+      gap: 6px;
+      overflow: hidden;
     }
 
     .xstatus {
       font-size: 16px;
       opacity: 0.8;
-      margin-left: 2px;
       min-height: 18px;
     }
 
-    /* 2 columns × 5 rows */
     .xgrid {
       height: 100%;
       display: grid;
       grid-template-columns: 1fr 1fr;
       grid-template-rows: repeat(5, 1fr);
       gap: 8px;
-      overflow: hidden;
     }
 
     .xrow {
@@ -102,59 +106,75 @@
       gap: 10px;
       padding: 10px 12px;
       border-radius: 14px;
-      font-size: clamp(14px, 2.2vw, 24px);
+      font-size: clamp(14px, 2.3vw, 24px);
       line-height: 1.15;
       overflow: hidden;
     }
 
-    /* Left vs Right tint */
-    .xrow.left  { background: rgba(255, 215, 0, 0.12); }  /* gold tint */
-    .xrow.right { background: rgba(0, 255, 102, 0.10); }  /* green tint */
+    .xrow.left {
+      background: rgba(255, 215, 0, 0.14);
+    }
+
+    .xrow.right {
+      background: rgba(0, 255, 102, 0.12);
+    }
 
     .xrate {
       font-weight: 900;
       text-align: right;
-      padding-right: 6px;
       white-space: nowrap;
     }
 
-    /* Default (desktop): pill single line */
     .xtype {
       font-weight: 800;
-      padding: 8px 12px;
-      border-radius: 999px;
       background: rgba(255,255,255,0.12);
-      display: inline-block;
-      width: fit-content;
-      max-width: 100%;
+      border-radius: 999px;
+      padding: 8px 12px;
       overflow: hidden;
       text-overflow: ellipsis;
-      white-space: nowrap;     /* desktop: one line */
+      white-space: nowrap;
+      width: 100%;
     }
 
-    /* ✅ MOBILE FIX: allow 2 lines for TYPE so full text shows */
+    /* =======================
+       MOBILE FIXES
+    ======================== */
     @media (max-width: 600px) {
+
       .page {
-        grid-template-rows: 68% 32%; /* give top a bit more, bottom still fits 10 */
+        grid-template-rows: 68% 32%;
+      }
+
+      .xgrid {
+        gap: 6px;
       }
 
       .xrow {
-        grid-template-columns: 70px 1fr; /* more room for type */
-        gap: 8px;
-        padding: 8px 10px;
+        grid-template-columns: 54px 1fr;
+        gap: 6px;
+        padding: 7px 8px;
         border-radius: 12px;
         font-size: 14px;
       }
 
+      .xrate {
+        font-size: 13px;
+        padding-right: 2px;
+      }
+
       .xtype {
-        white-space: normal;     /* allow wrapping */
-        overflow: hidden;        /* still no overflow outside row */
-        text-overflow: clip;     /* no "..." */
-        border-radius: 14px;     /* nicer for multi-line */
+        white-space: normal;
+        overflow: hidden;
+        text-overflow: clip;
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        border-radius: 12px;
+        padding: 6px 8px;
         line-height: 1.15;
-        display: block;          /* allow wrap properly */
-        padding: 6px 10px;
-        max-height: 2.4em;       /* roughly 2 lines */
+
+        /* allow ~3 lines */
+        max-height: 3.4em;
       }
     }
   </style>
@@ -164,7 +184,7 @@
   <div class="status" id="statusText">Loading…</div>
 
   <div class="page">
-    <!-- TOP: 4 squares -->
+    <!-- TOP 4 BOXES -->
     <div class="grid">
       <div class="quad">
         <div class="value" id="TL_value" style="color:#FFD700">—</div>
@@ -184,7 +204,7 @@
       </div>
     </div>
 
-    <!-- BOTTOM: XRATES 10 items, 2 columns × 5 rows -->
+    <!-- XRATES -->
     <div class="xpanel">
       <div class="xstatus" id="xratesStatus"></div>
       <div class="xgrid" id="xratesGrid"></div>
@@ -214,27 +234,25 @@
   async function updateXrates() {
     try {
       const data = await fetchJSON('/api/xrates');
-      document.getElementById('xratesStatus').textContent = (data.status === 'OK') ? '' : (data.status || '');
+      document.getElementById('xratesStatus').textContent =
+        data.status === 'OK' ? '' : (data.status || '');
 
       const grid = document.getElementById('xratesGrid');
       grid.innerHTML = '';
 
-      const items = Array.isArray(data.items) ? data.items : [];
+      const items = Array.isArray(data.items) ? data.items.slice(0, 10) : [];
 
-      // Ensure exactly 10 boxes
-      const padded = items.slice(0, 10);
-      while (padded.length < 10) padded.push({ rate: "", type: "" });
+      while (items.length < 10) items.push({ rate: "", type: "" });
 
-      // First 5 left, next 5 right, arranged row-wise
       const ordered = [];
       for (let i = 0; i < 5; i++) {
-        ordered.push({ ...padded[i], _col: "left" });
-        ordered.push({ ...padded[i+5], _col: "right" });
+        ordered.push({ ...items[i], col: 'left' });
+        ordered.push({ ...items[i + 5], col: 'right' });
       }
 
       for (const it of ordered) {
         const row = document.createElement('div');
-        row.className = 'xrow ' + (it._col === "left" ? 'left' : 'right');
+        row.className = 'xrow ' + it.col;
 
         const rate = document.createElement('div');
         rate.className = 'xrate';
