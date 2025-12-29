@@ -12,52 +12,8 @@
       color: white;
       font-family: Arial, sans-serif;
       overflow: hidden;
-      user-select: none;
-      -webkit-user-select: none;
-      touch-action: manipulation;
     }
 
-    /* Screens */
-    .screen {
-      position: absolute;
-      inset: 0;
-      display: none;
-    }
-    .screen.active { display: block; }
-
-    /* 4 Squares layout */
-    .grid {
-      height: 100%;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
-      gap: 10px;
-      padding: 10px;
-      box-sizing: border-box;
-    }
-    .quad {
-      border: 10px solid white;
-      background: black;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .value {
-      font-weight: 800;
-      font-size: clamp(28px, 9vw, 120px);
-      text-align: center;
-      line-height: 1;
-      padding: 10px;
-    }
-    .tag {
-      position: absolute;
-      right: 18px;
-      bottom: 14px;
-      font-weight: 800;
-      font-size: clamp(18px, 4vw, 60px);
-      opacity: 0.95;
-    }
     .status {
       position: absolute;
       left: 14px;
@@ -68,45 +24,96 @@
       z-index: 5;
     }
 
-    /* XRATES screen */
-    .xwrap {
+    /* Layout: top (squares) + bottom (xrates) */
+    .page {
       height: 100%;
-      padding: 18px;
+      display: grid;
+      grid-template-rows: 62% 38%;
+      gap: 10px;
+      padding: 10px;
       box-sizing: border-box;
+    }
+
+    /* 4 Squares */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 10px;
+    }
+    .quad {
+      border: 10px solid white;
+      background: black;
+      position: relative;
       display: flex;
-      flex-direction: column;
-      gap: 14px;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
     }
-    .xtitle {
-      font-size: clamp(18px, 4vw, 40px);
+    .value {
       font-weight: 800;
-      letter-spacing: 0.5px;
+      font-size: clamp(24px, 9vw, 110px);
+      text-align: center;
+      line-height: 1;
+      padding: 10px;
     }
-    .xlist {
-      flex: 1;
+    .tag {
+      position: absolute;
+      right: 18px;
+      bottom: 14px;
+      font-weight: 800;
+      font-size: clamp(16px, 4vw, 56px);
+      opacity: 0.95;
+    }
+
+    /* XRATES list area */
+    .xpanel {
+      border: 10px solid white;
+      border-radius: 0;
+      background: black;
+      padding: 12px;
+      box-sizing: border-box;
       overflow: hidden;
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
+
+    .xstatus {
+      font-size: 16px;
+      opacity: 0.8;
+      margin-left: 2px;
+    }
+
+    .xlist {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
     .xrow {
       display: grid;
-      grid-template-columns: 140px 1fr;
+      grid-template-columns: 120px 1fr;
       align-items: center;
-      gap: 14px;
-      padding: 14px 16px;
+      gap: 12px;
+      padding: 10px 12px;
       border-radius: 14px;
       background: rgba(255,255,255,0.08);
-      font-size: clamp(16px, 3.2vw, 30px);
+      font-size: clamp(14px, 3.0vw, 26px);
     }
+
     .xrate {
       font-weight: 800;
       text-align: right;
-      padding-right: 8px;
+      padding-right: 6px;
+      white-space: nowrap;
     }
+
     .xtype {
       font-weight: 700;
-      padding: 8px 14px;
+      padding: 8px 12px;
       border-radius: 999px;
       background: rgba(255,255,255,0.12);
       display: inline-block;
@@ -116,29 +123,14 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .xstatus {
-      font-size: 16px;
-      opacity: 0.85;
-    }
-
-    /* hint */
-    .hint {
-      position: absolute;
-      right: 14px;
-      top: 10px;
-      font-size: 14px;
-      opacity: 0.7;
-      z-index: 5;
-    }
   </style>
 </head>
+
 <body>
-
   <div class="status" id="statusText">Loading…</div>
-  <div class="hint" id="hintText">Tap anywhere to switch</div>
 
-  <!-- Screen 1: 4 squares -->
-  <div class="screen active" id="screenSquares">
+  <div class="page">
+    <!-- TOP: 4 squares -->
     <div class="grid">
       <div class="quad">
         <div class="value" id="TL_value" style="color:#FFD700">—</div>
@@ -157,30 +149,15 @@
         <div class="tag" id="BR_tag" style="color:#00FF66">24CASH</div>
       </div>
     </div>
-  </div>
 
-  <!-- Screen 2: XRATES top 10 -->
-  <div class="screen" id="screenXrates">
-    <div class="xwrap">
-      <div class="xtitle">XRATES (Top 10)</div>
+    <!-- BOTTOM: XRATES top 10 (no title) -->
+    <div class="xpanel">
       <div class="xstatus" id="xratesStatus">Loading…</div>
       <div class="xlist" id="xratesList"></div>
     </div>
   </div>
 
 <script>
-  let showingXrates = false;
-
-  function setScreen(xrates) {
-    showingXrates = xrates;
-    document.getElementById('screenSquares').classList.toggle('active', !xrates);
-    document.getElementById('screenXrates').classList.toggle('active', xrates);
-  }
-
-  // Tap anywhere toggles screens
-  document.addEventListener('click', () => setScreen(!showingXrates));
-  document.addEventListener('touchstart', () => setScreen(!showingXrates), { passive: true });
-
   async function fetchJSON(url) {
     const r = await fetch(url, { cache: "no-store" });
     return await r.json();
@@ -192,12 +169,10 @@
       document.getElementById('statusText').textContent = data.status || 'OK';
 
       for (const key of ['TL','TR','BL','BR']) {
-        const tag = data[key]?.tag ?? '';
-        const val = data[key]?.value ?? '—';
-        document.getElementById(key + '_tag').textContent = tag;
-        document.getElementById(key + '_value').textContent = val;
+        document.getElementById(key + '_tag').textContent = data[key]?.tag ?? '';
+        document.getElementById(key + '_value').textContent = data[key]?.value ?? '—';
       }
-    } catch (e) {
+    } catch {
       document.getElementById('statusText').textContent = 'NETWORK ERROR';
     }
   }
@@ -205,7 +180,7 @@
   async function updateXrates() {
     try {
       const data = await fetchJSON('/api/xrates');
-      document.getElementById('xratesStatus').textContent = data.status || 'OK';
+      document.getElementById('xratesStatus').textContent = (data.status === 'OK') ? '' : (data.status || '');
 
       const list = document.getElementById('xratesList');
       list.innerHTML = '';
@@ -227,19 +202,18 @@
         row.appendChild(type);
         list.appendChild(row);
       }
-    } catch (e) {
+    } catch {
       document.getElementById('xratesStatus').textContent = 'NETWORK ERROR';
     }
   }
 
-  // Start loops
+  // Start
   updateSquares();
   updateXrates();
 
-  // Front-end polling (safe: backend caches)
-  setInterval(updateSquares, 5000);   // UI updates fast, backend throttles SuccessFN/SharePoint
-  setInterval(updateXrates, 15000);  // UI checks XRATES, backend throttles to 5 min
+  // UI refresh (backend caching keeps it cheap)
+  setInterval(updateSquares, 5000);
+  setInterval(updateXrates, 15000);
 </script>
-
 </body>
 </html>
