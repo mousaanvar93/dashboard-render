@@ -13,6 +13,10 @@ from fastapi.responses import HTMLResponse, JSONResponse
 SUCCESSFN_API_URL = "https://www.successfn.com/wp-content/themes/neve/page-templates/getprice.php?site=cfgs"
 SUCCESSFN_SYMBOL = "LLGUSD"
 
+SUCCESSFN_POLL_SECONDS = 15          # ✅ SuccessFN every 15s
+SHAREPOINT_POLL_SECONDS = 300        # ✅ SharePoint every 5 minutes
+XRATES_POLL_SECONDS = 300            # ✅ XRATES every 5 minutes
+
 # --------------------------
 # YOUR MATH
 # --------------------------
@@ -21,13 +25,11 @@ MULT_A = 3.674
 MULT_B = 0.916
 
 ITEMS = {
-    "TL": {"id": 1, "use_0916": True,  "tag": "22EXCH"},
-    "BL": {"id": 2, "use_0916": False, "tag": "24EXCH"},
-    "TR": {"id": 3, "use_0916": True,  "tag": "22CASH"},
-    "BR": {"id": 4, "use_0916": False, "tag": "24CASH"},
+    "TL": {"id": 1, "use_0916": True,  "tag": "22EXCH", "color": "#FFD700"},
+    "BL": {"id": 2, "use_0916": False, "tag": "24EXCH", "color": "#FFD700"},
+    "TR": {"id": 3, "use_0916": True,  "tag": "22CASH", "color": "#00FF66"},
+    "BR": {"id": 4, "use_0916": False, "tag": "24CASH", "color": "#00FF66"},
 }
-
-POLL_SECONDS = 10
 
 # --------------------------
 # GRAPH / SHAREPOINT CONFIG (Render env vars)
@@ -38,8 +40,15 @@ CLIENT_SECRET = os.environ["CLIENT_SECRET"]
 
 SP_HOST = os.environ.get("SP_HOST", "anvarluxuryjewellery.sharepoint.com")
 SP_SITE_PATH = os.environ.get("SP_SITE_PATH", "/sites/PRODUCTENTRY")
+
+# list for the 4 IDs
 SP_LIST_NAME = os.environ.get("SP_LIST_NAME", "staffinstructions")
 SP_COLUMN_NAME = os.environ.get("SP_COLUMN_NAME", "setval")
+
+# list for xrates (top 10)
+XRATES_LIST_NAME = os.environ.get("XRATES_LIST_NAME", "xrates")
+XRATES_RATE_FIELD = os.environ.get("XRATES_RATE_FIELD", "rate")
+XRATES_TYPE_FIELD = os.environ.get("XRATES_TYPE_FIELD", "type")
 
 AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
 SCOPE = ["https://graph.microsoft.com/.default"]
@@ -69,7 +78,7 @@ def get_access_token() -> str:
     return _access_token
 
 
-def graph_get(url: str, timeout=20):
+def graph_get(url: str, timeout=25):
     token = get_access_token()
     headers = {"Authorization": f"Bearer {token}"}
     r = requests.get(url, headers=headers, timeout=timeout)
@@ -77,6 +86,9 @@ def graph_get(url: str, timeout=20):
     return r.json()
 
 
+# --------------------------
+# HELPERS
+# --------------------------
 def safe_float(x):
     if x is None:
         return None
@@ -94,6 +106,7 @@ def fetch_successfn_price():
     r.raise_for_status()
     text = r.text.strip()
 
+    # The API returns space-separated CSV records
     records = text.replace("\r", "\n").split()
     for rec in records:
         parts = [p.strip() for p in rec.split(",") if p.strip()]
@@ -109,12 +122,22 @@ def compute_final(success_val, sp_val, use_0916):
     return base - sp_val
 
 
+# --------------------------
+# SHAREPOINT
+# --------------------------
 _site_id_cache = None
 
 
 def fetch_site_id():
     url = f"https://graph.microsoft.com/v1.0/sites/{SP_HOST}:{SP_SITE_PATH}"
     return graph_get(url)["id"]
+
+
+def ensure_site_id():
+    global _site_id_cache
+    if not _site_id_cache:
+        _site_id_cache = fetch_site_id()
+    return _site_id_cache
 
 
 def fetch_setval(site_id: str, item_id: int):
@@ -127,6 +150,32 @@ def fetch_setval(site_id: str, item_id: int):
     return data.get("fields", {}).get(SP_COLUMN_NAME, "")
 
 
+def fetch_xrates_top10(site_id: str):
+    # Order by ID ascending, take first 10
+    url = (
+        f"https://graph.microsoft.com/v1.0/sites/{site_id}"
+        f"/lists/{XRATES_LIST_NAME}"
+        f"/items?$top=10&$orderby=id asc&expand=fields"
+    )
+    data = graph_get(url)
+    items = data.get("value", [])
+    out = []
+    for it in items:
+        fields = it.get("fields", {}) or {}
+        rate = fields.get(XRATES_RATE_FIELD)
+        typ = fields.get(XRATES_TYPE_FIELD)
+
+        # Keep as strings for display
+        out.append({
+            "rate": "" if rate is None else str(rate),
+            "type": "" if typ is None else str(typ),
+        })
+    return out
+
+
+# --------------------------
+# FASTAPI
+# --------------------------
 app = FastAPI()
 
 
@@ -136,9 +185,51 @@ def home():
         return f.read()
 
 
+# --------------------------
+# CACHES (two timers)
+# --------------------------
 _lock = threading.Lock()
-_last_payload = None
-_last_time = 0
+
+_success_cache = {"value": None, "ts": 0.0}
+_sharepoint_cache = {"vals": None, "ts": 0.0}
+_xrates_cache = {"items": None, "ts": 0.0}
+
+
+def get_success_value():
+    now = time.time()
+    if _success_cache["value"] is not None and (now - _success_cache["ts"]) < SUCCESSFN_POLL_SECONDS:
+        return _success_cache["value"]
+
+    val = fetch_successfn_price()
+    _success_cache["value"] = val
+    _success_cache["ts"] = now
+    return val
+
+
+def get_sharepoint_values(site_id: str):
+    now = time.time()
+    if _sharepoint_cache["vals"] is not None and (now - _sharepoint_cache["ts"]) < SHAREPOINT_POLL_SECONDS:
+        return _sharepoint_cache["vals"]
+
+    vals = {}
+    for key, cfg in ITEMS.items():
+        raw = fetch_setval(site_id, cfg["id"])
+        vals[key] = raw
+
+    _sharepoint_cache["vals"] = vals
+    _sharepoint_cache["ts"] = now
+    return vals
+
+
+def get_xrates(site_id: str):
+    now = time.time()
+    if _xrates_cache["items"] is not None and (now - _xrates_cache["ts"]) < XRATES_POLL_SECONDS:
+        return _xrates_cache["items"]
+
+    items = fetch_xrates_top10(site_id)
+    _xrates_cache["items"] = items
+    _xrates_cache["ts"] = now
+    return items
 
 
 def blank_payload(status: str):
@@ -151,46 +242,47 @@ def blank_payload(status: str):
     }
 
 
-def build_payload():
-    global _site_id_cache
-
-    try:
-        success_val = fetch_successfn_price()
-        if success_val is None:
-            return blank_payload("SUCCESSFN ERROR")
-    except Exception:
-        return blank_payload("SUCCESSFN ERROR")
-
-    try:
-        if not _site_id_cache:
-            _site_id_cache = fetch_site_id()
-    except Exception:
-        _site_id_cache = None
-        return blank_payload("SHAREPOINT ERROR")
-
-    out = {"status": "OK"}
-    try:
-        for key, cfg in ITEMS.items():
-            raw = fetch_setval(_site_id_cache, cfg["id"])
-            sp_val = safe_float(raw)
-            if sp_val is None:
-                out[key] = {"tag": cfg["tag"], "value": "INVALID SETVAL"}
-                continue
-
-            final = compute_final(success_val, sp_val, cfg["use_0916"])
-            out[key] = {"tag": cfg["tag"], "value": f"{final:,.0f}"}
-    except Exception:
-        return blank_payload("SHAREPOINT ERROR")
-
-    return out
-
-
 @app.get("/api/values")
 def api_values():
-    global _last_payload, _last_time
-    now = time.time()
+    # returns the 4-squares values
     with _lock:
-        if _last_payload is None or (now - _last_time) >= POLL_SECONDS:
-            _last_payload = build_payload()
-            _last_time = now
-        return JSONResponse(_last_payload)
+        try:
+            site_id = ensure_site_id()
+        except Exception:
+            return JSONResponse(blank_payload("SHAREPOINT ERROR (SITE)"))
+
+        try:
+            success_val = get_success_value()
+            if success_val is None:
+                return JSONResponse(blank_payload("SUCCESSFN ERROR"))
+
+            raw_map = get_sharepoint_values(site_id)
+
+            out = {"status": "OK"}
+            for key, cfg in ITEMS.items():
+                sp_val = safe_float(raw_map.get(key))
+                if sp_val is None:
+                    out[key] = {"tag": cfg["tag"], "value": "INVALID"}
+                    continue
+                final = compute_final(success_val, sp_val, cfg["use_0916"])
+                out[key] = {"tag": cfg["tag"], "value": f"{final:,.0f}"}
+            return JSONResponse(out)
+
+        except Exception:
+            return JSONResponse(blank_payload("SHAREPOINT ERROR (LIST)"))
+
+
+@app.get("/api/xrates")
+def api_xrates():
+    # returns top 10 list for tap-to-show screen
+    with _lock:
+        try:
+            site_id = ensure_site_id()
+        except Exception:
+            return JSONResponse({"status": "SHAREPOINT ERROR (SITE)", "items": []})
+
+        try:
+            items = get_xrates(site_id)
+            return JSONResponse({"status": "OK", "items": items})
+        except Exception:
+            return JSONResponse({"status": "SHAREPOINT ERROR (XRATES)", "items": []})
