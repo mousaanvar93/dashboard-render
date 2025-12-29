@@ -34,7 +34,7 @@
       box-sizing: border-box;
     }
 
-    /* 4 Squares */
+    /* 4 Squares (UNCHANGED) */
     .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -66,53 +66,60 @@
       opacity: 0.95;
     }
 
-    /* XRATES list area */
+    /* XRATES panel (UPDATED) */
     .xpanel {
       border: 10px solid white;
-      border-radius: 0;
       background: black;
       padding: 12px;
       box-sizing: border-box;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+      overflow: hidden; /* no scrolling */
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 8px;
     }
 
     .xstatus {
       font-size: 16px;
       opacity: 0.8;
       margin-left: 2px;
+      min-height: 18px;
     }
 
-    .xlist {
-      flex: 1;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
+    /* 2 columns × 5 rows */
+    .xgrid {
+      height: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: repeat(5, 1fr);
       gap: 8px;
+      overflow: hidden;
     }
 
     .xrow {
       display: grid;
-      grid-template-columns: 120px 1fr;
+      grid-template-columns: 90px 1fr;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       padding: 10px 12px;
       border-radius: 14px;
-      background: rgba(255,255,255,0.08);
-      font-size: clamp(14px, 3.0vw, 26px);
+      font-size: clamp(14px, 2.2vw, 24px);
+      line-height: 1.1;
+      overflow: hidden;
     }
 
+    /* Left vs Right tint */
+    .xrow.left  { background: rgba(255, 215, 0, 0.12); }  /* gold tint */
+    .xrow.right { background: rgba(0, 255, 102, 0.10); }  /* green tint */
+
     .xrate {
-      font-weight: 800;
+      font-weight: 900;
       text-align: right;
       padding-right: 6px;
       white-space: nowrap;
     }
 
     .xtype {
-      font-weight: 700;
+      font-weight: 800;
       padding: 8px 12px;
       border-radius: 999px;
       background: rgba(255,255,255,0.12);
@@ -150,10 +157,10 @@
       </div>
     </div>
 
-    <!-- BOTTOM: XRATES top 10 (no title) -->
+    <!-- BOTTOM: XRATES 10 items, 2 columns × 5 rows -->
     <div class="xpanel">
-      <div class="xstatus" id="xratesStatus">Loading…</div>
-      <div class="xlist" id="xratesList"></div>
+      <div class="xstatus" id="xratesStatus"></div>
+      <div class="xgrid" id="xratesGrid"></div>
     </div>
   </div>
 
@@ -182,13 +189,29 @@
       const data = await fetchJSON('/api/xrates');
       document.getElementById('xratesStatus').textContent = (data.status === 'OK') ? '' : (data.status || '');
 
-      const list = document.getElementById('xratesList');
-      list.innerHTML = '';
+      const grid = document.getElementById('xratesGrid');
+      grid.innerHTML = '';
 
       const items = Array.isArray(data.items) ? data.items : [];
-      for (const it of items) {
+
+      // Ensure exactly 10 boxes (fill blanks if fewer)
+      const padded = items.slice(0, 10);
+      while (padded.length < 10) padded.push({ rate: "", type: "" });
+
+      // Put first 5 on LEFT column, next 5 on RIGHT column
+      // With CSS grid row-major, to get column-first ordering we place items in this order:
+      // row1: left0, right5
+      // row2: left1, right6
+      // ...
+      const ordered = [];
+      for (let i = 0; i < 5; i++) {
+        ordered.push({ ...padded[i], _col: "left" });
+        ordered.push({ ...padded[i+5], _col: "right" });
+      }
+
+      for (const it of ordered) {
         const row = document.createElement('div');
-        row.className = 'xrow';
+        row.className = 'xrow ' + (it._col === "left" ? 'left' : 'right');
 
         const rate = document.createElement('div');
         rate.className = 'xrate';
@@ -200,7 +223,7 @@
 
         row.appendChild(rate);
         row.appendChild(type);
-        list.appendChild(row);
+        grid.appendChild(row);
       }
     } catch {
       document.getElementById('xratesStatus').textContent = 'NETWORK ERROR';
