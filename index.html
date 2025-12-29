@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard</title>
+  <style>
+    html, body { height:100%; margin:0; background:#000; font-family: Arial, sans-serif; }
+    .grid { height:100%; display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; gap:10px; padding:10px; box-sizing:border-box; }
+    .tile { border:10px solid #fff; background:#000; position:relative; display:flex; align-items:center; justify-content:center; }
+    .value { font-size:min(16vw,16vh); font-weight:900; text-align:center; }
+    .tag { position:absolute; right:18px; bottom:12px; font-size:min(6vw,6vh); font-weight:900; opacity:0.95; }
+    .banner { position:fixed; top:0; left:0; right:0; background:#111; color:#fff; padding:8px 12px; font-weight:800; font-size:14px; display:none; z-index:9999; }
+  </style>
+</head>
+<body>
+  <div class="banner" id="banner"></div>
+
+  <div class="grid">
+    <div class="tile">
+      <div id="TL_value" class="value" style="color:#FFD700"></div>
+      <div id="TL_tag" class="tag" style="color:#FFD700"></div>
+    </div>
+    <div class="tile">
+      <div id="TR_value" class="value" style="color:#00FF66"></div>
+      <div id="TR_tag" class="tag" style="color:#00FF66"></div>
+    </div>
+    <div class="tile">
+      <div id="BL_value" class="value" style="color:#FFD700"></div>
+      <div id="BL_tag" class="tag" style="color:#FFD700"></div>
+    </div>
+    <div class="tile">
+      <div id="BR_value" class="value" style="color:#00FF66"></div>
+      <div id="BR_tag" class="tag" style="color:#00FF66"></div>
+    </div>
+  </div>
+
+<script>
+async function refresh() {
+  try {
+    const r = await fetch("/api/values", { cache: "no-store" });
+    const data = await r.json();
+
+    const banner = document.getElementById("banner");
+    if (data.status && data.status !== "OK") {
+      banner.style.display = "block";
+      banner.textContent = data.status;
+    } else {
+      banner.style.display = "none";
+    }
+
+    ["TL","TR","BL","BR"].forEach(k => {
+      document.getElementById(k+"_tag").textContent = data[k].tag;
+      document.getElementById(k+"_value").textContent = data[k].value;
+    });
+  } catch(e) {
+    const banner = document.getElementById("banner");
+    banner.style.display = "block";
+    banner.textContent = "SERVER OFFLINE";
+  }
+}
+
+refresh();
+setInterval(refresh, 10000);
+</script>
+</body>
+</html>
