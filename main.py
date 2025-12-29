@@ -1,16 +1,17 @@
 import os
-import json
 import time
 import threading
 import requests
-from fastapi import FastAPI, Header, HTTPException
+import msal
+
+from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, JSONResponse
 
 # --------------------------
 # SUCCESSFN
 # --------------------------
 SUCCESSFN_API_URL = "https://www.successfn.com/wp-content/themes/neve/page-templates/getprice.php?site=cfgs"
-SUCCESSFN_SYMBOL = "LLGUSD"  # change if needed
+SUCCESSFN_SYMBOL = "LLGUSD"
 
 # --------------------------
 # YOUR MATH
@@ -20,21 +21,60 @@ MULT_A = 3.674
 MULT_B = 0.916
 
 ITEMS = {
-    "TL": {"use_0916": True,  "tag": "22EXCH"},
-    "BL": {"use_0916": False, "tag": "24EXCH"},
-    "TR": {"use_0916": True,  "tag": "22CASH"},
-    "BR": {"use_0916": False, "tag": "24CASH"},
+    "TL": {"id": 1, "use_0916": True,  "tag": "22EXCH"},
+    "BL": {"id": 2, "use_0916": False, "tag": "24EXCH"},
+    "TR": {"id": 3, "use_0916": True,  "tag": "22CASH"},
+    "BR": {"id": 4, "use_0916": False, "tag": "24CASH"},
 }
 
 POLL_SECONDS = 10
 
 # --------------------------
-# SECURITY (Render env var)
+# GRAPH / SHAREPOINT CONFIG (Render env vars)
 # --------------------------
-API_KEY = os.environ.get("DASHBOARD_API_KEY", "CHANGE_ME_NOW")
+TENANT_ID = os.environ["TENANT_ID"]
+CLIENT_ID = os.environ["CLIENT_ID"]
+CLIENT_SECRET = os.environ["CLIENT_SECRET"]
 
-# Persistent file path (we'll set this to /var/data/store.json on Render disk)
-STORE_PATH = os.environ.get("STORE_PATH", "store.json")
+SP_HOST = os.environ.get("SP_HOST", "anvarluxuryjewellery.sharepoint.com")
+SP_SITE_PATH = os.environ.get("SP_SITE_PATH", "/sites/PRODUCTENTRY")
+SP_LIST_NAME = os.environ.get("SP_LIST_NAME", "staffinstructions")
+SP_COLUMN_NAME = os.environ.get("SP_COLUMN_NAME", "setval")
+
+AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
+SCOPE = ["https://graph.microsoft.com/.default"]
+
+msal_app = msal.ConfidentialClientApplication(
+    client_id=CLIENT_ID,
+    authority=AUTHORITY,
+    client_credential=CLIENT_SECRET,
+)
+
+_access_token = None
+_token_expires_at = 0
+
+
+def get_access_token() -> str:
+    global _access_token, _token_expires_at
+    now = int(time.time())
+    if _access_token and now < (_token_expires_at - 60):
+        return _access_token
+
+    result = msal_app.acquire_token_for_client(scopes=SCOPE)
+    if "access_token" not in result:
+        raise RuntimeError(f"Token error: {result}")
+
+    _access_token = result["access_token"]
+    _token_expires_at = now + int(result.get("expires_in", 3600))
+    return _access_token
+
+
+def graph_get(url: str, timeout=20):
+    token = get_access_token()
+    headers = {"Authorization": f"Bearer {token}"}
+    r = requests.get(url, headers=headers, timeout=timeout)
+    r.raise_for_status()
+    return r.json()
 
 
 def safe_float(x):
@@ -54,43 +94,38 @@ def fetch_successfn_price():
     r.raise_for_status()
     text = r.text.strip()
 
-    # Records are separated by whitespace/newlines
     records = text.replace("\r", "\n").split()
     for rec in records:
         parts = [p.strip() for p in rec.split(",") if p.strip()]
-        # Example: LLGUSD,4531.91,4531.91,...
         if len(parts) >= 2 and parts[0] == SUCCESSFN_SYMBOL:
             return safe_float(parts[1])
     return None
 
 
-def compute_final(success_val, subtract_val, use_0916):
+def compute_final(success_val, sp_val, use_0916):
     base = (success_val / DIVISOR) * MULT_A
     if use_0916:
         base *= MULT_B
-    return base - subtract_val
+    return base - sp_val
 
 
-def load_store():
-    if not os.path.exists(STORE_PATH):
-        return {"TL": 0.0, "TR": 0.0, "BL": 0.0, "BR": 0.0}
-    try:
-        with open(STORE_PATH, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        for k in ["TL", "TR", "BL", "BR"]:
-            data.setdefault(k, 0.0)
-        return data
-    except Exception:
-        return {"TL": 0.0, "TR": 0.0, "BL": 0.0, "BR": 0.0}
+_site_id_cache = None
 
 
-def save_store(data):
-    os.makedirs(os.path.dirname(STORE_PATH) or ".", exist_ok=True)
-    with open(STORE_PATH, "w", encoding="utf-8") as f:
-        json.dump(data, f)
+def fetch_site_id():
+    url = f"https://graph.microsoft.com/v1.0/sites/{SP_HOST}:{SP_SITE_PATH}"
+    return graph_get(url)["id"]
 
 
-store = load_store()
+def fetch_setval(site_id: str, item_id: int):
+    url = (
+        f"https://graph.microsoft.com/v1.0/sites/{site_id}"
+        f"/lists/{SP_LIST_NAME}"
+        f"/items/{item_id}?expand=fields"
+    )
+    data = graph_get(url)
+    return data.get("fields", {}).get(SP_COLUMN_NAME, "")
+
 
 app = FastAPI()
 
@@ -117,6 +152,8 @@ def blank_payload(status: str):
 
 
 def build_payload():
+    global _site_id_cache
+
     try:
         success_val = fetch_successfn_price()
         if success_val is None:
@@ -124,14 +161,27 @@ def build_payload():
     except Exception:
         return blank_payload("SUCCESSFN ERROR")
 
+    try:
+        if not _site_id_cache:
+            _site_id_cache = fetch_site_id()
+    except Exception:
+        _site_id_cache = None
+        return blank_payload("SHAREPOINT ERROR")
+
     out = {"status": "OK"}
-    for k, cfg in ITEMS.items():
-        subtract_val = safe_float(store.get(k))
-        if subtract_val is None:
-            out[k] = {"tag": cfg["tag"], "value": "INVALID"}
-            continue
-        final = compute_final(success_val, subtract_val, cfg["use_0916"])
-        out[k] = {"tag": cfg["tag"], "value": f"{final:,.0f}"}
+    try:
+        for key, cfg in ITEMS.items():
+            raw = fetch_setval(_site_id_cache, cfg["id"])
+            sp_val = safe_float(raw)
+            if sp_val is None:
+                out[key] = {"tag": cfg["tag"], "value": "INVALID SETVAL"}
+                continue
+
+            final = compute_final(success_val, sp_val, cfg["use_0916"])
+            out[key] = {"tag": cfg["tag"], "value": f"{final:,.0f}"}
+    except Exception:
+        return blank_payload("SHAREPOINT ERROR")
+
     return out
 
 
@@ -144,37 +194,3 @@ def api_values():
             _last_payload = build_payload()
             _last_time = now
         return JSONResponse(_last_payload)
-
-
-@app.get("/api/store")
-def api_store():
-    return store
-
-
-def require_key(x_api_key: str | None):
-    if x_api_key != API_KEY:
-        raise HTTPException(status_code=401, detail="Invalid API key")
-
-
-@app.post("/api/set")
-async def api_set(body: dict, x_api_key: str | None = Header(default=None)):
-    """
-    POST JSON:
-    {"TL": 10, "TR": 20, "BL": 30, "BR": 40}
-    You can send only some keys and it will update only those.
-    """
-    require_key(x_api_key)
-
-    changed = False
-    for k in ["TL", "TR", "BL", "BR"]:
-        if k in body:
-            v = safe_float(body[k])
-            if v is None:
-                raise HTTPException(status_code=400, detail=f"{k} must be a number")
-            store[k] = float(v)
-            changed = True
-
-    if changed:
-        save_store(store)
-
-    return {"ok": True, "store": store}
