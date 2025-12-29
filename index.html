@@ -25,10 +25,11 @@
       z-index: 5;
     }
 
+    /* ✅ 50 / 50 split */
     .page {
       height: 100%;
       display: grid;
-      grid-template-rows: 62% 38%;
+      grid-template-rows: 50% 50%;
       gap: 10px;
       padding: 10px;
       box-sizing: border-box;
@@ -56,7 +57,7 @@
 
     .value {
       font-weight: 800;
-      font-size: clamp(24px, 9vw, 110px);
+      font-size: clamp(22px, 9vw, 110px);
       text-align: center;
       line-height: 1;
       padding: 10px;
@@ -67,22 +68,22 @@
       right: 18px;
       bottom: 14px;
       font-weight: 800;
-      font-size: clamp(16px, 4vw, 56px);
+      font-size: clamp(14px, 4vw, 56px);
       opacity: 0.95;
     }
 
     /* =======================
-       XRATES CONTAINER
+       XRATES PANEL
     ======================== */
     .xpanel {
       border: 10px solid white;
       background: black;
-      padding: 10px;
+      padding: 12px;
       box-sizing: border-box;
       display: grid;
       grid-template-rows: auto 1fr;
-      gap: 6px;
-      overflow: hidden;
+      gap: 8px;
+      overflow: hidden; /* no scrolling */
     }
 
     .xstatus {
@@ -91,33 +92,30 @@
       min-height: 18px;
     }
 
+    /* 2 columns × 5 rows */
     .xgrid {
       height: 100%;
       display: grid;
       grid-template-columns: 1fr 1fr;
       grid-template-rows: repeat(5, 1fr);
-      gap: 8px;
+      gap: 10px;
+      overflow: hidden;
     }
 
     .xrow {
       display: grid;
-      grid-template-columns: 90px 1fr;
+      grid-template-columns: 80px 1fr;
       align-items: center;
       gap: 10px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      font-size: clamp(14px, 2.3vw, 24px);
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-size: clamp(14px, 2.2vw, 26px);
       line-height: 1.15;
       overflow: hidden;
     }
 
-    .xrow.left {
-      background: rgba(255, 215, 0, 0.14);
-    }
-
-    .xrow.right {
-      background: rgba(0, 255, 102, 0.12);
-    }
+    .xrow.left  { background: rgba(255, 215, 0, 0.14); }
+    .xrow.right { background: rgba(0, 255, 102, 0.12); }
 
     .xrate {
       font-weight: 900;
@@ -129,7 +127,9 @@
       font-weight: 800;
       background: rgba(255,255,255,0.12);
       border-radius: 999px;
-      padding: 8px 12px;
+      padding: 10px 14px;
+
+      /* Default: one line with ... on large screens */
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -137,44 +137,42 @@
     }
 
     /* =======================
-       MOBILE FIXES
+       MOBILE OPTIMIZATION
+       (Still 50/50 split)
     ======================== */
     @media (max-width: 600px) {
-
       .page {
-        grid-template-rows: 68% 32%;
+        grid-template-rows: 50% 50%;
+        gap: 8px;
+        padding: 8px;
       }
 
-      .xgrid {
-        gap: 6px;
-      }
+      .grid { gap: 8px; }
+      .quad { border-width: 8px; }
+      .xpanel { border-width: 8px; padding: 10px; }
+
+      .xgrid { gap: 8px; }
 
       .xrow {
-        grid-template-columns: 54px 1fr;
-        gap: 6px;
-        padding: 7px 8px;
-        border-radius: 12px;
-        font-size: 14px;
+        grid-template-columns: 58px 1fr; /* give type more room */
+        gap: 8px;
+        padding: 10px 10px;
+        border-radius: 14px;
+        font-size: 13px; /* readable but fits 5 rows */
+        line-height: 1.12;
       }
 
-      .xrate {
-        font-size: 13px;
-        padding-right: 2px;
-      }
-
+      /* On mobile: show up to 2 lines (no row growth) */
       .xtype {
         white-space: normal;
         overflow: hidden;
         text-overflow: clip;
-        display: block;
-        width: 100%;
-        max-width: 100%;
-        border-radius: 12px;
-        padding: 6px 8px;
-        line-height: 1.15;
+        border-radius: 14px;
+        padding: 8px 10px;
 
-        /* allow ~3 lines */
-        max-height: 3.4em;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;         /* max 2 lines */
+        -webkit-box-orient: vertical;
       }
     }
   </style>
@@ -184,7 +182,7 @@
   <div class="status" id="statusText">Loading…</div>
 
   <div class="page">
-    <!-- TOP 4 BOXES -->
+    <!-- TOP 4 -->
     <div class="grid">
       <div class="quad">
         <div class="value" id="TL_value" style="color:#FFD700">—</div>
@@ -241,9 +239,9 @@
       grid.innerHTML = '';
 
       const items = Array.isArray(data.items) ? data.items.slice(0, 10) : [];
-
       while (items.length < 10) items.push({ rate: "", type: "" });
 
+      // row1: left0 right5, row2: left1 right6, ...
       const ordered = [];
       for (let i = 0; i < 5; i++) {
         ordered.push({ ...items[i], col: 'left' });
