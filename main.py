@@ -326,13 +326,13 @@ def api_values():
                 out["silver_buy"] = "INVALID"
             else:
                 kb = compute_kilo_silver(silver_val, buy_add)
-                out["silver_buy"] = f"{kb:,.2f}"
+                out["silver_buy"] = f"{kb:,.0f}"
 
             if sell_add is None:
                 out["silver_sell"] = "INVALID"
             else:
                 ks = compute_kilo_silver(silver_val, sell_add)
-                out["silver_sell"] = f"{ks:,.2f}"
+                out["silver_sell"] = f"{ks:,.0f}"
 
             return JSONResponse(out)
 
