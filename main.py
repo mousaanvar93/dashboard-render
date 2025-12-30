@@ -37,10 +37,10 @@ ITEMS = {
 }
 
 # --------------------------
-# NEW: SILVER BOXES CONFIG
+# SILVER BOXES CONFIG
 # --------------------------
-SILVER_BUY_ID = 5   # SharePoint item ID 5 setval
-SILVER_SELL_ID = 6  # SharePoint item ID 6 setval
+SILVER_BUY_ID = 5   # subtract this
+SILVER_SELL_ID = 6  # add this
 SILVER_MULT = 3.674
 SILVER_TO_KILO = 32.15
 
@@ -152,9 +152,13 @@ def compute_final_4squares(gold_val, sp_val, use_0916):
     return base - sp_val
 
 
-def compute_kilo_silver(silver_val, sp_add_val):
-    # ((LLSUSD + setval) * 3.674) * 32.15
-    return ((silver_val + sp_add_val) * SILVER_MULT) * SILVER_TO_KILO
+def compute_kilo_silver(silver_val: float, delta: float):
+    """
+    Final = ((silver_val + delta) * 3.674) * 32.15
+    For BUY: delta = -ID5
+    For SELL: delta = +ID6
+    """
+    return ((silver_val + delta) * SILVER_MULT) * SILVER_TO_KILO
 
 
 # --------------------------
@@ -256,8 +260,8 @@ def get_sharepoint_values(site_id: str):
         vals[key] = fetch_setval(site_id, cfg["id"])
 
     # IDs 5..6 (silver)
-    vals["SILVER_BUY_ADD"] = fetch_setval(site_id, SILVER_BUY_ID)
-    vals["SILVER_SELL_ADD"] = fetch_setval(site_id, SILVER_SELL_ID)
+    vals["SILVER_BUY_ID5"] = fetch_setval(site_id, SILVER_BUY_ID)
+    vals["SILVER_SELL_ID6"] = fetch_setval(site_id, SILVER_SELL_ID)
 
     _sharepoint_cache["vals"] = vals
     _sharepoint_cache["ts"] = now
@@ -300,7 +304,6 @@ def api_values():
             if gold_val is None:
                 return JSONResponse(blank_payload("SUCCESSFN ERROR (LLGUSD)"))
             if silver_val is None:
-                # still show 4 squares, but silver missing
                 payload = blank_payload("SUCCESSFN ERROR (LLSUSD)")
                 payload["status"] = "SUCCESSFN ERROR (LLSUSD)"
                 return JSONResponse(payload)
@@ -318,20 +321,22 @@ def api_values():
                 final = compute_final_4squares(gold_val, sp_val, cfg["use_0916"])
                 out[key] = {"tag": cfg["tag"], "value": f"{final:,.0f}"}
 
-            # Silver squares (ID 5 & 6)
-            buy_add = safe_float(raw_map.get("SILVER_BUY_ADD"))
-            sell_add = safe_float(raw_map.get("SILVER_SELL_ADD"))
+            # Silver squares
+            # BUY: subtract ID 5
+            # SELL: add ID 6
+            id5 = safe_float(raw_map.get("SILVER_BUY_ID5"))
+            id6 = safe_float(raw_map.get("SILVER_SELL_ID6"))
 
-            if buy_add is None:
+            if id5 is None:
                 out["silver_buy"] = "INVALID"
             else:
-                kb = compute_kilo_silver(silver_val, buy_add)
+                kb = compute_kilo_silver(silver_val, -id5)  # ✅ subtract
                 out["silver_buy"] = f"{kb:,.0f}"
 
-            if sell_add is None:
+            if id6 is None:
                 out["silver_sell"] = "INVALID"
             else:
-                ks = compute_kilo_silver(silver_val, sell_add)
+                ks = compute_kilo_silver(silver_val, +id6)  # ✅ add
                 out["silver_sell"] = f"{ks:,.0f}"
 
             return JSONResponse(out)
