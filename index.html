@@ -65,12 +65,33 @@
       overflow: hidden;
     }
 
+    /* NEW: wrapper so we can show unit text without breaking layout */
     .value {
       font-weight: 800;
       font-size: clamp(22px, 8vw, 110px);
       text-align: center;
       line-height: 1;
       padding: 10px;
+      display: inline-flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+      max-width: 98%;
+    }
+
+    /* NEW: the number span */
+    .num {
+      display: inline-block;
+    }
+
+    /* NEW: unit next to number */
+    .unit {
+      font-size: 0.28em;  /* small */
+      font-weight: 800;
+      opacity: 0.78;
+      white-space: nowrap;
+      letter-spacing: 0.4px;
     }
 
     .tag {
@@ -103,6 +124,7 @@
       overflow: hidden;
     }
 
+    /* NEW: wrapper for silver value + unit */
     .silverValue{
       color: white;
       font-weight: 900;
@@ -110,6 +132,21 @@
       text-align: center;
       line-height: 1;
       padding: 10px;
+      display: inline-flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+      max-width: 98%;
+    }
+
+    /* NEW: silver unit text */
+    .unit-silver {
+      font-size: 0.30em;
+      font-weight: 900;
+      opacity: 0.78;
+      white-space: nowrap;
+      letter-spacing: 0.4px;
     }
 
     .silverTag{
@@ -228,6 +265,16 @@
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
       }
+
+      /* Slightly smaller unit on mobile to avoid squeezing */
+      .unit { font-size: 0.24em; }
+      .unit-silver { font-size: 0.26em; }
+
+      /* If number is long, let unit drop to next line ONLY on mobile */
+      .value, .silverValue {
+        flex-wrap: wrap;
+        row-gap: 2px;
+      }
     }
   </style>
 </head>
@@ -241,19 +288,34 @@
       <!-- 4 squares -->
       <div class="grid">
         <div class="quad">
-          <div class="value" id="TL_value" style="color:#FFD700">—</div>
+          <div class="value" style="color:#FFD700">
+            <span class="num" id="TL_value">—</span>
+            <span class="unit">AED/GRAM</span>
+          </div>
           <div class="tag" id="TL_tag" style="color:#FFD700">22EXCH</div>
         </div>
+
         <div class="quad">
-          <div class="value" id="TR_value" style="color:#00FF66">—</div>
+          <div class="value" style="color:#00FF66">
+            <span class="num" id="TR_value">—</span>
+            <span class="unit">AED/GRAM</span>
+          </div>
           <div class="tag" id="TR_tag" style="color:#00FF66">22CASH</div>
         </div>
+
         <div class="quad">
-          <div class="value" id="BL_value" style="color:#FFD700">—</div>
+          <div class="value" style="color:#FFD700">
+            <span class="num" id="BL_value">—</span>
+            <span class="unit">AED/GRAM</span>
+          </div>
           <div class="tag" id="BL_tag" style="color:#FFD700">24EXCH</div>
         </div>
+
         <div class="quad">
-          <div class="value" id="BR_value" style="color:#00FF66">—</div>
+          <div class="value" style="color:#00FF66">
+            <span class="num" id="BR_value">—</span>
+            <span class="unit">AED/GRAM</span>
+          </div>
           <div class="tag" id="BR_tag" style="color:#00FF66">24CASH</div>
         </div>
       </div>
@@ -261,11 +323,18 @@
       <!-- NEW silver squares -->
       <div class="silverGrid">
         <div class="silverBox">
-          <div class="silverValue" id="SILVER_BUY_value">—</div>
+          <div class="silverValue">
+            <span class="num" id="SILVER_BUY_value">—</span>
+            <span class="unit-silver">AED/KG</span>
+          </div>
           <div class="silverTag">Kilo Silver Buy</div>
         </div>
+
         <div class="silverBox">
-          <div class="silverValue" id="SILVER_SELL_value">—</div>
+          <div class="silverValue">
+            <span class="num" id="SILVER_SELL_value">—</span>
+            <span class="unit-silver">AED/KG</span>
+          </div>
           <div class="silverTag">Kilo Silver Sell</div>
         </div>
       </div>
@@ -299,9 +368,6 @@
         setText(key + '_value', data[key]?.value ?? '—');
       }
 
-      // ✅ NEW: expects backend to provide these
-      // Example backend JSON fields:
-      // { "silver_buy": "123", "silver_sell": "456" }
       setText('SILVER_BUY_value', data.silver_buy ?? '—');
       setText('SILVER_SELL_value', data.silver_sell ?? '—');
 
