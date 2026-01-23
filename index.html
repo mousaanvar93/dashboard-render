@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -13,6 +14,18 @@
       color: white;
       font-family: Arial, sans-serif;
       overflow: hidden;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .hint {
+      position: absolute;
+      right: 14px;
+      top: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      opacity: 0.55;
+      z-index: 6;
     }
 
     .status {
@@ -25,6 +38,19 @@
       z-index: 5;
     }
 
+    /* Two full-screen "screens" */
+    .screen {
+      position: absolute;
+      inset: 0;
+    }
+    .hidden {
+      display: none !important;
+    }
+
+    /* ----------------------------
+       SCREEN 1 (your current UI)
+    ----------------------------- */
+
     /* We keep XRATES the same area by keeping a fixed 50/50 split */
     .page {
       height: 100%;
@@ -35,9 +61,7 @@
       box-sizing: border-box;
     }
 
-    /* =======================
-       TOP AREA (4 squares + 2 silver squares)
-    ======================== */
+    /* TOP AREA (4 squares + 2 silver squares) */
     .topWrap{
       height: 100%;
       display: grid;
@@ -46,7 +70,7 @@
       overflow: hidden;
     }
 
-    /* 4 squares (same look) */
+    /* 4 squares */
     .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -65,7 +89,6 @@
       overflow: hidden;
     }
 
-    /* NEW: wrapper so we can show unit text without breaking layout */
     .value {
       font-weight: 800;
       font-size: clamp(22px, 8vw, 110px);
@@ -80,14 +103,10 @@
       max-width: 98%;
     }
 
-    /* NEW: the number span */
-    .num {
-      display: inline-block;
-    }
+    .num { display: inline-block; }
 
-    /* NEW: unit next to number */
     .unit {
-      font-size: 0.28em;  /* small */
+      font-size: 0.28em;
       font-weight: 800;
       opacity: 0.78;
       white-space: nowrap;
@@ -103,15 +122,13 @@
       opacity: 0.95;
     }
 
-    /* =======================
-       NEW SILVER ROW (2 squares)
-    ======================== */
+    /* SILVER ROW (2 squares) */
     .silverGrid{
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
       height: 100%;
-      min-height: 120px; /* ensures it stays visible */
+      min-height: 120px;
     }
 
     .silverBox{
@@ -124,7 +141,6 @@
       overflow: hidden;
     }
 
-    /* NEW: wrapper for silver value + unit */
     .silverValue{
       color: white;
       font-weight: 900;
@@ -140,7 +156,6 @@
       max-width: 98%;
     }
 
-    /* NEW: silver unit text */
     .unit-silver {
       font-size: 0.30em;
       font-weight: 900;
@@ -161,9 +176,7 @@
       letter-spacing: 0.5px;
     }
 
-    /* =======================
-       XRATES PANEL (DO NOT CHANGE SIZE)
-    ======================== */
+    /* XRATES PANEL (fixed bottom 50%) */
     .xpanel {
       border: 10px solid white;
       background: black;
@@ -172,7 +185,7 @@
       display: grid;
       grid-template-rows: auto 1fr;
       gap: 8px;
-      overflow: hidden; /* no scrolling */
+      overflow: hidden;
     }
 
     .xstatus {
@@ -223,10 +236,119 @@
       width: 100%;
     }
 
-    /* =======================
-       MOBILE TUNING
-       (XRATES still takes bottom 50%)
-    ======================== */
+    /* ----------------------------
+       SCREEN 2 (PAMP / LOCAL / VALCAM)
+    ----------------------------- */
+    .screen2Wrap {
+      height: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 10px;
+    }
+
+    .s2TopBar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 4px 4px 0 4px;
+    }
+
+    .s2Title {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      opacity: 0.95;
+    }
+
+    .s2Status {
+      font-size: 16px;
+      font-weight: 800;
+      opacity: 0.80;
+      text-align: right;
+      min-height: 18px;
+    }
+
+    .sections {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .sectionCard {
+      border: 10px solid white;
+      background: black;
+      border-radius: 0;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      overflow: hidden;
+    }
+
+    .sectionHeader {
+      padding: 14px 14px 6px 14px;
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    .sectionCols {
+      display: grid;
+      grid-template-columns: 1.2fr 0.7fr 0.9fr;
+      gap: 10px;
+      padding: 0 14px 10px 14px;
+      font-size: 14px;
+      font-weight: 900;
+      opacity: 0.75;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .sectionBody {
+      padding: 0 14px 14px 14px;
+      overflow: hidden;
+      display: grid;
+      grid-auto-rows: 1fr;
+      gap: 10px;
+    }
+
+    .row3 {
+      background: rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 12px 12px;
+      display: grid;
+      grid-template-columns: 1.2fr 0.7fr 0.9fr;
+      gap: 10px;
+      align-items: center;
+      overflow: hidden;
+      font-size: clamp(12px, 1.55vw, 18px);
+      line-height: 1.15;
+    }
+
+    .cellType {
+      font-weight: 900;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .cellDisc, .cellCert {
+      font-weight: 900;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    /* Mobile tuning */
+    @media (max-width: 900px) {
+      .sections { grid-template-columns: 1fr; }
+      .sectionCard { border-width: 8px; }
+      .sectionHeader { font-size: 22px; }
+    }
+
     @media (max-width: 600px) {
       .page {
         grid-template-rows: 50% 50%;
@@ -266,11 +388,9 @@
         -webkit-box-orient: vertical;
       }
 
-      /* Slightly smaller unit on mobile to avoid squeezing */
       .unit { font-size: 0.24em; }
       .unit-silver { font-size: 0.26em; }
 
-      /* If number is long, let unit drop to next line ONLY on mobile */
       .value, .silverValue {
         flex-wrap: wrap;
         row-gap: 2px;
@@ -281,69 +401,112 @@
 
 <body>
   <div class="status" id="statusText">Loading…</div>
+  <div class="hint" id="hintText">Tap to switch view</div>
 
-  <div class="page">
-    <!-- TOP HALF: 4 squares + 2 silver squares -->
-    <div class="topWrap">
-      <!-- 4 squares -->
-      <div class="grid">
-        <div class="quad">
-          <div class="value" style="color:#FFD700">
-            <span class="num" id="TL_value">—</span>
-            <span class="unit">AED/GRAM</span>
+  <!-- SCREEN 1 -->
+  <div class="screen" id="screen1">
+    <div class="page">
+      <!-- TOP HALF: 4 squares + 2 silver squares -->
+      <div class="topWrap">
+        <!-- 4 squares -->
+        <div class="grid">
+          <div class="quad">
+            <div class="value" style="color:#FFD700">
+              <span class="num" id="TL_value">—</span>
+              <span class="unit">AED/GRAM</span>
+            </div>
+            <div class="tag" id="TL_tag" style="color:#FFD700">22EXCH</div>
           </div>
-          <div class="tag" id="TL_tag" style="color:#FFD700">22EXCH</div>
+
+          <div class="quad">
+            <div class="value" style="color:#00FF66">
+              <span class="num" id="TR_value">—</span>
+              <span class="unit">AED/GRAM</span>
+            </div>
+            <div class="tag" id="TR_tag" style="color:#00FF66">22CASH</div>
+          </div>
+
+          <div class="quad">
+            <div class="value" style="color:#FFD700">
+              <span class="num" id="BL_value">—</span>
+              <span class="unit">AED/GRAM</span>
+            </div>
+            <div class="tag" id="BL_tag" style="color:#FFD700">24EXCH</div>
+          </div>
+
+          <div class="quad">
+            <div class="value" style="color:#00FF66">
+              <span class="num" id="BR_value">—</span>
+              <span class="unit">AED/GRAM</span>
+            </div>
+            <div class="tag" id="BR_tag" style="color:#00FF66">24CASH</div>
+          </div>
         </div>
 
-        <div class="quad">
-          <div class="value" style="color:#00FF66">
-            <span class="num" id="TR_value">—</span>
-            <span class="unit">AED/GRAM</span>
+        <!-- silver squares -->
+        <div class="silverGrid">
+          <div class="silverBox">
+            <div class="silverValue">
+              <span class="num" id="SILVER_BUY_value">—</span>
+              <span class="unit-silver">AED/KG</span>
+            </div>
+            <div class="silverTag">Kilo Silver Buy</div>
           </div>
-          <div class="tag" id="TR_tag" style="color:#00FF66">22CASH</div>
-        </div>
 
-        <div class="quad">
-          <div class="value" style="color:#FFD700">
-            <span class="num" id="BL_value">—</span>
-            <span class="unit">AED/GRAM</span>
+          <div class="silverBox">
+            <div class="silverValue">
+              <span class="num" id="SILVER_SELL_value">—</span>
+              <span class="unit-silver">AED/KG</span>
+            </div>
+            <div class="silverTag">Kilo Silver Sell</div>
           </div>
-          <div class="tag" id="BL_tag" style="color:#FFD700">24EXCH</div>
-        </div>
-
-        <div class="quad">
-          <div class="value" style="color:#00FF66">
-            <span class="num" id="BR_value">—</span>
-            <span class="unit">AED/GRAM</span>
-          </div>
-          <div class="tag" id="BR_tag" style="color:#00FF66">24CASH</div>
         </div>
       </div>
 
-      <!-- NEW silver squares -->
-      <div class="silverGrid">
-        <div class="silverBox">
-          <div class="silverValue">
-            <span class="num" id="SILVER_BUY_value">—</span>
-            <span class="unit-silver">AED/KG</span>
-          </div>
-          <div class="silverTag">Kilo Silver Buy</div>
-        </div>
-
-        <div class="silverBox">
-          <div class="silverValue">
-            <span class="num" id="SILVER_SELL_value">—</span>
-            <span class="unit-silver">AED/KG</span>
-          </div>
-          <div class="silverTag">Kilo Silver Sell</div>
-        </div>
+      <!-- BOTTOM HALF: XRATES -->
+      <div class="xpanel">
+        <div class="xstatus" id="xratesStatus"></div>
+        <div class="xgrid" id="xratesGrid"></div>
       </div>
     </div>
+  </div>
 
-    <!-- BOTTOM HALF: XRATES -->
-    <div class="xpanel">
-      <div class="xstatus" id="xratesStatus"></div>
-      <div class="xgrid" id="xratesGrid"></div>
+  <!-- SCREEN 2 -->
+  <div class="screen hidden" id="screen2">
+    <div class="screen2Wrap">
+      <div class="s2TopBar">
+        <div class="s2Title">Discounts</div>
+        <div class="s2Status" id="discountsStatus">Loading…</div>
+      </div>
+
+      <div class="sections">
+        <!-- PAMP -->
+        <div class="sectionCard">
+          <div class="sectionHeader">PAMP</div>
+          <div class="sectionCols">
+            <div>Type</div><div style="text-align:right">Disc</div><div style="text-align:right">Cert Charge</div>
+          </div>
+          <div class="sectionBody" id="pampBody"></div>
+        </div>
+
+        <!-- LOCAL -->
+        <div class="sectionCard">
+          <div class="sectionHeader">LOCAL</div>
+          <div class="sectionCols">
+            <div>Type</div><div style="text-align:right">Disc</div><div style="text-align:right">Cert Charge</div>
+          </div>
+          <div class="sectionBody" id="localBody"></div>
+        </div>
+
+        <!-- VALCAM -->
+        <div class="sectionCard">
+          <div class="sectionHeader">VALCAM</div>
+          <div class="sectionCols">
+            <div>Type</div><div style="text-align:right">Disc</div><div style="text-align:right">Cert Charge</div>
+          </div>
+          <div class="sectionBody" id="valcamBody"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -358,6 +521,36 @@
     if (el) el.textContent = text;
   }
 
+  function showScreen(n) {
+    const s1 = document.getElementById('screen1');
+    const s2 = document.getElementById('screen2');
+    if (n === 1) {
+      s1.classList.remove('hidden');
+      s2.classList.add('hidden');
+      setText('hintText', 'Tap to switch view');
+    } else {
+      s2.classList.remove('hidden');
+      s1.classList.add('hidden');
+      setText('hintText', 'Tap to switch view');
+    }
+  }
+
+  let currentScreen = 1;
+
+  // Toggle on ANY tap/click
+  document.addEventListener('click', () => {
+    currentScreen = (currentScreen === 1) ? 2 : 1;
+    showScreen(currentScreen);
+
+    // Force-refresh relevant view immediately on switch
+    if (currentScreen === 1) {
+      updateSquaresAndSilver();
+      updateXrates();
+    } else {
+      updateDiscounts();
+    }
+  }, { passive: true });
+
   async function updateSquaresAndSilver() {
     try {
       const data = await fetchJSON('/api/values');
@@ -370,7 +563,6 @@
 
       setText('SILVER_BUY_value', data.silver_buy ?? '—');
       setText('SILVER_SELL_value', data.silver_sell ?? '—');
-
     } catch {
       setText('statusText', 'NETWORK ERROR');
       setText('SILVER_BUY_value', '—');
@@ -416,11 +608,70 @@
     }
   }
 
+  function renderSection(bodyId, rows) {
+    const body = document.getElementById(bodyId);
+    if (!body) return;
+    body.innerHTML = '';
+
+    const safeRows = Array.isArray(rows) ? rows : [];
+
+    // Fill to a stable count so the card looks consistent
+    // PAMP max 11 rows, LOCAL max 7 rows, VALCAM max 8 rows.
+    // We just render exactly what's returned; if less, pad a bit.
+    const target = Math.max(safeRows.length, 8);
+
+    for (let i = 0; i < target; i++) {
+      const r = safeRows[i] || { type: "", disc: "", cert_charge: "" };
+
+      const row = document.createElement('div');
+      row.className = 'row3';
+
+      const c1 = document.createElement('div');
+      c1.className = 'cellType';
+      c1.textContent = r.type ?? '';
+
+      const c2 = document.createElement('div');
+      c2.className = 'cellDisc';
+      c2.textContent = r.disc ?? '';
+
+      const c3 = document.createElement('div');
+      c3.className = 'cellCert';
+      c3.textContent = r.cert_charge ?? '';
+
+      row.appendChild(c1);
+      row.appendChild(c2);
+      row.appendChild(c3);
+      body.appendChild(row);
+    }
+  }
+
+  async function updateDiscounts() {
+    try {
+      const data = await fetchJSON('/api/discounts');
+      setText('discountsStatus', data.status || 'OK');
+
+      const sections = data.sections || {};
+      renderSection('pampBody', sections.PAMP);
+      renderSection('localBody', sections.LOCAL);
+      renderSection('valcamBody', sections.VALCAM);
+    } catch {
+      setText('discountsStatus', 'NETWORK ERROR');
+      renderSection('pampBody', []);
+      renderSection('localBody', []);
+      renderSection('valcamBody', []);
+    }
+  }
+
+  // Initial load
+  showScreen(1);
   updateSquaresAndSilver();
   updateXrates();
+  updateDiscounts(); // warm cache even before switching
 
-  setInterval(updateSquaresAndSilver, 5000);
-  setInterval(updateXrates, 15000);
+  // Keep updating (lightweight because backend is cached)
+  setInterval(() => { if (currentScreen === 1) updateSquaresAndSilver(); }, 5000);
+  setInterval(() => { if (currentScreen === 1) updateXrates(); }, 15000);
+  setInterval(() => { if (currentScreen === 2) updateDiscounts(); }, 10000);
 </script>
 </body>
 </html>
