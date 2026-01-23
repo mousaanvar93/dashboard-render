@@ -1,4 +1,4 @@
-<!-- index.html -->
+<!-- index.html (FULL FILE) -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -247,12 +247,14 @@
       padding: 2px 4px 0 4px;
     }
 
+    /* ✅ Larger + gold yellow titles */
     .bigTitle {
-      font-size: 30px;
+      font-size: clamp(34px, 6vw, 64px);
       font-weight: 900;
-      letter-spacing: 0.8px;
+      letter-spacing: 1px;
       text-transform: uppercase;
-      opacity: 0.95;
+      opacity: 0.98;
+      color: #FFD700;
     }
 
     .tableStatus {
@@ -311,10 +313,19 @@
       white-space: nowrap;
     }
 
-    .cellDisc, .cellCert {
+    /* ✅ Colors for Disc / Cert */
+    .cellDisc {
       font-weight: 900;
       text-align: right;
       white-space: nowrap;
+      color: #FF3B30; /* red */
+    }
+
+    .cellCert {
+      font-weight: 900;
+      text-align: right;
+      white-space: nowrap;
+      color: #00FF66; /* green */
     }
 
     /* Mobile tuning */
@@ -365,7 +376,6 @@
       }
 
       .tableCard { border-width: 8px; }
-      .bigTitle { font-size: 24px; }
       .row3 { font-size: 14px; }
     }
   </style>
@@ -502,8 +512,49 @@
   }
 
   // --------------------------
-  // SCREEN ROTATION
-  // 1 -> 2 -> 3 -> 4 -> 1 ...
+  // Formatting helpers (Screens 2/3/4)
+  // --------------------------
+  function toNumber(x) {
+    if (x === null || x === undefined) return null;
+    const s = String(x).trim().replace(/,/g, '');
+    if (!s) return null;
+    const n = Number(s);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function fmtNoDecimals(x) {
+    const n = toNumber(x);
+    if (n === null) return null;
+    // No decimals:
+    return String(Math.round(n));
+  }
+
+  // Disc rules:
+  // - no decimals
+  // - if 0 => '-'
+  // - if not 0 => show with leading '-' (minus)
+  function fmtDisc(x) {
+    const n = toNumber(x);
+    if (n === null) return '';
+    const v = Math.round(n);
+    if (v === 0) return '-';
+    return '-' + String(Math.abs(v));
+  }
+
+  // Cert rules:
+  // - no decimals
+  // - if 0 => '-'
+  // - if not 0 => show with leading '+'
+  function fmtCert(x) {
+    const n = toNumber(x);
+    if (n === null) return '';
+    const v = Math.round(n);
+    if (v === 0) return '-';
+    return '+' + String(Math.abs(v));
+  }
+
+  // --------------------------
+  // SCREEN ROTATION (1->2->3->4->1)
   // --------------------------
   let currentScreen = 1;
 
@@ -521,7 +572,6 @@
     currentScreen = (currentScreen % 4) + 1;
     showScreen(currentScreen);
 
-    // Immediate refresh on switch
     if (currentScreen === 1) {
       updateSquaresAndSilver();
       updateXrates();
@@ -613,15 +663,15 @@
 
       const c1 = document.createElement('div');
       c1.className = 'cellType';
-      c1.textContent = r.type ?? '';
+      c1.textContent = (r.type ?? '');
 
       const c2 = document.createElement('div');
       c2.className = 'cellDisc';
-      c2.textContent = r.disc ?? '';
+      c2.textContent = fmtDisc(r.disc);
 
       const c3 = document.createElement('div');
       c3.className = 'cellCert';
-      c3.textContent = r.cert_charge ?? '';
+      c3.textContent = fmtCert(r.cert_charge);
 
       row.appendChild(c1);
       row.appendChild(c2);
@@ -643,7 +693,6 @@
       sec === 'LOCAL' ? 'localRows' :
       'valcambiRows';
 
-    // padding to keep visuals consistent
     const padTo =
       sec === 'PAMP' ? 11 :
       sec === 'LOCAL' ? 7 :
@@ -664,14 +713,14 @@
   // --------------------------
   showScreen(1);
 
-  // warm everything once
+  // warm once
   updateSquaresAndSilver();
   updateXrates();
   updateSection('PAMP');
   updateSection('LOCAL');
   updateSection('VALCAMBI');
 
-  // update only what is currently visible
+  // update only the visible screen
   setInterval(() => { if (currentScreen === 1) updateSquaresAndSilver(); }, 5000);
   setInterval(() => { if (currentScreen === 1) updateXrates(); }, 15000);
 
