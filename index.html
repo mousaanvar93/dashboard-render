@@ -1,4 +1,3 @@
-<!-- index.html (FULL FILE) -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -25,7 +24,7 @@
       font-weight: 700;
       font-size: 14px;
       opacity: 0.55;
-      z-index: 10;
+      z-index: 20;
     }
 
     .status {
@@ -35,18 +34,98 @@
       font-weight: 700;
       font-size: 18px;
       opacity: 0.9;
-      z-index: 10;
+      z-index: 20;
     }
 
-    /* Screens */
     .screen {
       position: absolute;
       inset: 0;
     }
+
     .hidden { display: none !important; }
 
+    /* --------------------------------
+       NEW SCREEN 1: ANVAR LUXURY SELL PRICE
+    --------------------------------- */
+    .luxuryScreenWrap {
+      height: 100%;
+      padding: 56px 10px 10px 10px;
+      box-sizing: border-box;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 10px;
+    }
+
+    .luxuryHeader {
+      text-align: center;
+      font-size: clamp(26px, 5vw, 58px);
+      font-weight: 900;
+      color: #FFD700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      line-height: 1.05;
+      padding: 4px 10px 0 10px;
+    }
+
+    .luxuryGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      min-height: 0;
+    }
+
+    .luxuryCol {
+      display: grid;
+      grid-template-rows: 1fr 1fr 1fr;
+      gap: 10px;
+      min-height: 0;
+    }
+
+    .luxuryBox {
+      border: 10px solid white;
+      background: black;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .luxuryValue {
+      font-weight: 900;
+      font-size: clamp(26px, 7vw, 90px);
+      text-align: center;
+      line-height: 1;
+      padding: 16px;
+      max-width: 96%;
+      word-break: break-word;
+    }
+
+    .luxuryTag {
+      position: absolute;
+      right: 16px;
+      bottom: 12px;
+      font-weight: 900;
+      font-size: clamp(12px, 2.2vw, 26px);
+      opacity: 0.95;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-align: right;
+      max-width: 85%;
+      line-height: 1.08;
+    }
+
+    .goldFinal {
+      color: #FFD700;
+    }
+
+    .whiteText {
+      color: white;
+    }
+
     /* ----------------------------
-       SCREEN 1 (original)
+       OLD SCREEN 1 (now SCREEN 2)
     ----------------------------- */
     .page {
       height: 100%;
@@ -228,7 +307,7 @@
     }
 
     /* ----------------------------
-       SCREENS 2/3/4 (single section table)
+       SCREENS 3/4/5 tables
     ----------------------------- */
     .screenTableWrap {
       height: 100%;
@@ -247,7 +326,6 @@
       padding: 2px 4px 0 4px;
     }
 
-    /* ✅ Larger + gold yellow titles */
     .bigTitle {
       font-size: clamp(34px, 6vw, 64px);
       font-weight: 900;
@@ -313,23 +391,54 @@
       white-space: nowrap;
     }
 
-    /* ✅ Colors for Disc / Cert */
     .cellDisc {
       font-weight: 900;
       text-align: right;
       white-space: nowrap;
-      color: #FF3B30; /* red */
+      color: #FF3B30;
     }
 
     .cellCert {
       font-weight: 900;
       text-align: right;
       white-space: nowrap;
-      color: #00FF66; /* green */
+      color: #00FF66;
     }
 
-    /* Mobile tuning */
     @media (max-width: 600px) {
+      .luxuryScreenWrap {
+        padding: 52px 8px 8px 8px;
+        gap: 8px;
+      }
+
+      .luxuryGrid {
+        gap: 8px;
+      }
+
+      .luxuryCol {
+        gap: 8px;
+      }
+
+      .luxuryBox {
+        border-width: 8px;
+      }
+
+      .luxuryHeader {
+        font-size: clamp(22px, 6vw, 38px);
+      }
+
+      .luxuryValue {
+        font-size: clamp(22px, 8vw, 54px);
+        padding: 12px;
+      }
+
+      .luxuryTag {
+        font-size: 12px;
+        right: 10px;
+        bottom: 10px;
+        max-width: 82%;
+      }
+
       .page {
         grid-template-rows: 50% 50%;
         gap: 8px;
@@ -361,7 +470,6 @@
         text-overflow: clip;
         border-radius: 14px;
         padding: 8px 10px;
-
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
@@ -385,8 +493,51 @@
   <div class="status" id="statusText">Loading…</div>
   <div class="hint" id="hintText">Tap to switch view</div>
 
-  <!-- SCREEN 1 -->
+  <!-- SCREEN 1 (NEW) -->
   <div class="screen" id="screen1">
+    <div class="luxuryScreenWrap">
+      <div class="luxuryHeader">ANVAR LUXURY SELL PRICE</div>
+
+      <div class="luxuryGrid">
+        <div class="luxuryCol">
+          <div class="luxuryBox">
+            <div class="luxuryValue whiteText" id="SELL22_value">—</div>
+            <div class="luxuryTag whiteText">SELL PRICE 22K</div>
+          </div>
+
+          <div class="luxuryBox">
+            <div class="luxuryValue whiteText" id="DISC22_value">—</div>
+            <div class="luxuryTag whiteText">DISCOUNT</div>
+          </div>
+
+          <div class="luxuryBox">
+            <div class="luxuryValue goldFinal" id="FINAL22_value">—</div>
+            <div class="luxuryTag goldFinal">FINAL SELL PRICE 22K</div>
+          </div>
+        </div>
+
+        <div class="luxuryCol">
+          <div class="luxuryBox">
+            <div class="luxuryValue whiteText" id="SELL24_value">—</div>
+            <div class="luxuryTag whiteText">SELL PRICE 24K</div>
+          </div>
+
+          <div class="luxuryBox">
+            <div class="luxuryValue whiteText" id="DISC24_value">—</div>
+            <div class="luxuryTag whiteText">DISCOUNT</div>
+          </div>
+
+          <div class="luxuryBox">
+            <div class="luxuryValue goldFinal" id="FINAL24_value">—</div>
+            <div class="luxuryTag goldFinal">FINAL SELL PRICE 24K</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2 (old original screen 1) -->
+  <div class="screen hidden" id="screen2">
     <div class="page">
       <div class="topWrap">
         <div class="grid">
@@ -449,8 +600,8 @@
     </div>
   </div>
 
-  <!-- SCREEN 2 (PAMP) -->
-  <div class="screen hidden" id="screen2">
+  <!-- SCREEN 3 (PAMP) -->
+  <div class="screen hidden" id="screen3">
     <div class="screenTableWrap">
       <div class="tableHeaderBar">
         <div class="bigTitle">PAMP</div>
@@ -466,8 +617,8 @@
     </div>
   </div>
 
-  <!-- SCREEN 3 (LOCAL) -->
-  <div class="screen hidden" id="screen3">
+  <!-- SCREEN 4 (LOCAL) -->
+  <div class="screen hidden" id="screen4">
     <div class="screenTableWrap">
       <div class="tableHeaderBar">
         <div class="bigTitle">LOCAL</div>
@@ -483,8 +634,8 @@
     </div>
   </div>
 
-  <!-- SCREEN 4 (VALCAMBI) -->
-  <div class="screen hidden" id="screen4">
+  <!-- SCREEN 5 (VALCAMBI) -->
+  <div class="screen hidden" id="screen5">
     <div class="screenTableWrap">
       <div class="tableHeaderBar">
         <div class="bigTitle">VALCAMBI</div>
@@ -511,9 +662,6 @@
     if (el) el.textContent = text;
   }
 
-  // --------------------------
-  // Formatting helpers (Screens 2/3/4)
-  // --------------------------
   function toNumber(x) {
     if (x === null || x === undefined) return null;
     const s = String(x).trim().replace(/,/g, '');
@@ -525,14 +673,9 @@
   function fmtNoDecimals(x) {
     const n = toNumber(x);
     if (n === null) return null;
-    // No decimals:
     return String(Math.round(n));
   }
 
-  // Disc rules:
-  // - no decimals
-  // - if 0 => '-'
-  // - if not 0 => show with leading '-' (minus)
   function fmtDisc(x) {
     const n = toNumber(x);
     if (n === null) return '';
@@ -541,10 +684,6 @@
     return '-' + String(Math.abs(v));
   }
 
-  // Cert rules:
-  // - no decimals
-  // - if 0 => '-'
-  // - if not 0 => show with leading '+'
   function fmtCert(x) {
     const n = toNumber(x);
     if (n === null) return '';
@@ -554,12 +693,13 @@
   }
 
   // --------------------------
-  // SCREEN ROTATION (1->2->3->4->1)
+  // SCREEN ROTATION (1->2->3->4->5->1)
   // --------------------------
   let currentScreen = 1;
+  const TOTAL_SCREENS = 5;
 
   function showScreen(n) {
-    for (let i = 1; i <= 4; i++) {
+    for (let i = 1; i <= TOTAL_SCREENS; i++) {
       const el = document.getElementById('screen' + i);
       if (!el) continue;
       if (i === n) el.classList.remove('hidden');
@@ -569,23 +709,53 @@
   }
 
   document.addEventListener('click', () => {
-    currentScreen = (currentScreen % 4) + 1;
+    currentScreen = (currentScreen % TOTAL_SCREENS) + 1;
     showScreen(currentScreen);
 
     if (currentScreen === 1) {
+      updateLuxurySell();
+    } else if (currentScreen === 2) {
       updateSquaresAndSilver();
       updateXrates();
-    } else if (currentScreen === 2) {
-      updateSection('PAMP');
     } else if (currentScreen === 3) {
-      updateSection('LOCAL');
+      updateSection('PAMP');
     } else if (currentScreen === 4) {
+      updateSection('LOCAL');
+    } else if (currentScreen === 5) {
       updateSection('VALCAMBI');
     }
   }, { passive: true });
 
   // --------------------------
-  // SCREEN 1 logic
+  // SCREEN 1 logic (NEW)
+  // --------------------------
+  async function updateLuxurySell() {
+    try {
+      const data = await fetchJSON('/api/values');
+      setText('statusText', data.status || 'OK');
+
+      setText('SELL22_value', data.sell_price_22 ?? '—');
+      setText('DISC22_value', data.discount_22 ?? '—');
+      setText('FINAL22_value', data.final_sell_price_22 ?? '—');
+
+      setText('SELL24_value', data.sell_price_24 ?? '—');
+      setText('DISC24_value', data.discount_24 ?? '—');
+      setText('FINAL24_value', data.final_sell_price_24 ?? '—');
+    } catch {
+      setText('statusText', 'NETWORK ERROR');
+
+      setText('SELL22_value', '—');
+      setText('DISC22_value', '—');
+      setText('FINAL22_value', '—');
+
+      setText('SELL24_value', '—');
+      setText('DISC24_value', '—');
+      setText('FINAL24_value', '—');
+    }
+  }
+
+  // --------------------------
+  // SCREEN 2 logic (old screen 1)
   // --------------------------
   async function updateSquaresAndSilver() {
     try {
@@ -645,7 +815,7 @@
   }
 
   // --------------------------
-  // Screens 2/3/4 logic
+  // SCREENS 3/4/5 logic
   // --------------------------
   function renderRows(containerId, rows, padTo) {
     const box = document.getElementById(containerId);
@@ -714,6 +884,7 @@
   showScreen(1);
 
   // warm once
+  updateLuxurySell();
   updateSquaresAndSilver();
   updateXrates();
   updateSection('PAMP');
@@ -721,13 +892,22 @@
   updateSection('VALCAMBI');
 
   // update only the visible screen
-  setInterval(() => { if (currentScreen === 1) updateSquaresAndSilver(); }, 5000);
-  setInterval(() => { if (currentScreen === 1) updateXrates(); }, 15000);
+  setInterval(() => {
+    if (currentScreen === 1) updateLuxurySell();
+  }, 5000);
 
   setInterval(() => {
-    if (currentScreen === 2) updateSection('PAMP');
-    else if (currentScreen === 3) updateSection('LOCAL');
-    else if (currentScreen === 4) updateSection('VALCAMBI');
+    if (currentScreen === 2) updateSquaresAndSilver();
+  }, 5000);
+
+  setInterval(() => {
+    if (currentScreen === 2) updateXrates();
+  }, 15000);
+
+  setInterval(() => {
+    if (currentScreen === 3) updateSection('PAMP');
+    else if (currentScreen === 4) updateSection('LOCAL');
+    else if (currentScreen === 5) updateSection('VALCAMBI');
   }, 10000);
 </script>
 </body>

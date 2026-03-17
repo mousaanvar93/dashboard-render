@@ -1,4 +1,3 @@
-# main.py
 import os
 import time
 import threading
@@ -15,10 +14,10 @@ SUCCESSFN_API_URL = "https://www.successfn.com/wp-content/themes/neve/page-templ
 SUCCESSFN_GOLD_SYMBOL = "LLGUSD"   # Gold for 4 squares
 SUCCESSFN_SILVER_SYMBOL = "LLSUSD" # Silver for kilo silver boxes
 
-SUCCESSFN_POLL_SECONDS = 15          # SuccessFN every 15s
-SHAREPOINT_POLL_SECONDS = 300        # SharePoint every 5 minutes
-XRATES_POLL_SECONDS = 300            # XRATES every 5 minutes
-DISCOUNTS_POLL_SECONDS = 300         # Discounts every 5 minutes
+SUCCESSFN_POLL_SECONDS = 15
+SHAREPOINT_POLL_SECONDS = 300
+XRATES_POLL_SECONDS = 300
+DISCOUNTS_POLL_SECONDS = 300
 
 # --------------------------
 # YOUR MATH (4 squares)
@@ -37,10 +36,18 @@ ITEMS = {
 # --------------------------
 # SILVER BOXES CONFIG
 # --------------------------
-SILVER_BUY_ID = 5   # subtract this
-SILVER_SELL_ID = 6  # add this
+SILVER_BUY_ID = 5
+SILVER_SELL_ID = 6
 SILVER_MULT = 3.674
 SILVER_TO_KILO = 32.15
+
+# --------------------------
+# NEW LUXURY SELL SCREEN CONFIG
+# --------------------------
+DISCOUNT_22_ID = 37
+DISCOUNT_24_ID = 38
+SELL_PRICE_22_ID = 39
+SELL_PRICE_24_ID = 40
 
 # --------------------------
 # DISCOUNTS SCREENS CONFIG
@@ -61,9 +68,9 @@ CLIENT_SECRET = os.environ["CLIENT_SECRET"]
 SP_HOST = os.environ.get("SP_HOST", "anvarluxuryjewellery.sharepoint.com")
 SP_SITE_PATH = os.environ.get("SP_SITE_PATH", "/sites/PRODUCTENTRY")
 
-# list for values (IDs 1..6 and 11..36)
+# list for values (IDs 1..6, 11..36, 37..40)
 SP_LIST_NAME = os.environ.get("SP_LIST_NAME", "staffinstructions")
-SP_COLUMN_NAME = os.environ.get("SP_COLUMN_NAME", "setval")  # Disc
+SP_COLUMN_NAME = os.environ.get("SP_COLUMN_NAME", "setval")  # Disc / generic value
 SP_CERTCHARGE_COLUMN = os.environ.get("SP_CERTCHARGE_COLUMN", "certcharge")  # Cert Charge
 
 # list for xrates (top 10)
@@ -129,6 +136,12 @@ def safe_str(x) -> str:
     if x is None:
         return ""
     return str(x).strip()
+
+
+def fmt0(x):
+    if x is None:
+        return "INVALID"
+    return f"{x:,.0f}"
 
 
 def parse_successfn_symbol(text: str, symbol: str):
@@ -254,7 +267,6 @@ _success_cache = {"gold": None, "silver": None, "ts": 0.0}
 _sharepoint_cache = {"vals": None, "ts": 0.0}
 _xrates_cache = {"items": None, "ts": 0.0}
 
-# Discounts cache: per-section
 _discounts_cache = {
     "PAMP": {"rows": None, "ts": 0.0},
     "LOCAL": {"rows": None, "ts": 0.0},
@@ -280,11 +292,17 @@ def get_sharepoint_values(site_id: str):
         return _sharepoint_cache["vals"]
 
     vals = {}
+
     for key, cfg in ITEMS.items():
         vals[key] = fetch_setval(site_id, cfg["id"])
 
     vals["SILVER_BUY_ID5"] = fetch_setval(site_id, SILVER_BUY_ID)
     vals["SILVER_SELL_ID6"] = fetch_setval(site_id, SILVER_SELL_ID)
+
+    vals["DISCOUNT_22_ID37"] = fetch_setval(site_id, DISCOUNT_22_ID)
+    vals["DISCOUNT_24_ID38"] = fetch_setval(site_id, DISCOUNT_24_ID)
+    vals["SELL_PRICE_22_ID39"] = fetch_setval(site_id, SELL_PRICE_22_ID)
+    vals["SELL_PRICE_24_ID40"] = fetch_setval(site_id, SELL_PRICE_24_ID)
 
     _sharepoint_cache["vals"] = vals
     _sharepoint_cache["ts"] = now
@@ -318,10 +336,20 @@ def get_discounts_section(site_id: str, section_name: str):
 def blank_payload(status: str):
     return {
         "status": status,
+
+        "sell_price_22": "—",
+        "discount_22": "—",
+        "final_sell_price_22": "—",
+
+        "sell_price_24": "—",
+        "discount_24": "—",
+        "final_sell_price_24": "—",
+
         "TL": {"tag": ITEMS["TL"]["tag"], "value": "—"},
         "TR": {"tag": ITEMS["TR"]["tag"], "value": "—"},
         "BL": {"tag": ITEMS["BL"]["tag"], "value": "—"},
         "BR": {"tag": ITEMS["BR"]["tag"], "value": "—"},
+
         "silver_buy": "—",
         "silver_sell": "—",
     }
@@ -341,12 +369,34 @@ def api_values():
                 return JSONResponse(blank_payload("SUCCESSFN ERROR (LLGUSD)"))
             if silver_val is None:
                 payload = blank_payload("SUCCESSFN ERROR (LLSUSD)")
-                payload["status"] = "SUCCESSFN ERROR (LLSUSD)"
                 return JSONResponse(payload)
 
             raw_map = get_sharepoint_values(site_id)
             out = {"status": "OK"}
 
+            # --------------------------
+            # New luxury sell screen values
+            # --------------------------
+            sell22 = safe_float(raw_map.get("SELL_PRICE_22_ID39"))
+            disc22 = safe_float(raw_map.get("DISCOUNT_22_ID37"))
+            sell24 = safe_float(raw_map.get("SELL_PRICE_24_ID40"))
+            disc24 = safe_float(raw_map.get("DISCOUNT_24_ID38"))
+
+            out["sell_price_22"] = fmt0(sell22)
+            out["discount_22"] = fmt0(disc22)
+            out["sell_price_24"] = fmt0(sell24)
+            out["discount_24"] = fmt0(disc24)
+
+            out["final_sell_price_22"] = (
+                "INVALID" if sell22 is None or disc22 is None else fmt0(sell22 - disc22)
+            )
+            out["final_sell_price_24"] = (
+                "INVALID" if sell24 is None or disc24 is None else fmt0(sell24 - disc24)
+            )
+
+            # --------------------------
+            # Existing 4 squares
+            # --------------------------
             for key, cfg in ITEMS.items():
                 sp_val = safe_float(raw_map.get(key))
                 if sp_val is None:
@@ -355,6 +405,9 @@ def api_values():
                 final = compute_final_4squares(gold_val, sp_val, cfg["use_0916"])
                 out[key] = {"tag": cfg["tag"], "value": f"{final:,.0f}"}
 
+            # --------------------------
+            # Existing silver values
+            # --------------------------
             id5 = safe_float(raw_map.get("SILVER_BUY_ID5"))
             id6 = safe_float(raw_map.get("SILVER_SELL_ID6"))
 
@@ -362,6 +415,7 @@ def api_values():
             out["silver_sell"] = "INVALID" if id6 is None else f"{compute_kilo_silver(silver_val, +id6):,.0f}"
 
             return JSONResponse(out)
+
         except Exception:
             return JSONResponse(blank_payload("SHAREPOINT ERROR (LIST)"))
 
