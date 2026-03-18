@@ -11,8 +11,8 @@ from fastapi.responses import HTMLResponse, JSONResponse
 # SUCCESSFN
 # --------------------------
 SUCCESSFN_API_URL = "https://www.successfn.com/wp-content/themes/neve/page-templates/getprice.php?site=cfgs"
-SUCCESSFN_GOLD_SYMBOL = "LLGUSD"   # Gold for 4 squares
-SUCCESSFN_SILVER_SYMBOL = "LLSUSD" # Silver for kilo silver boxes
+SUCCESSFN_GOLD_SYMBOL = "LLGUSD"
+SUCCESSFN_SILVER_SYMBOL = "LLSUSD"
 
 SUCCESSFN_POLL_SECONDS = 15
 SHAREPOINT_POLL_SECONDS = 300
@@ -27,14 +27,14 @@ MULT_A = 3.674
 MULT_B = 0.916
 
 ITEMS = {
-    "TL": {"id": 1, "use_0916": True,  "tag": "22EXCH", "color": "#FFD700"},
-    "BL": {"id": 2, "use_0916": False, "tag": "24EXCH", "color": "#FFD700"},
-    "TR": {"id": 3, "use_0916": True,  "tag": "22CASH", "color": "#00FF66"},
-    "BR": {"id": 4, "use_0916": False, "tag": "24CASH", "color": "#00FF66"},
+    "TL": {"id": 1, "use_0916": True,  "tag": "22EXCH"},
+    "BL": {"id": 2, "use_0916": False, "tag": "24EXCH"},
+    "TR": {"id": 3, "use_0916": True,  "tag": "22CASH"},
+    "BR": {"id": 4, "use_0916": False, "tag": "24CASH"},
 }
 
 # --------------------------
-# SILVER BOXES CONFIG
+# SILVER
 # --------------------------
 SILVER_BUY_ID = 5
 SILVER_SELL_ID = 6
@@ -42,7 +42,7 @@ SILVER_MULT = 3.674
 SILVER_TO_KILO = 32.15
 
 # --------------------------
-# NEW LUXURY SELL SCREEN CONFIG
+# NEW SCREEN IDs
 # --------------------------
 DISCOUNT_22_ID = 37
 DISCOUNT_24_ID = 38
@@ -50,7 +50,7 @@ SELL_PRICE_22_ID = 39
 SELL_PRICE_24_ID = 40
 
 # --------------------------
-# DISCOUNTS SCREENS CONFIG
+# DISCOUNTS SCREENS
 # --------------------------
 DISCOUNTS_SECTIONS = {
     "PAMP": (11, 21),
@@ -59,7 +59,7 @@ DISCOUNTS_SECTIONS = {
 }
 
 # --------------------------
-# GRAPH / SHAREPOINT CONFIG (Render env vars)
+# GRAPH CONFIG
 # --------------------------
 TENANT_ID = os.environ["TENANT_ID"]
 CLIENT_ID = os.environ["CLIENT_ID"]
@@ -68,12 +68,10 @@ CLIENT_SECRET = os.environ["CLIENT_SECRET"]
 SP_HOST = os.environ.get("SP_HOST", "anvarluxuryjewellery.sharepoint.com")
 SP_SITE_PATH = os.environ.get("SP_SITE_PATH", "/sites/PRODUCTENTRY")
 
-# list for values (IDs 1..6, 11..36, 37..40)
 SP_LIST_NAME = os.environ.get("SP_LIST_NAME", "staffinstructions")
-SP_COLUMN_NAME = os.environ.get("SP_COLUMN_NAME", "setval")  # Disc / generic value
-SP_CERTCHARGE_COLUMN = os.environ.get("SP_CERTCHARGE_COLUMN", "certcharge")  # Cert Charge
+SP_COLUMN_NAME = os.environ.get("SP_COLUMN_NAME", "setval")
+SP_CERTCHARGE_COLUMN = os.environ.get("SP_CERTCHARGE_COLUMN", "certcharge")
 
-# list for xrates (top 10)
 XRATES_LIST_NAME = os.environ.get("XRATES_LIST_NAME", "xrates")
 XRATES_RATE_FIELD = os.environ.get("XRATES_RATE_FIELD", "rate")
 XRATES_TYPE_FIELD = os.environ.get("XRATES_TYPE_FIELD", "type")
@@ -91,7 +89,7 @@ _access_token = None
 _token_expires_at = 0
 
 
-def get_access_token() -> str:
+def get_access_token():
     global _access_token, _token_expires_at
     now = int(time.time())
     if _access_token and now < (_token_expires_at - 60):
@@ -99,17 +97,17 @@ def get_access_token() -> str:
 
     result = msal_app.acquire_token_for_client(scopes=SCOPE)
     if "access_token" not in result:
-        raise RuntimeError(f"Token error: {result}")
+        raise RuntimeError(result)
 
     _access_token = result["access_token"]
     _token_expires_at = now + int(result.get("expires_in", 3600))
     return _access_token
 
 
-def graph_get(url: str, timeout=25):
+def graph_get(url):
     token = get_access_token()
     headers = {"Authorization": f"Bearer {token}"}
-    r = requests.get(url, headers=headers, timeout=timeout)
+    r = requests.get(url, headers=headers, timeout=25)
     r.raise_for_status()
     return r.json()
 
@@ -120,22 +118,10 @@ def graph_get(url: str, timeout=25):
 def safe_float(x):
     if x is None:
         return None
-    s = str(x).strip().replace(",", "")
-    if not s:
-        return None
     try:
-        v = float(s)
-        if v != v or v in (float("inf"), float("-inf")):
-            return None
-        return v
-    except Exception:
+        return float(str(x).replace(",", "").strip())
+    except:
         return None
-
-
-def safe_str(x) -> str:
-    if x is None:
-        return ""
-    return str(x).strip()
 
 
 def fmt0(x):
@@ -144,22 +130,28 @@ def fmt0(x):
     return f"{x:,.0f}"
 
 
-def parse_successfn_symbol(text: str, symbol: str):
-    records = text.replace("\r", "\n").split()
-    for rec in records:
-        parts = [p.strip() for p in rec.split(",")]
+def fmt2(x):
+    if x is None:
+        return "INVALID"
+    return f"{x:,.2f}"
+
+
+def parse_successfn_symbol(text, symbol):
+    for rec in text.split():
+        parts = rec.split(",")
         if len(parts) >= 2 and parts[0] == symbol:
             return safe_float(parts[1])
     return None
 
 
 def fetch_successfn_prices():
-    r = requests.get(SUCCESSFN_API_URL, headers={"User-Agent": "Mozilla/5.0"}, timeout=20)
+    r = requests.get(SUCCESSFN_API_URL, timeout=20)
     r.raise_for_status()
-    text = r.text.strip()
-    gold = parse_successfn_symbol(text, SUCCESSFN_GOLD_SYMBOL)
-    silver = parse_successfn_symbol(text, SUCCESSFN_SILVER_SYMBOL)
-    return gold, silver
+    txt = r.text.strip()
+    return (
+        parse_successfn_symbol(txt, SUCCESSFN_GOLD_SYMBOL),
+        parse_successfn_symbol(txt, SUCCESSFN_SILVER_SYMBOL),
+    )
 
 
 def compute_final_4squares(gold_val, sp_val, use_0916):
@@ -169,79 +161,53 @@ def compute_final_4squares(gold_val, sp_val, use_0916):
     return base - sp_val
 
 
-def compute_kilo_silver(silver_val: float, delta: float):
+def compute_kilo_silver(silver_val, delta):
     return ((silver_val + delta) * SILVER_MULT) * SILVER_TO_KILO
 
 
 # --------------------------
-# SHAREPOINT (Graph)
+# SHAREPOINT
 # --------------------------
 _site_id_cache = None
-
-
-def fetch_site_id():
-    url = f"https://graph.microsoft.com/v1.0/sites/{SP_HOST}:{SP_SITE_PATH}"
-    return graph_get(url)["id"]
 
 
 def ensure_site_id():
     global _site_id_cache
     if not _site_id_cache:
-        _site_id_cache = fetch_site_id()
+        url = f"https://graph.microsoft.com/v1.0/sites/{SP_HOST}:{SP_SITE_PATH}"
+        _site_id_cache = graph_get(url)["id"]
     return _site_id_cache
 
 
-def fetch_item_fields(site_id: str, item_id: int):
-    url = (
-        f"https://graph.microsoft.com/v1.0/sites/{site_id}"
-        f"/lists/{SP_LIST_NAME}"
-        f"/items/{item_id}?expand=fields"
-    )
+def fetch_setval(site_id, item_id):
+    url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/lists/{SP_LIST_NAME}/items/{item_id}?expand=fields"
+    return graph_get(url)["fields"].get(SP_COLUMN_NAME)
+
+
+def fetch_xrates(site_id):
+    url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/lists/{XRATES_LIST_NAME}/items?$top=10&expand=fields"
     data = graph_get(url)
-    return data.get("fields", {}) or {}
+    return [
+        {
+            "rate": str(i["fields"].get(XRATES_RATE_FIELD, "")),
+            "type": str(i["fields"].get(XRATES_TYPE_FIELD, "")),
+        }
+        for i in data.get("value", [])
+    ]
 
 
-def fetch_setval(site_id: str, item_id: int):
-    fields = fetch_item_fields(site_id, item_id)
-    return fields.get(SP_COLUMN_NAME, "")
-
-
-def fetch_xrates_top10(site_id: str):
-    url = (
-        f"https://graph.microsoft.com/v1.0/sites/{site_id}"
-        f"/lists/{XRATES_LIST_NAME}"
-        f"/items?$top=10&$orderby=id asc&expand=fields"
-    )
-    data = graph_get(url)
-    items = data.get("value", [])
-    out = []
-    for it in items:
-        fields = it.get("fields", {}) or {}
-        out.append({
-            "rate": "" if fields.get(XRATES_RATE_FIELD) is None else str(fields.get(XRATES_RATE_FIELD)),
-            "type": "" if fields.get(XRATES_TYPE_FIELD) is None else str(fields.get(XRATES_TYPE_FIELD)),
-        })
-    return out
-
-
-def fetch_discounts_section(site_id: str, section_name: str):
-    if section_name not in DISCOUNTS_SECTIONS:
+def fetch_discounts_section(site_id, sec):
+    if sec not in DISCOUNTS_SECTIONS:
         return []
-
-    start_id, end_id = DISCOUNTS_SECTIONS[section_name]
+    s, e = DISCOUNTS_SECTIONS[sec]
     rows = []
-    for item_id in range(start_id, end_id + 1):
-        fields = fetch_item_fields(site_id, item_id)
-
-        typ = safe_str(fields.get("Title") or fields.get("title"))
-        disc = safe_str(fields.get(SP_COLUMN_NAME))
-        cert = safe_str(fields.get(SP_CERTCHARGE_COLUMN))
-
+    for i in range(s, e + 1):
+        url = f"https://graph.microsoft.com/v1.0/sites/{site_id}/lists/{SP_LIST_NAME}/items/{i}?expand=fields"
+        f = graph_get(url)["fields"]
         rows.append({
-            "id": item_id,
-            "type": typ,
-            "disc": disc,
-            "cert_charge": cert,
+            "type": f.get("Title", ""),
+            "disc": f.get(SP_COLUMN_NAME, ""),
+            "cert_charge": f.get(SP_CERTCHARGE_COLUMN, ""),
         })
     return rows
 
@@ -250,211 +216,75 @@ def fetch_discounts_section(site_id: str, section_name: str):
 # FASTAPI
 # --------------------------
 app = FastAPI()
+_lock = threading.Lock()
 
 
 @app.get("/", response_class=HTMLResponse)
 def home():
-    with open("index.html", "r", encoding="utf-8") as f:
-        return f.read()
-
-
-# --------------------------
-# CACHES
-# --------------------------
-_lock = threading.Lock()
-
-_success_cache = {"gold": None, "silver": None, "ts": 0.0}
-_sharepoint_cache = {"vals": None, "ts": 0.0}
-_xrates_cache = {"items": None, "ts": 0.0}
-
-_discounts_cache = {
-    "PAMP": {"rows": None, "ts": 0.0},
-    "LOCAL": {"rows": None, "ts": 0.0},
-    "VALCAMBI": {"rows": None, "ts": 0.0},
-}
-
-
-def get_success_values():
-    now = time.time()
-    if _success_cache["gold"] is not None and (now - _success_cache["ts"]) < SUCCESSFN_POLL_SECONDS:
-        return _success_cache["gold"], _success_cache["silver"]
-
-    gold, silver = fetch_successfn_prices()
-    _success_cache["gold"] = gold
-    _success_cache["silver"] = silver
-    _success_cache["ts"] = now
-    return gold, silver
-
-
-def get_sharepoint_values(site_id: str):
-    now = time.time()
-    if _sharepoint_cache["vals"] is not None and (now - _sharepoint_cache["ts"]) < SHAREPOINT_POLL_SECONDS:
-        return _sharepoint_cache["vals"]
-
-    vals = {}
-
-    for key, cfg in ITEMS.items():
-        vals[key] = fetch_setval(site_id, cfg["id"])
-
-    vals["SILVER_BUY_ID5"] = fetch_setval(site_id, SILVER_BUY_ID)
-    vals["SILVER_SELL_ID6"] = fetch_setval(site_id, SILVER_SELL_ID)
-
-    vals["DISCOUNT_22_ID37"] = fetch_setval(site_id, DISCOUNT_22_ID)
-    vals["DISCOUNT_24_ID38"] = fetch_setval(site_id, DISCOUNT_24_ID)
-    vals["SELL_PRICE_22_ID39"] = fetch_setval(site_id, SELL_PRICE_22_ID)
-    vals["SELL_PRICE_24_ID40"] = fetch_setval(site_id, SELL_PRICE_24_ID)
-
-    _sharepoint_cache["vals"] = vals
-    _sharepoint_cache["ts"] = now
-    return vals
-
-
-def get_xrates(site_id: str):
-    now = time.time()
-    if _xrates_cache["items"] is not None and (now - _xrates_cache["ts"]) < XRATES_POLL_SECONDS:
-        return _xrates_cache["items"]
-
-    items = fetch_xrates_top10(site_id)
-    _xrates_cache["items"] = items
-    _xrates_cache["ts"] = now
-    return items
-
-
-def get_discounts_section(site_id: str, section_name: str):
-    now = time.time()
-    cache = _discounts_cache.get(section_name)
-    if cache and cache["rows"] is not None and (now - cache["ts"]) < DISCOUNTS_POLL_SECONDS:
-        return cache["rows"]
-
-    rows = fetch_discounts_section(site_id, section_name)
-    if cache is not None:
-        cache["rows"] = rows
-        cache["ts"] = now
-    return rows
-
-
-def blank_payload(status: str):
-    return {
-        "status": status,
-
-        "sell_price_22": "—",
-        "discount_22": "—",
-        "final_sell_price_22": "—",
-
-        "sell_price_24": "—",
-        "discount_24": "—",
-        "final_sell_price_24": "—",
-
-        "TL": {"tag": ITEMS["TL"]["tag"], "value": "—"},
-        "TR": {"tag": ITEMS["TR"]["tag"], "value": "—"},
-        "BL": {"tag": ITEMS["BL"]["tag"], "value": "—"},
-        "BR": {"tag": ITEMS["BR"]["tag"], "value": "—"},
-
-        "silver_buy": "—",
-        "silver_sell": "—",
-    }
+    return open("index.html", encoding="utf-8").read()
 
 
 @app.get("/api/values")
 def api_values():
     with _lock:
         try:
-            site_id = ensure_site_id()
-        except Exception:
-            return JSONResponse(blank_payload("SHAREPOINT ERROR (SITE)"))
+            site = ensure_site_id()
+            gold, silver = fetch_successfn_prices()
 
-        try:
-            gold_val, silver_val = get_success_values()
-            if gold_val is None:
-                return JSONResponse(blank_payload("SUCCESSFN ERROR (LLGUSD)"))
-            if silver_val is None:
-                payload = blank_payload("SUCCESSFN ERROR (LLSUSD)")
-                return JSONResponse(payload)
+            raw = {}
 
-            raw_map = get_sharepoint_values(site_id)
+            for k, v in ITEMS.items():
+                raw[k] = safe_float(fetch_setval(site, v["id"]))
+
+            raw["buy"] = safe_float(fetch_setval(site, SILVER_BUY_ID))
+            raw["sell"] = safe_float(fetch_setval(site, SILVER_SELL_ID))
+
+            # NEW SCREEN VALUES
+            sell22 = safe_float(fetch_setval(site, SELL_PRICE_22_ID))
+            disc22 = safe_float(fetch_setval(site, DISCOUNT_22_ID))
+            sell24 = safe_float(fetch_setval(site, SELL_PRICE_24_ID))
+            disc24 = safe_float(fetch_setval(site, DISCOUNT_24_ID))
+
             out = {"status": "OK"}
 
-            # --------------------------
-            # New luxury sell screen values
-            # --------------------------
-            sell22 = safe_float(raw_map.get("SELL_PRICE_22_ID39"))
-            disc22 = safe_float(raw_map.get("DISCOUNT_22_ID37"))
-            sell24 = safe_float(raw_map.get("SELL_PRICE_24_ID40"))
-            disc24 = safe_float(raw_map.get("DISCOUNT_24_ID38"))
-
-            out["sell_price_22"] = fmt0(sell22)
+            # ✅ FORMATTING RULES
+            out["sell_price_22"] = fmt2(sell22)
             out["discount_22"] = fmt0(disc22)
-            out["sell_price_24"] = fmt0(sell24)
+            out["sell_price_24"] = fmt2(sell24)
             out["discount_24"] = fmt0(disc24)
 
-            out["final_sell_price_22"] = (
-                "INVALID" if sell22 is None or disc22 is None else fmt0(sell22 - disc22)
-            )
-            out["final_sell_price_24"] = (
-                "INVALID" if sell24 is None or disc24 is None else fmt0(sell24 - disc24)
-            )
+            out["final_sell_price_22"] = fmt2(sell22 - disc22) if sell22 is not None and disc22 is not None else "INVALID"
+            out["final_sell_price_24"] = fmt2(sell24 - disc24) if sell24 is not None and disc24 is not None else "INVALID"
 
-            # --------------------------
-            # Existing 4 squares
-            # --------------------------
-            for key, cfg in ITEMS.items():
-                sp_val = safe_float(raw_map.get(key))
-                if sp_val is None:
-                    out[key] = {"tag": cfg["tag"], "value": "INVALID"}
-                    continue
-                final = compute_final_4squares(gold_val, sp_val, cfg["use_0916"])
-                out[key] = {"tag": cfg["tag"], "value": f"{final:,.0f}"}
+            # ORIGINAL 4 SQUARES
+            for k, cfg in ITEMS.items():
+                if raw[k] is None:
+                    out[k] = {"tag": cfg["tag"], "value": "INVALID"}
+                else:
+                    val = compute_final_4squares(gold, raw[k], cfg["use_0916"])
+                    out[k] = {"tag": cfg["tag"], "value": f"{val:,.0f}"}
 
-            # --------------------------
-            # Existing silver values
-            # --------------------------
-            id5 = safe_float(raw_map.get("SILVER_BUY_ID5"))
-            id6 = safe_float(raw_map.get("SILVER_SELL_ID6"))
-
-            out["silver_buy"] = "INVALID" if id5 is None else f"{compute_kilo_silver(silver_val, -id5):,.0f}"
-            out["silver_sell"] = "INVALID" if id6 is None else f"{compute_kilo_silver(silver_val, +id6):,.0f}"
+            # SILVER
+            out["silver_buy"] = fmt0(compute_kilo_silver(silver, -raw["buy"])) if raw["buy"] is not None else "INVALID"
+            out["silver_sell"] = fmt0(compute_kilo_silver(silver, raw["sell"])) if raw["sell"] is not None else "INVALID"
 
             return JSONResponse(out)
 
         except Exception:
-            return JSONResponse(blank_payload("SHAREPOINT ERROR (LIST)"))
+            return JSONResponse({"status": "ERROR"})
 
 
 @app.get("/api/xrates")
 def api_xrates():
-    with _lock:
-        try:
-            site_id = ensure_site_id()
-        except Exception:
-            return JSONResponse({"status": "SHAREPOINT ERROR (SITE)", "items": []})
-
-        try:
-            items = get_xrates(site_id)
-            return JSONResponse({"status": "OK", "items": items})
-        except Exception:
-            return JSONResponse({"status": "SHAREPOINT ERROR (XRATES)", "items": []})
+    try:
+        return {"status": "OK", "items": fetch_xrates(ensure_site_id())}
+    except:
+        return {"status": "ERROR", "items": []}
 
 
-@app.get("/api/discounts/{section_name}")
-def api_discounts(section_name: str):
-    """
-    Returns one section per screen:
-    - /api/discounts/PAMP     IDs 11..21
-    - /api/discounts/LOCAL    IDs 22..28
-    - /api/discounts/VALCAMBI IDs 29..36
-    """
-    sec = (section_name or "").strip().upper()
-    with _lock:
-        try:
-            site_id = ensure_site_id()
-        except Exception:
-            return JSONResponse({"status": "SHAREPOINT ERROR (SITE)", "section": sec, "rows": []})
-
-        try:
-            if sec not in DISCOUNTS_SECTIONS:
-                return JSONResponse({"status": "INVALID SECTION", "section": sec, "rows": []})
-
-            rows = get_discounts_section(site_id, sec)
-            return JSONResponse({"status": "OK", "section": sec, "rows": rows})
-        except Exception:
-            return JSONResponse({"status": "SHAREPOINT ERROR (DISCOUNTS)", "section": sec, "rows": []})
+@app.get("/api/discounts/{sec}")
+def api_disc(sec: str):
+    try:
+        return {"status": "OK", "rows": fetch_discounts_section(ensure_site_id(), sec.upper())}
+    except:
+        return {"status": "ERROR", "rows": []}
