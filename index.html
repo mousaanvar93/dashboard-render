@@ -9,8 +9,8 @@
     html, body {
       margin: 0;
       height: 100%;
-      background: black;
-      color: white;
+      background: #000;
+      color: #fff;
       font-family: Arial, sans-serif;
       overflow: hidden;
       user-select: none;
@@ -24,7 +24,7 @@
       font-weight: 700;
       font-size: 14px;
       opacity: 0.55;
-      z-index: 20;
+      z-index: 30;
     }
 
     .status {
@@ -34,7 +34,7 @@
       font-weight: 700;
       font-size: 18px;
       opacity: 0.9;
-      z-index: 20;
+      z-index: 30;
     }
 
     .screen {
@@ -44,12 +44,12 @@
 
     .hidden { display: none !important; }
 
-    /* --------------------------------
-       NEW SCREEN 1: ANVAR LUXURY SELL PRICE
-    --------------------------------- */
+    /* =========================================
+       SCREEN 1 — IMPROVED LUXURY SELL PRICE
+    ========================================= */
     .luxuryScreenWrap {
       height: 100%;
-      padding: 56px 10px 10px 10px;
+      padding: 52px 10px 10px 10px;
       box-sizing: border-box;
       display: grid;
       grid-template-rows: auto 1fr;
@@ -57,76 +57,168 @@
     }
 
     .luxuryHeader {
+      display: grid;
+      gap: 8px;
       text-align: center;
-      font-size: clamp(26px, 5vw, 58px);
-      font-weight: 900;
+      align-content: start;
+    }
+
+    .luxuryTitle {
       color: #FFD700;
-      letter-spacing: 1px;
+      font-size: clamp(26px, 4.4vw, 56px);
+      font-weight: 900;
       text-transform: uppercase;
-      line-height: 1.05;
-      padding: 4px 10px 0 10px;
+      letter-spacing: 1.2px;
+      line-height: 1.02;
+      text-shadow: 0 0 14px rgba(255, 215, 0, 0.12);
+    }
+
+    .luxurySubtitle {
+      color: rgba(255,255,255,0.72);
+      font-size: clamp(12px, 1.7vw, 18px);
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
     }
 
     .luxuryGrid {
+      min-height: 0;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      min-height: 0;
     }
 
     .luxuryCol {
-      display: grid;
-      grid-template-rows: 1fr 1fr 1fr;
-      gap: 10px;
       min-height: 0;
+      display: grid;
+      grid-template-rows: auto 0.72fr 0.62fr 1.46fr;
+      gap: 10px;
+    }
+
+    .karatHead {
+      border: 4px solid #FFD700;
+      border-radius: 22px;
+      background: linear-gradient(to bottom, rgba(255,215,0,0.14), rgba(255,215,0,0.05));
+      display: grid;
+      place-items: center;
+      min-height: 56px;
+      box-shadow: inset 0 0 0 1px rgba(255,215,0,0.10);
+    }
+
+    .karatText {
+      color: #FFD700;
+      font-weight: 900;
+      font-size: clamp(22px, 3.5vw, 38px);
+      line-height: 1;
+      letter-spacing: 1px;
+      text-transform: uppercase;
     }
 
     .luxuryBox {
-      border: 10px solid white;
-      background: black;
       position: relative;
-      display: flex;
+      overflow: hidden;
+      border: 10px solid #fff;
+      background: #000;
+      border-radius: 24px;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      box-sizing: border-box;
+      padding: 12px;
+    }
+
+    .luxuryBox::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(to bottom right, rgba(255,255,255,0.04), transparent 42%);
+    }
+
+    .boxLabel {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
+      justify-self: start;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: clamp(11px, 1.4vw, 16px);
+      font-weight: 900;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      line-height: 1;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    .labelWhite {
+      color: #fff;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .labelRed {
+      color: #FF3B30;
+      background: rgba(255,59,48,0.10);
+      border: 1px solid rgba(255,59,48,0.22);
+    }
+
+    .labelGold {
+      color: #FFD700;
+      background: rgba(255,215,0,0.10);
+      border: 1px solid rgba(255,215,0,0.24);
+    }
+
+    .boxValueWrap {
+      position: relative;
+      z-index: 1;
       min-height: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 6px;
     }
 
     .luxuryValue {
       font-weight: 900;
-      font-size: clamp(26px, 7vw, 90px);
-      text-align: center;
       line-height: 1;
-      padding: 16px;
-      max-width: 96%;
+      letter-spacing: 0.5px;
+      max-width: 100%;
       word-break: break-word;
     }
 
-    .luxuryTag {
-      position: absolute;
-      right: 16px;
-      bottom: 12px;
-      font-weight: 900;
-      font-size: clamp(12px, 2.2vw, 26px);
-      opacity: 0.95;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      text-align: right;
-      max-width: 85%;
-      line-height: 1.08;
+    .sellBox .luxuryValue {
+      color: #fff;
+      font-size: clamp(24px, 5.9vw, 72px);
     }
 
-    .goldFinal {
+    .discountBox .luxuryValue {
+      color: #FF3B30;
+      font-size: clamp(24px, 5.9vw, 72px);
+    }
+
+    .finalBox {
+      border-color: #FFD700;
+      box-shadow:
+        inset 0 0 0 2px rgba(255,215,0,0.14),
+        0 0 18px rgba(255,215,0,0.06);
+    }
+
+    .finalBox .luxuryValue {
       color: #FFD700;
+      font-size: clamp(34px, 8.8vw, 112px);
+      text-shadow: 0 0 18px rgba(255, 215, 0, 0.10);
     }
 
-    .whiteText {
-      color: white;
+    .finalBox .boxLabel {
+      font-size: clamp(12px, 1.55vw, 18px);
     }
 
-    /* ----------------------------
-       OLD SCREEN 1 (now SCREEN 2)
-    ----------------------------- */
+    /* ============================
+       SCREEN 2 (old original screen 1)
+    ============================ */
     .page {
       height: 100%;
       display: grid;
@@ -306,9 +398,9 @@
       width: 100%;
     }
 
-    /* ----------------------------
+    /* ============================
        SCREENS 3/4/5 tables
-    ----------------------------- */
+    ============================ */
     .screenTableWrap {
       height: 100%;
       padding: 10px;
@@ -405,10 +497,25 @@
       color: #00FF66;
     }
 
+    /* ============================
+       MOBILE
+    ============================ */
     @media (max-width: 600px) {
       .luxuryScreenWrap {
-        padding: 52px 8px 8px 8px;
+        padding: 50px 8px 8px 8px;
         gap: 8px;
+      }
+
+      .luxuryHeader {
+        gap: 6px;
+      }
+
+      .luxuryTitle {
+        font-size: clamp(21px, 6vw, 34px);
+      }
+
+      .luxurySubtitle {
+        font-size: 11px;
       }
 
       .luxuryGrid {
@@ -417,26 +524,37 @@
 
       .luxuryCol {
         gap: 8px;
+        grid-template-rows: auto 0.70fr 0.58fr 1.52fr;
+      }
+
+      .karatHead {
+        min-height: 46px;
+        border-width: 3px;
+        border-radius: 18px;
+      }
+
+      .karatText {
+        font-size: clamp(18px, 5vw, 24px);
       }
 
       .luxuryBox {
         border-width: 8px;
+        border-radius: 18px;
+        padding: 10px;
       }
 
-      .luxuryHeader {
-        font-size: clamp(22px, 6vw, 38px);
+      .boxLabel {
+        padding: 7px 11px;
+        font-size: 10px;
       }
 
-      .luxuryValue {
-        font-size: clamp(22px, 8vw, 54px);
-        padding: 12px;
+      .sellBox .luxuryValue,
+      .discountBox .luxuryValue {
+        font-size: clamp(22px, 7vw, 42px);
       }
 
-      .luxuryTag {
-        font-size: 12px;
-        right: 10px;
-        bottom: 10px;
-        max-width: 82%;
+      .finalBox .luxuryValue {
+        font-size: clamp(28px, 9.6vw, 58px);
       }
 
       .page {
@@ -493,50 +611,73 @@
   <div class="status" id="statusText">Loading…</div>
   <div class="hint" id="hintText">Tap to switch view</div>
 
-  <!-- SCREEN 1 (NEW) -->
+  <!-- SCREEN 1 -->
   <div class="screen" id="screen1">
     <div class="luxuryScreenWrap">
-      <div class="luxuryHeader">ANVAR LUXURY SELL PRICE</div>
+      <div class="luxuryHeader">
+        <div class="luxuryTitle">ANVAR LUXURY SELL PRICE</div>
+        <div class="luxurySubtitle">Live pricing dashboard</div>
+      </div>
 
       <div class="luxuryGrid">
         <div class="luxuryCol">
-          <div class="luxuryBox">
-            <div class="luxuryValue whiteText" id="SELL22_value">—</div>
-            <div class="luxuryTag whiteText">SELL PRICE 22K</div>
+          <div class="karatHead">
+            <div class="karatText">22K</div>
           </div>
 
-          <div class="luxuryBox">
-            <div class="luxuryValue whiteText" id="DISC22_value">—</div>
-            <div class="luxuryTag whiteText">DISCOUNT</div>
+          <div class="luxuryBox sellBox">
+            <div class="boxLabel labelWhite">Sell Price</div>
+            <div class="boxValueWrap">
+              <div class="luxuryValue" id="SELL22_value">—</div>
+            </div>
           </div>
 
-          <div class="luxuryBox">
-            <div class="luxuryValue goldFinal" id="FINAL22_value">—</div>
-            <div class="luxuryTag goldFinal">FINAL SELL PRICE 22K</div>
+          <div class="luxuryBox discountBox">
+            <div class="boxLabel labelRed">Discount</div>
+            <div class="boxValueWrap">
+              <div class="luxuryValue" id="DISC22_value">—</div>
+            </div>
+          </div>
+
+          <div class="luxuryBox finalBox">
+            <div class="boxLabel labelGold">Final Sell Price 22K</div>
+            <div class="boxValueWrap">
+              <div class="luxuryValue" id="FINAL22_value">—</div>
+            </div>
           </div>
         </div>
 
         <div class="luxuryCol">
-          <div class="luxuryBox">
-            <div class="luxuryValue whiteText" id="SELL24_value">—</div>
-            <div class="luxuryTag whiteText">SELL PRICE 24K</div>
+          <div class="karatHead">
+            <div class="karatText">24K</div>
           </div>
 
-          <div class="luxuryBox">
-            <div class="luxuryValue whiteText" id="DISC24_value">—</div>
-            <div class="luxuryTag whiteText">DISCOUNT</div>
+          <div class="luxuryBox sellBox">
+            <div class="boxLabel labelWhite">Sell Price</div>
+            <div class="boxValueWrap">
+              <div class="luxuryValue" id="SELL24_value">—</div>
+            </div>
           </div>
 
-          <div class="luxuryBox">
-            <div class="luxuryValue goldFinal" id="FINAL24_value">—</div>
-            <div class="luxuryTag goldFinal">FINAL SELL PRICE 24K</div>
+          <div class="luxuryBox discountBox">
+            <div class="boxLabel labelRed">Discount</div>
+            <div class="boxValueWrap">
+              <div class="luxuryValue" id="DISC24_value">—</div>
+            </div>
+          </div>
+
+          <div class="luxuryBox finalBox">
+            <div class="boxLabel labelGold">Final Sell Price 24K</div>
+            <div class="boxValueWrap">
+              <div class="luxuryValue" id="FINAL24_value">—</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- SCREEN 2 (old original screen 1) -->
+  <!-- SCREEN 2 -->
   <div class="screen hidden" id="screen2">
     <div class="page">
       <div class="topWrap">
@@ -600,7 +741,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 3 (PAMP) -->
+  <!-- SCREEN 3 -->
   <div class="screen hidden" id="screen3">
     <div class="screenTableWrap">
       <div class="tableHeaderBar">
@@ -617,7 +758,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 4 (LOCAL) -->
+  <!-- SCREEN 4 -->
   <div class="screen hidden" id="screen4">
     <div class="screenTableWrap">
       <div class="tableHeaderBar">
@@ -634,7 +775,7 @@
     </div>
   </div>
 
-  <!-- SCREEN 5 (VALCAMBI) -->
+  <!-- SCREEN 5 -->
   <div class="screen hidden" id="screen5">
     <div class="screenTableWrap">
       <div class="tableHeaderBar">
@@ -692,9 +833,6 @@
     return '+' + String(Math.abs(v));
   }
 
-  // --------------------------
-  // SCREEN ROTATION (1->2->3->4->5->1)
-  // --------------------------
   let currentScreen = 1;
   const TOTAL_SCREENS = 5;
 
@@ -726,9 +864,6 @@
     }
   }, { passive: true });
 
-  // --------------------------
-  // SCREEN 1 logic (NEW)
-  // --------------------------
   async function updateLuxurySell() {
     try {
       const data = await fetchJSON('/api/values');
@@ -743,20 +878,15 @@
       setText('FINAL24_value', data.final_sell_price_24 ?? '—');
     } catch {
       setText('statusText', 'NETWORK ERROR');
-
       setText('SELL22_value', '—');
       setText('DISC22_value', '—');
       setText('FINAL22_value', '—');
-
       setText('SELL24_value', '—');
       setText('DISC24_value', '—');
       setText('FINAL24_value', '—');
     }
   }
 
-  // --------------------------
-  // SCREEN 2 logic (old screen 1)
-  // --------------------------
   async function updateSquaresAndSilver() {
     try {
       const data = await fetchJSON('/api/values');
@@ -814,9 +944,6 @@
     }
   }
 
-  // --------------------------
-  // SCREENS 3/4/5 logic
-  // --------------------------
   function renderRows(containerId, rows, padTo) {
     const box = document.getElementById(containerId);
     if (!box) return;
@@ -878,12 +1005,8 @@
     }
   }
 
-  // --------------------------
-  // Initial load + intervals
-  // --------------------------
   showScreen(1);
 
-  // warm once
   updateLuxurySell();
   updateSquaresAndSilver();
   updateXrates();
@@ -891,7 +1014,6 @@
   updateSection('LOCAL');
   updateSection('VALCAMBI');
 
-  // update only the visible screen
   setInterval(() => {
     if (currentScreen === 1) updateLuxurySell();
   }, 5000);
