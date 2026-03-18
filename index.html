@@ -76,28 +76,9 @@
 
     .luxuryCol {
       display: grid;
-      grid-template-rows: auto 0.72fr 0.62fr 1.28fr;
+      grid-template-rows: 1fr 1fr 1fr;
       gap: 10px;
       min-height: 0;
-    }
-
-    .karatBadge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      justify-self: center;
-      align-self: center;
-      min-width: 120px;
-      padding: 10px 22px;
-      border: 4px solid #FFD700;
-      border-radius: 999px;
-      color: #FFD700;
-      background: rgba(255, 215, 0, 0.10);
-      font-weight: 900;
-      font-size: clamp(18px, 3.3vw, 34px);
-      letter-spacing: 1px;
-      line-height: 1;
-      text-transform: uppercase;
     }
 
     .luxuryBox {
@@ -141,31 +122,6 @@
 
     .whiteText {
       color: white;
-    }
-
-    .discountRed {
-      color: #FF3B30;
-    }
-
-    .sellBox .luxuryValue {
-      font-size: clamp(22px, 5.8vw, 72px);
-    }
-
-    .discountBox .luxuryValue {
-      font-size: clamp(22px, 5.8vw, 72px);
-    }
-
-    .finalBox {
-      border-color: #FFD700;
-      box-shadow: inset 0 0 0 2px rgba(255, 215, 0, 0.18);
-    }
-
-    .finalBox .luxuryValue {
-      font-size: clamp(30px, 8.2vw, 102px);
-    }
-
-    .finalBox .luxuryTag {
-      font-size: clamp(13px, 2.4vw, 28px);
     }
 
     /* ----------------------------
@@ -461,14 +417,6 @@
 
       .luxuryCol {
         gap: 8px;
-        grid-template-rows: auto 0.68fr 0.58fr 1.34fr;
-      }
-
-      .karatBadge {
-        min-width: 92px;
-        padding: 8px 16px;
-        border-width: 3px;
-        font-size: clamp(16px, 5vw, 22px);
       }
 
       .luxuryBox {
@@ -482,15 +430,6 @@
       .luxuryValue {
         font-size: clamp(22px, 8vw, 54px);
         padding: 12px;
-      }
-
-      .sellBox .luxuryValue,
-      .discountBox .luxuryValue {
-        font-size: clamp(20px, 6.8vw, 42px);
-      }
-
-      .finalBox .luxuryValue {
-        font-size: clamp(26px, 9vw, 58px);
       }
 
       .luxuryTag {
@@ -561,38 +500,34 @@
 
       <div class="luxuryGrid">
         <div class="luxuryCol">
-          <div class="karatBadge">22K</div>
-
-          <div class="luxuryBox sellBox">
+          <div class="luxuryBox">
             <div class="luxuryValue whiteText" id="SELL22_value">—</div>
-            <div class="luxuryTag whiteText">SELL PRICE</div>
+            <div class="luxuryTag whiteText">SELL PRICE 22K</div>
           </div>
 
-          <div class="luxuryBox discountBox">
-            <div class="luxuryValue discountRed" id="DISC22_value">—</div>
-            <div class="luxuryTag discountRed">DISCOUNT</div>
+          <div class="luxuryBox">
+            <div class="luxuryValue whiteText" id="DISC22_value">—</div>
+            <div class="luxuryTag whiteText">DISCOUNT</div>
           </div>
 
-          <div class="luxuryBox finalBox">
+          <div class="luxuryBox">
             <div class="luxuryValue goldFinal" id="FINAL22_value">—</div>
             <div class="luxuryTag goldFinal">FINAL SELL PRICE 22K</div>
           </div>
         </div>
 
         <div class="luxuryCol">
-          <div class="karatBadge">24K</div>
-
-          <div class="luxuryBox sellBox">
+          <div class="luxuryBox">
             <div class="luxuryValue whiteText" id="SELL24_value">—</div>
-            <div class="luxuryTag whiteText">SELL PRICE</div>
+            <div class="luxuryTag whiteText">SELL PRICE 24K</div>
           </div>
 
-          <div class="luxuryBox discountBox">
-            <div class="luxuryValue discountRed" id="DISC24_value">—</div>
-            <div class="luxuryTag discountRed">DISCOUNT</div>
+          <div class="luxuryBox">
+            <div class="luxuryValue whiteText" id="DISC24_value">—</div>
+            <div class="luxuryTag whiteText">DISCOUNT</div>
           </div>
 
-          <div class="luxuryBox finalBox">
+          <div class="luxuryBox">
             <div class="luxuryValue goldFinal" id="FINAL24_value">—</div>
             <div class="luxuryTag goldFinal">FINAL SELL PRICE 24K</div>
           </div>
