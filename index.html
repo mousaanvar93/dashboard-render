@@ -570,7 +570,7 @@
       padding: 16px;
       box-sizing: border-box;
       display: grid;
-      grid-template-rows: repeat(3, auto) 1fr;
+      grid-template-rows: repeat(4, auto) 1fr;
       gap: 14px;
       overflow: hidden;
     }
@@ -606,6 +606,26 @@
     .diaInput:focus {
       border-color: #FFD700;
       box-shadow: 0 0 0 2px rgba(255,215,0,0.12);
+    }
+
+    .clearBtnWrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .clearBtn {
+      border: 2px solid #FF3B30;
+      background: rgba(255,59,48,0.10);
+      color: #FF3B30;
+      border-radius: 999px;
+      padding: 12px 24px;
+      font-size: clamp(13px, 1.7vw, 18px);
+      font-weight: 900;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      cursor: pointer;
+      min-width: 140px;
     }
 
     .diaCalcResultBox {
@@ -822,6 +842,13 @@
         border-radius: 14px;
         padding: 14px 14px;
         font-size: 18px;
+      }
+
+      .clearBtn {
+        width: 100%;
+        min-width: 0;
+        padding: 12px 16px;
+        font-size: 13px;
       }
 
       .diaCalcResultBox {
@@ -1049,18 +1076,22 @@
           <input class="diaInput" id="colorStoneWeightInput" type="number" inputmode="decimal" step="any" placeholder="Enter color stone weight" />
         </div>
 
+        <div class="clearBtnWrap">
+          <button class="clearBtn" id="diaCalcClearBtn" type="button">CLEAR</button>
+        </div>
+
         <div class="diaCalcResultBox">
           <div class="diaCalcResultLabel">Diamond Sell Price</div>
           <div class="diaCalcResultValueWrap">
             <div class="diaCalcResultValue">
-              <span id="diamondSellPriceValue">—</span>
+              <span id="diamondSellPriceValue">0</span>
               <span class="diaAed">AED</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="diaCalcStatus" id="diaCalcStatus">Loading…</div>
+      <div class="diaCalcStatus" id="diaCalcStatus">OK</div>
     </div>
   </div>
 
@@ -1142,8 +1173,9 @@
   document.addEventListener('click', (ev) => {
     const diaBtn = ev.target.closest('#diaCalcOpenBtn');
     const homeBtn = ev.target.closest('#diaCalcHomeBtn');
+    const clearBtn = ev.target.closest('#diaCalcClearBtn');
 
-    if (diaBtn || homeBtn) return;
+    if (diaBtn || homeBtn || clearBtn) return;
     if (isDiaCalcOpen) return;
 
     currentScreen = (currentScreen % TOTAL_SCREENS) + 1;
@@ -1173,6 +1205,14 @@
     currentScreen = 1;
     showScreen(1);
     updateLuxurySell();
+  });
+
+  document.getElementById('diaCalcClearBtn').addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    document.getElementById('goldWeightInput').value = '';
+    document.getElementById('diamondWeightInput').value = '';
+    document.getElementById('colorStoneWeightInput').value = '';
+    updateDiamondCalc();
   });
 
   async function updateLuxurySell() {
@@ -1336,10 +1376,10 @@
 
       const data = await fetchJSON('/api/diamond-calc?' + params.toString());
       setText('diaCalcStatus', data.status || 'OK');
-      setText('diamondSellPriceValue', data.diamond_sell_price ?? '—');
+      setText('diamondSellPriceValue', data.diamond_sell_price ?? '0');
     } catch {
       setText('diaCalcStatus', 'NETWORK ERROR');
-      setText('diamondSellPriceValue', '—');
+      setText('diamondSellPriceValue', '0');
     }
   }
 

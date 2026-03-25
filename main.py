@@ -581,16 +581,22 @@ def api_diamond_calc(gold_weight: str = "", diamond_weight: str = "", color_ston
             })
 
         try:
+            # If ANY input is blank, show 0 AED
+            if not str(gold_weight).strip() or not str(diamond_weight).strip() or not str(color_stone_weight).strip():
+                return JSONResponse({
+                    "status": "OK",
+                    "diamond_sell_price": "0",
+                })
+
             gold_w = safe_float(gold_weight)
             diamond_w = safe_float(diamond_weight)
             color_w = safe_float(color_stone_weight)
 
-            if gold_w is None:
-                gold_w = 0.0
-            if diamond_w is None:
-                diamond_w = 0.0
-            if color_w is None:
-                color_w = 0.0
+            if gold_w is None or diamond_w is None or color_w is None:
+                return JSONResponse({
+                    "status": "OK",
+                    "diamond_sell_price": "0",
+                })
 
             cfg = get_diamond_calc_values(site_id)
             final_price = compute_diamond_sell_price(gold_w, diamond_w, color_w, cfg)
