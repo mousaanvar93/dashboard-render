@@ -18,6 +18,7 @@ SUCCESSFN_POLL_SECONDS = 15
 SHAREPOINT_POLL_SECONDS = 300
 XRATES_POLL_SECONDS = 300
 DISCOUNTS_POLL_SECONDS = 300
+DIAMOND_CALC_POLL_SECONDS = 300
 
 # --------------------------
 # YOUR MATH (4 squares)
@@ -57,6 +58,19 @@ DISCOUNTS_SECTIONS = {
     "LOCAL": (22, 28),
     "VALCAMBI": (29, 36),
 }
+
+# --------------------------
+# DIAMOND CALCULATOR CONFIG
+# --------------------------
+DIAMOND_LIST_NAME = "diamondpricecalculator"
+DIAMOND_ITEM_ID = 1
+
+DIAMOND_GOLDVALUE_FIELD = "goldvalue"
+DIAMOND_DIAMONDVALUE_FIELD = "diamondvalue"
+DIAMOND_MARGIN_FIELD = "margin"
+DIAMOND_COLORSTONEVALUE_FIELD = "colorstonevalue"
+DIAMOND_CERTVALUE_FIELD = "certvalue"
+DIAMOND_MAKING_FIELD = "making"
 
 # --------------------------
 # GRAPH / SHAREPOINT CONFIG (Render env vars)
@@ -211,6 +225,16 @@ def fetch_item_fields(site_id: str, item_id: int):
     return data.get("fields", {}) or {}
 
 
+def fetch_item_fields_from_list(site_id: str, list_name: str, item_id: int):
+    url = (
+        f"https://graph.microsoft.com/v1.0/sites/{site_id}"
+        f"/lists/{list_name}"
+        f"/items/{item_id}?expand=fields"
+    )
+    data = graph_get(url)
+    return data.get("fields", {}) or {}
+
+
 def fetch_setval(site_id: str, item_id: int):
     fields = fetch_item_fields(site_id, item_id)
     return fields.get(SP_COLUMN_NAME, "")
@@ -256,6 +280,49 @@ def fetch_discounts_section(site_id: str, section_name: str):
     return rows
 
 
+def fetch_diamond_calc_values(site_id: str):
+    fields = fetch_item_fields_from_list(site_id, DIAMOND_LIST_NAME, DIAMOND_ITEM_ID)
+    return {
+        "goldvalue": safe_float(fields.get(DIAMOND_GOLDVALUE_FIELD)),
+        "diamondvalue": safe_float(fields.get(DIAMOND_DIAMONDVALUE_FIELD)),
+        "margin": safe_float(fields.get(DIAMOND_MARGIN_FIELD)),
+        "colorstonevalue": safe_float(fields.get(DIAMOND_COLORSTONEVALUE_FIELD)),
+        "certvalue": safe_float(fields.get(DIAMOND_CERTVALUE_FIELD)),
+        "making": safe_float(fields.get(DIAMOND_MAKING_FIELD)),
+    }
+
+
+def compute_diamond_sell_price(gold_weight, diamond_weight, color_stone_weight, cfg):
+    goldvalue = cfg.get("goldvalue")
+    diamondvalue = cfg.get("diamondvalue")
+    margin = cfg.get("margin")
+    colorstonevalue = cfg.get("colorstonevalue")
+    certvalue = cfg.get("certvalue")
+    making = cfg.get("making")
+
+    if (
+        goldvalue is None or
+        diamondvalue is None or
+        margin is None or
+        colorstonevalue is None or
+        certvalue is None or
+        making is None
+    ):
+        return None
+
+    if gold_weight is None or diamond_weight is None or color_stone_weight is None:
+        return None
+
+    result_a = gold_weight * goldvalue
+    result_b = gold_weight * making * 3.674
+    result_c = diamond_weight * diamondvalue * 3.674
+    result_d = color_stone_weight * colorstonevalue * 3.674
+    result_e = result_a + result_b + result_c + result_d + certvalue
+
+    final_price = result_e * margin
+    return final_price
+
+
 # --------------------------
 # FASTAPI
 # --------------------------
@@ -276,6 +343,7 @@ _lock = threading.Lock()
 _success_cache = {"gold": None, "silver": None, "ts": 0.0}
 _sharepoint_cache = {"vals": None, "ts": 0.0}
 _xrates_cache = {"items": None, "ts": 0.0}
+_diamond_calc_cache = {"vals": None, "ts": 0.0}
 
 _discounts_cache = {
     "PAMP": {"rows": None, "ts": 0.0},
@@ -341,6 +409,17 @@ def get_discounts_section(site_id: str, section_name: str):
         cache["rows"] = rows
         cache["ts"] = now
     return rows
+
+
+def get_diamond_calc_values(site_id: str):
+    now = time.time()
+    if _diamond_calc_cache["vals"] is not None and (now - _diamond_calc_cache["ts"]) < DIAMOND_CALC_POLL_SECONDS:
+        return _diamond_calc_cache["vals"]
+
+    vals = fetch_diamond_calc_values(site_id)
+    _diamond_calc_cache["vals"] = vals
+    _diamond_calc_cache["ts"] = now
+    return vals
 
 
 def blank_payload(status: str):
@@ -455,3 +534,80 @@ def api_discounts(section_name: str):
             return JSONResponse({"status": "OK", "section": sec, "rows": rows})
         except Exception:
             return JSONResponse({"status": "SHAREPOINT ERROR (DISCOUNTS)", "section": sec, "rows": []})
+
+
+@app.get("/api/diamond-config")
+def api_diamond_config():
+    with _lock:
+        try:
+            site_id = ensure_site_id()
+        except Exception:
+            return JSONResponse({
+                "status": "SHAREPOINT ERROR (SITE)",
+                "goldvalue": None,
+                "diamondvalue": None,
+                "margin": None,
+                "colorstonevalue": None,
+                "certvalue": None,
+                "making": None,
+            })
+
+        try:
+            vals = get_diamond_calc_values(site_id)
+            out = {"status": "OK"}
+            out.update(vals)
+            return JSONResponse(out)
+        except Exception:
+            return JSONResponse({
+                "status": "SHAREPOINT ERROR (DIAMOND CALC)",
+                "goldvalue": None,
+                "diamondvalue": None,
+                "margin": None,
+                "colorstonevalue": None,
+                "certvalue": None,
+                "making": None,
+            })
+
+
+@app.get("/api/diamond-calc")
+def api_diamond_calc(gold_weight: str = "", diamond_weight: str = "", color_stone_weight: str = ""):
+    with _lock:
+        try:
+            site_id = ensure_site_id()
+        except Exception:
+            return JSONResponse({
+                "status": "SHAREPOINT ERROR (SITE)",
+                "diamond_sell_price": "—",
+            })
+
+        try:
+            gold_w = safe_float(gold_weight)
+            diamond_w = safe_float(diamond_weight)
+            color_w = safe_float(color_stone_weight)
+
+            if gold_w is None:
+                gold_w = 0.0
+            if diamond_w is None:
+                diamond_w = 0.0
+            if color_w is None:
+                color_w = 0.0
+
+            cfg = get_diamond_calc_values(site_id)
+            final_price = compute_diamond_sell_price(gold_w, diamond_w, color_w, cfg)
+
+            if final_price is None:
+                return JSONResponse({
+                    "status": "SHAREPOINT ERROR (DIAMOND CALC)",
+                    "diamond_sell_price": "INVALID",
+                })
+
+            return JSONResponse({
+                "status": "OK",
+                "diamond_sell_price": f"{final_price:,.0f}",
+            })
+
+        except Exception:
+            return JSONResponse({
+                "status": "SHAREPOINT ERROR (DIAMOND CALC)",
+                "diamond_sell_price": "INVALID",
+            })
