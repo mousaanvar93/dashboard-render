@@ -489,12 +489,12 @@ def api_values():
                 final = compute_final_4squares(gold_val, sp_val, cfg["use_0916"])
                 out[key] = {"tag": cfg["tag"], "value": f"{final:,.0f}"}
 
-            # Existing silver values
+            # Existing silver values - now AED/GRAM instead of AED/KG
             id5 = safe_float(raw_map.get("SILVER_BUY_ID5"))
             id6 = safe_float(raw_map.get("SILVER_SELL_ID6"))
 
-            out["silver_buy"] = "INVALID" if id5 is None else f"{compute_kilo_silver(silver_val, -id5):,.0f}"
-            out["silver_sell"] = "INVALID" if id6 is None else f"{compute_kilo_silver(silver_val, +id6):,.0f}"
+            out["silver_buy"] = "INVALID" if id5 is None else f"{(compute_kilo_silver(silver_val, -id5) / 1000):,.0f}"
+            out["silver_sell"] = "INVALID" if id6 is None else f"{(compute_kilo_silver(silver_val, +id6) / 1000):,.0f}"
 
             return JSONResponse(out)
 
