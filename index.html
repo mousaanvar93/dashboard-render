@@ -45,7 +45,7 @@
     .hidden { display: none !important; }
 
     /* =========================================
-       SCREEN 1 — IMPROVED LUXURY SELL PRICE
+       SCREEN 1 — UPDATED LUXURY SELL PRICE
     ========================================= */
     .luxuryScreenWrap {
       height: 100%;
@@ -98,40 +98,26 @@
       cursor: pointer;
     }
 
-    .luxuryGrid {
+    .luxury3Grid {
       min-height: 0;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
 
-    .luxuryCol {
+    .luxuryLeftCol {
       min-height: 0;
       display: grid;
-      grid-template-rows: auto 0.72fr 0.62fr 1.46fr;
+      grid-template-rows: 1fr 1fr;
       gap: 10px;
     }
 
-    .karatHead {
-      border: 4px solid #FFD700;
-      border-radius: 22px;
-      background: linear-gradient(to bottom, rgba(255,215,0,0.14), rgba(255,215,0,0.05));
+    .luxuryRightCol {
+      min-height: 0;
       display: grid;
-      place-items: center;
-      min-height: 56px;
-      box-shadow: inset 0 0 0 1px rgba(255,215,0,0.10);
     }
 
-    .karatText {
-      color: #FFD700;
-      font-weight: 900;
-      font-size: clamp(22px, 3.5vw, 38px);
-      line-height: 1;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-
-    .luxuryBox {
+    .luxuryBigBox {
       position: relative;
       overflow: hidden;
       border: 10px solid #fff;
@@ -139,12 +125,12 @@
       border-radius: 24px;
       min-height: 0;
       display: grid;
-      grid-template-rows: auto 1fr;
+      grid-template-rows: auto auto 1fr;
       box-sizing: border-box;
       padding: 12px;
     }
 
-    .luxuryBox::before {
+    .luxuryBigBox::before {
       content: "";
       position: absolute;
       inset: 0;
@@ -152,13 +138,69 @@
       background: linear-gradient(to bottom right, rgba(255,255,255,0.04), transparent 42%);
     }
 
-    .boxLabel {
+    .beforeBox {
+      border-color: #fff;
+    }
+
+    .beforeBox .luxuryMainValue {
+      color: #fff;
+    }
+
+    .afterBox {
+      border-color: #FFD700;
+      box-shadow:
+        inset 0 0 0 2px rgba(255,215,0,0.14),
+        0 0 18px rgba(255,215,0,0.06);
+    }
+
+    .afterBox .luxuryMainValue,
+    .afterBox .karatBadge {
+      color: #FFD700;
+    }
+
+    .afterBox .boxLabel {
+      color: #FFD700;
+      background: rgba(255,215,0,0.10);
+      border: 1px solid rgba(255,215,0,0.24);
+    }
+
+    .tall24Box {
+      border-color: #fff;
+    }
+
+    .tall24Box .luxuryMainValue {
+      color: #fff;
+      font-size: clamp(42px, 9vw, 118px);
+    }
+
+    .karatBadge {
       position: relative;
       z-index: 1;
+      justify-self: start;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: clamp(13px, 1.7vw, 18px);
+      font-weight: 900;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      line-height: 1;
+      color: #fff;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.18);
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    .boxLabel {
+      position: relative;
+      z-index: 1;
       justify-self: start;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       border-radius: 999px;
       padding: 8px 14px;
       font-size: clamp(11px, 1.4vw, 16px);
@@ -166,29 +208,15 @@
       letter-spacing: 0.8px;
       text-transform: uppercase;
       line-height: 1;
-      max-width: 100%;
-      box-sizing: border-box;
-    }
-
-    .labelWhite {
       color: #fff;
       background: rgba(255,255,255,0.10);
       border: 1px solid rgba(255,255,255,0.18);
+      max-width: 100%;
+      box-sizing: border-box;
+      margin-top: 10px;
     }
 
-    .labelRed {
-      color: #FF3B30;
-      background: rgba(255,59,48,0.10);
-      border: 1px solid rgba(255,59,48,0.22);
-    }
-
-    .labelGold {
-      color: #FFD700;
-      background: rgba(255,215,0,0.10);
-      border: 1px solid rgba(255,215,0,0.24);
-    }
-
-    .boxValueWrap {
+    .luxuryValueWrap {
       position: relative;
       z-index: 1;
       min-height: 0;
@@ -198,39 +226,30 @@
       padding: 6px;
     }
 
-    .luxuryValue {
+    .luxuryValueStack {
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+      align-content: center;
+      max-width: 100%;
+    }
+
+    .luxuryMainValue {
       font-weight: 900;
+      font-size: clamp(34px, 7.8vw, 92px);
       line-height: 1;
       letter-spacing: 0.5px;
       max-width: 100%;
       word-break: break-word;
     }
 
-    .sellBox .luxuryValue {
-      color: #fff;
-      font-size: clamp(24px, 5.9vw, 72px);
-    }
-
-    .discountBox .luxuryValue {
-      color: #FF3B30;
-      font-size: clamp(24px, 5.9vw, 72px);
-    }
-
-    .finalBox {
-      border-color: #FFD700;
-      box-shadow:
-        inset 0 0 0 2px rgba(255,215,0,0.14),
-        0 0 18px rgba(255,215,0,0.06);
-    }
-
-    .finalBox .luxuryValue {
-      color: #FFD700;
-      font-size: clamp(34px, 8.8vw, 112px);
-      text-shadow: 0 0 18px rgba(255, 215, 0, 0.10);
-    }
-
-    .finalBox .boxLabel {
-      font-size: clamp(12px, 1.55vw, 18px);
+    .luxuryUnit {
+      font-size: clamp(14px, 1.9vw, 22px);
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      opacity: 0.82;
+      line-height: 1;
     }
 
     /* ============================
@@ -722,43 +741,41 @@
         font-size: 11px;
       }
 
-      .luxuryGrid {
+      .luxury3Grid {
         gap: 8px;
       }
 
-      .luxuryCol {
+      .luxuryLeftCol {
         gap: 8px;
-        grid-template-rows: auto 0.70fr 0.58fr 1.52fr;
       }
 
-      .karatHead {
-        min-height: 46px;
-        border-width: 3px;
-        border-radius: 18px;
-      }
-
-      .karatText {
-        font-size: clamp(18px, 5vw, 24px);
-      }
-
-      .luxuryBox {
+      .luxuryBigBox {
         border-width: 8px;
         border-radius: 18px;
         padding: 10px;
       }
 
+      .karatBadge {
+        padding: 7px 11px;
+        font-size: 11px;
+      }
+
       .boxLabel {
         padding: 7px 11px;
         font-size: 10px;
+        margin-top: 8px;
       }
 
-      .sellBox .luxuryValue,
-      .discountBox .luxuryValue {
-        font-size: clamp(22px, 7vw, 42px);
+      .luxuryMainValue {
+        font-size: clamp(28px, 8.2vw, 52px);
       }
 
-      .finalBox .luxuryValue {
-        font-size: clamp(28px, 9.6vw, 58px);
+      .tall24Box .luxuryMainValue {
+        font-size: clamp(32px, 9vw, 60px);
+      }
+
+      .luxuryUnit {
+        font-size: 11px;
       }
 
       .page {
@@ -877,57 +894,39 @@
         <div class="luxurySubtitle">Live pricing dashboard</div>
       </div>
 
-      <div class="luxuryGrid">
-        <div class="luxuryCol">
-          <div class="karatHead">
-            <div class="karatText">22K</div>
-          </div>
-
-          <div class="luxuryBox sellBox">
-            <div class="boxLabel labelWhite">Sell Price</div>
-            <div class="boxValueWrap">
-              <div class="luxuryValue" id="SELL22_value">—</div>
+      <div class="luxury3Grid">
+        <div class="luxuryLeftCol">
+          <div class="luxuryBigBox beforeBox">
+            <div class="karatBadge">22K</div>
+            <div class="boxLabel">BEFORE</div>
+            <div class="luxuryValueWrap">
+              <div class="luxuryValueStack">
+                <div class="luxuryMainValue" id="SELL22_value">—</div>
+                <div class="luxuryUnit">AED/GRAM</div>
+              </div>
             </div>
           </div>
 
-          <div class="luxuryBox discountBox">
-            <div class="boxLabel labelRed">Discount</div>
-            <div class="boxValueWrap">
-              <div class="luxuryValue" id="DISC22_value">—</div>
-            </div>
-          </div>
-
-          <div class="luxuryBox finalBox">
-            <div class="boxLabel labelGold">Final Sell Price 22K</div>
-            <div class="boxValueWrap">
-              <div class="luxuryValue" id="FINAL22_value">—</div>
+          <div class="luxuryBigBox afterBox">
+            <div class="karatBadge">22K</div>
+            <div class="boxLabel">AFTER</div>
+            <div class="luxuryValueWrap">
+              <div class="luxuryValueStack">
+                <div class="luxuryMainValue" id="FINAL22_value">—</div>
+                <div class="luxuryUnit">AED/GRAM</div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="luxuryCol">
-          <div class="karatHead">
-            <div class="karatText">24K</div>
-          </div>
-
-          <div class="luxuryBox sellBox">
-            <div class="boxLabel labelWhite">Sell Price</div>
-            <div class="boxValueWrap">
-              <div class="luxuryValue" id="SELL24_value">—</div>
-            </div>
-          </div>
-
-          <div class="luxuryBox discountBox">
-            <div class="boxLabel labelRed">Discount</div>
-            <div class="boxValueWrap">
-              <div class="luxuryValue" id="DISC24_value">—</div>
-            </div>
-          </div>
-
-          <div class="luxuryBox finalBox">
-            <div class="boxLabel labelGold">Final Sell Price 24K</div>
-            <div class="boxValueWrap">
-              <div class="luxuryValue" id="FINAL24_value">—</div>
+        <div class="luxuryRightCol">
+          <div class="luxuryBigBox tall24Box">
+            <div class="karatBadge">24K</div>
+            <div class="luxuryValueWrap">
+              <div class="luxuryValueStack">
+                <div class="luxuryMainValue" id="SELL24_value">—</div>
+                <div class="luxuryUnit">AED/GRAM</div>
+              </div>
             </div>
           </div>
         </div>
@@ -1221,20 +1220,13 @@
       setText('statusText', data.status || 'OK');
 
       setText('SELL22_value', data.sell_price_22 ?? '—');
-      setText('DISC22_value', data.discount_22 ?? '—');
       setText('FINAL22_value', data.final_sell_price_22 ?? '—');
-
       setText('SELL24_value', data.sell_price_24 ?? '—');
-      setText('DISC24_value', data.discount_24 ?? '—');
-      setText('FINAL24_value', data.final_sell_price_24 ?? '—');
     } catch {
       setText('statusText', 'NETWORK ERROR');
       setText('SELL22_value', '—');
-      setText('DISC22_value', '—');
       setText('FINAL22_value', '—');
       setText('SELL24_value', '—');
-      setText('DISC24_value', '—');
-      setText('FINAL24_value', '—');
     }
   }
 
