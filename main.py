@@ -493,8 +493,8 @@ def api_values():
             id5 = safe_float(raw_map.get("SILVER_BUY_ID5"))
             id6 = safe_float(raw_map.get("SILVER_SELL_ID6"))
 
-            out["silver_buy"] = "INVALID" if id5 is None else f"{(compute_kilo_silver(silver_val, -id5) / 1000):,.0f}"
-            out["silver_sell"] = "INVALID" if id6 is None else f"{(compute_kilo_silver(silver_val, +id6) / 1000):,.0f}"
+            out["silver_buy"] = "INVALID" if id5 is None else f"{(compute_kilo_silver(silver_val, -id5) / 1000):,.2f}"
+            out["silver_sell"] = "INVALID" if id6 is None else f"{(compute_kilo_silver(silver_val, +id6) / 1000):,.2f}"
 
             return JSONResponse(out)
 
