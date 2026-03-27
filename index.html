@@ -45,26 +45,47 @@
     .hidden { display: none !important; }
 
     /* =========================================
-       SCREEN 1 — NEW TABLE STYLE
+       SCREEN 1 — IMPROVED LUXURY SELL PRICE
     ========================================= */
     .luxuryScreenWrap {
       height: 100%;
-      padding: 52px 14px 14px 14px;
+      padding: 52px 10px 10px 10px;
       box-sizing: border-box;
       display: grid;
-      grid-template-rows: auto 1fr auto;
-      gap: 14px;
+      grid-template-rows: auto 1fr;
+      gap: 10px;
     }
 
-    .luxuryTopBar {
+    .luxuryHeader {
+      display: grid;
+      gap: 8px;
+      text-align: center;
+      align-content: start;
       position: relative;
-      min-height: 54px;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
+    }
+
+    .luxuryTitle {
+      color: #FFD700;
+      font-size: clamp(26px, 4.4vw, 56px);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      line-height: 1.02;
+      text-shadow: 0 0 14px rgba(255, 215, 0, 0.12);
+    }
+
+    .luxurySubtitle {
+      color: rgba(255,255,255,0.72);
+      font-size: clamp(12px, 1.7vw, 18px);
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
     }
 
     .diaCalcBtn {
+      position: absolute;
+      right: 0;
+      top: 0;
       border: 2px solid #FFD700;
       background: rgba(255, 215, 0, 0.10);
       color: #FFD700;
@@ -77,58 +98,53 @@
       cursor: pointer;
     }
 
-    .luxuryMarqueeWrap {
-      overflow: hidden;
-      border: 4px solid #ffcc33;
-      background: #000;
-      position: relative;
-      min-height: 84px;
-      display: flex;
-      align-items: center;
-    }
-
-    .luxuryMarqueeTrack {
-      display: inline-flex;
-      width: max-content;
-      white-space: nowrap;
-      animation: luxuryMarquee 22s linear infinite;
-      will-change: transform;
-    }
-
-    .luxuryMarqueeText {
-      color: #ffd84d;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-size: clamp(26px, 4vw, 52px);
-      line-height: 1;
-      padding: 0 28px;
-    }
-
-    @keyframes luxuryMarquee {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-
-    .luxuryTable {
+    .luxuryGrid {
       min-height: 0;
       display: grid;
-      grid-template-columns: 1.5fr 2.2fr 2fr 2.7fr;
-      grid-template-rows: 1fr 1fr;
-      gap: 12px;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
     }
 
-    .luxCell {
-      position: relative;
-      background: #000;
-      border: 5px solid #ffcc33;
-      overflow: hidden;
-      box-sizing: border-box;
-      min-width: 0;
+    .luxuryCol {
       min-height: 0;
+      display: grid;
+      grid-template-rows: auto 0.72fr 0.62fr 1.46fr;
+      gap: 10px;
     }
 
-    .luxCell::before {
+    .karatHead {
+      border: 4px solid #FFD700;
+      border-radius: 22px;
+      background: linear-gradient(to bottom, rgba(255,215,0,0.14), rgba(255,215,0,0.05));
+      display: grid;
+      place-items: center;
+      min-height: 56px;
+      box-shadow: inset 0 0 0 1px rgba(255,215,0,0.10);
+    }
+
+    .karatText {
+      color: #FFD700;
+      font-weight: 900;
+      font-size: clamp(22px, 3.5vw, 38px);
+      line-height: 1;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .luxuryBox {
+      position: relative;
+      overflow: hidden;
+      border: 10px solid #fff;
+      background: #000;
+      border-radius: 24px;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      box-sizing: border-box;
+      padding: 12px;
+    }
+
+    .luxuryBox::before {
       content: "";
       position: absolute;
       inset: 0;
@@ -136,120 +152,85 @@
       background: linear-gradient(to bottom right, rgba(255,255,255,0.04), transparent 42%);
     }
 
-    .luxHeaderCell {
-      display: grid;
-      place-items: center;
-      text-align: center;
-      padding: 12px;
-    }
-
-    .karatBig {
-      color: #ffd84d;
-      font-weight: 900;
-      font-size: clamp(34px, 5.4vw, 74px);
-      line-height: 1;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-
-    .sellWord {
-      color: #fff;
-      font-weight: 900;
-      font-size: clamp(20px, 2.8vw, 42px);
-      line-height: 1;
-      margin-top: 10px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .luxMetricCell {
-      display: grid;
-      grid-template-rows: auto 1fr;
-      align-items: stretch;
-      padding: 14px;
-    }
-
-    .luxMetricTag {
-      justify-self: start;
+    .boxLabel {
+      position: relative;
+      z-index: 1;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      justify-self: start;
       border-radius: 999px;
       padding: 8px 14px;
-      font-size: clamp(12px, 1.25vw, 18px);
+      font-size: clamp(11px, 1.4vw, 16px);
       font-weight: 900;
       letter-spacing: 0.8px;
       text-transform: uppercase;
       line-height: 1;
-      margin-bottom: 10px;
       max-width: 100%;
       box-sizing: border-box;
     }
 
-    .tagWhite {
+    .labelWhite {
       color: #fff;
-      background: rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.10);
       border: 1px solid rgba(255,255,255,0.18);
     }
 
-    .tagRed {
-      color: #ff5a4e;
+    .labelRed {
+      color: #FF3B30;
       background: rgba(255,59,48,0.10);
       border: 1px solid rgba(255,59,48,0.22);
     }
 
-    .tagGold {
-      color: #ffd84d;
+    .labelGold {
+      color: #FFD700;
       background: rgba(255,215,0,0.10);
       border: 1px solid rgba(255,215,0,0.24);
     }
 
-    .luxMetricValueWrap {
+    .boxValueWrap {
+      position: relative;
+      z-index: 1;
       min-height: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: grid;
+      place-items: center;
       text-align: center;
+      padding: 6px;
     }
 
-    .luxMetricValue {
+    .luxuryValue {
       font-weight: 900;
       line-height: 1;
+      letter-spacing: 0.5px;
       max-width: 100%;
       word-break: break-word;
-      letter-spacing: 0.5px;
     }
 
-    .luxSellValue {
-      color: #ffffff;
-      font-size: clamp(28px, 5.4vw, 84px);
+    .sellBox .luxuryValue {
+      color: #fff;
+      font-size: clamp(24px, 5.9vw, 72px);
     }
 
-    .luxDiscountValue {
-      color: #ff5a4e;
-      font-size: clamp(28px, 5.2vw, 78px);
+    .discountBox .luxuryValue {
+      color: #FF3B30;
+      font-size: clamp(24px, 5.9vw, 72px);
     }
 
-    .luxFinalValue {
-      color: #ffd84d;
-      font-size: clamp(34px, 6.2vw, 96px);
-      text-shadow: 0 0 16px rgba(255, 215, 0, 0.08);
+    .finalBox {
+      border-color: #FFD700;
+      box-shadow:
+        inset 0 0 0 2px rgba(255,215,0,0.14),
+        0 0 18px rgba(255,215,0,0.06);
     }
 
-    .luxFooter {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 28px;
+    .finalBox .luxuryValue {
+      color: #FFD700;
+      font-size: clamp(34px, 8.8vw, 112px);
+      text-shadow: 0 0 18px rgba(255, 215, 0, 0.10);
     }
 
-    .luxFooterText {
-      color: #d0d0d0;
-      font-weight: 700;
-      font-size: clamp(12px, 1.3vw, 16px);
-      letter-spacing: 0.4px;
-      text-transform: uppercase;
-      opacity: 0.9;
+    .finalBox .boxLabel {
+      font-size: clamp(12px, 1.55vw, 18px);
     }
 
     /* ============================
@@ -715,73 +696,69 @@
     /* ============================
        MOBILE
     ============================ */
-    @media (max-width: 900px) {
+    @media (max-width: 600px) {
       .luxuryScreenWrap {
         padding: 50px 8px 8px 8px;
         gap: 8px;
       }
 
-      .luxuryTopBar {
-        min-height: 44px;
+      .luxuryHeader {
+        gap: 6px;
+        padding-top: 46px;
+      }
+
+      .luxuryTitle {
+        font-size: clamp(21px, 6vw, 34px);
+      }
+
+      .luxurySubtitle {
+        font-size: 11px;
       }
 
       .diaCalcBtn {
+        top: 0;
+        right: 0;
         padding: 8px 12px;
         font-size: 11px;
       }
 
-      .luxuryMarqueeWrap {
-        min-height: 62px;
-        border-width: 3px;
-      }
-
-      .luxuryMarqueeText {
-        font-size: clamp(18px, 4.8vw, 28px);
-        padding: 0 16px;
-      }
-
-      .luxuryTable {
-        grid-template-columns: 1.15fr 1fr 1fr 1.15fr;
+      .luxuryGrid {
         gap: 8px;
       }
 
-      .luxCell {
-        border-width: 3px;
+      .luxuryCol {
+        gap: 8px;
+        grid-template-rows: auto 0.70fr 0.58fr 1.52fr;
       }
 
-      .luxMetricCell {
+      .karatHead {
+        min-height: 46px;
+        border-width: 3px;
+        border-radius: 18px;
+      }
+
+      .karatText {
+        font-size: clamp(18px, 5vw, 24px);
+      }
+
+      .luxuryBox {
+        border-width: 8px;
+        border-radius: 18px;
         padding: 10px;
       }
 
-      .luxMetricTag {
-        padding: 6px 10px;
+      .boxLabel {
+        padding: 7px 11px;
         font-size: 10px;
-        margin-bottom: 8px;
       }
 
-      .karatBig {
-        font-size: clamp(24px, 5.5vw, 40px);
+      .sellBox .luxuryValue,
+      .discountBox .luxuryValue {
+        font-size: clamp(22px, 7vw, 42px);
       }
 
-      .sellWord {
-        font-size: clamp(13px, 3vw, 20px);
-        margin-top: 8px;
-      }
-
-      .luxSellValue {
-        font-size: clamp(18px, 4.9vw, 34px);
-      }
-
-      .luxDiscountValue {
-        font-size: clamp(18px, 4.7vw, 32px);
-      }
-
-      .luxFinalValue {
-        font-size: clamp(20px, 5.3vw, 38px);
-      }
-
-      .luxFooterText {
-        font-size: 11px;
+      .finalBox .luxuryValue {
+        font-size: clamp(28px, 9.6vw, 58px);
       }
 
       .page {
@@ -884,29 +861,6 @@
         font-size: clamp(30px, 10vw, 58px);
       }
     }
-
-    @media (max-width: 600px) {
-      .luxuryTable {
-        grid-template-columns: 1fr;
-        grid-template-rows: repeat(8, auto);
-      }
-
-      .luxHeaderCell {
-        min-height: 90px;
-      }
-
-      .luxMetricCell {
-        min-height: 110px;
-      }
-
-      .luxuryMarqueeWrap {
-        min-height: 56px;
-      }
-
-      .luxuryMarqueeText {
-        font-size: 18px;
-      }
-    }
   </style>
 </head>
 
@@ -917,77 +871,66 @@
   <!-- SCREEN 1 -->
   <div class="screen" id="screen1">
     <div class="luxuryScreenWrap">
-      <div class="luxuryTopBar">
+      <div class="luxuryHeader">
         <button class="diaCalcBtn" id="diaCalcOpenBtn" type="button">DIA CALC</button>
+        <div class="luxuryTitle">ANVAR LUXURY SELL PRICE</div>
+        <div class="luxurySubtitle">Live pricing dashboard</div>
       </div>
 
-      <div class="luxuryMarqueeWrap">
-        <div class="luxuryMarqueeTrack">
-          <div class="luxuryMarqueeText">ANVAR LUXURY SELL PRICE • LIVE PRICING DASHBOARD • ANVAR LUXURY SELL PRICE • LIVE PRICING DASHBOARD •</div>
-          <div class="luxuryMarqueeText">ANVAR LUXURY SELL PRICE • LIVE PRICING DASHBOARD • ANVAR LUXURY SELL PRICE • LIVE PRICING DASHBOARD •</div>
-        </div>
-      </div>
+      <div class="luxuryGrid">
+        <div class="luxuryCol">
+          <div class="karatHead">
+            <div class="karatText">22K</div>
+          </div>
 
-      <div class="luxuryTable">
-        <div class="luxCell luxHeaderCell">
-          <div>
-            <div class="karatBig">22K</div>
-            <div class="sellWord">SELL</div>
+          <div class="luxuryBox sellBox">
+            <div class="boxLabel labelWhite">Sell Price</div>
+            <div class="boxValueWrap">
+              <div class="luxuryValue" id="SELL22_value">—</div>
+            </div>
+          </div>
+
+          <div class="luxuryBox discountBox">
+            <div class="boxLabel labelRed">Discount</div>
+            <div class="boxValueWrap">
+              <div class="luxuryValue" id="DISC22_value">—</div>
+            </div>
+          </div>
+
+          <div class="luxuryBox finalBox">
+            <div class="boxLabel labelGold">Final Sell Price 22K</div>
+            <div class="boxValueWrap">
+              <div class="luxuryValue" id="FINAL22_value">—</div>
+            </div>
           </div>
         </div>
 
-        <div class="luxCell luxMetricCell">
-          <div class="luxMetricTag tagWhite">Sell Price</div>
-          <div class="luxMetricValueWrap">
-            <div class="luxMetricValue luxSellValue" id="SELL22_value">—</div>
+        <div class="luxuryCol">
+          <div class="karatHead">
+            <div class="karatText">24K</div>
+          </div>
+
+          <div class="luxuryBox sellBox">
+            <div class="boxLabel labelWhite">Sell Price</div>
+            <div class="boxValueWrap">
+              <div class="luxuryValue" id="SELL24_value">—</div>
+            </div>
+          </div>
+
+          <div class="luxuryBox discountBox">
+            <div class="boxLabel labelRed">Discount</div>
+            <div class="boxValueWrap">
+              <div class="luxuryValue" id="DISC24_value">—</div>
+            </div>
+          </div>
+
+          <div class="luxuryBox finalBox">
+            <div class="boxLabel labelGold">Final Sell Price 24K</div>
+            <div class="boxValueWrap">
+              <div class="luxuryValue" id="FINAL24_value">—</div>
+            </div>
           </div>
         </div>
-
-        <div class="luxCell luxMetricCell">
-          <div class="luxMetricTag tagRed">Discount</div>
-          <div class="luxMetricValueWrap">
-            <div class="luxMetricValue luxDiscountValue" id="DISC22_value">—</div>
-          </div>
-        </div>
-
-        <div class="luxCell luxMetricCell">
-          <div class="luxMetricTag tagGold">Final Sell Price</div>
-          <div class="luxMetricValueWrap">
-            <div class="luxMetricValue luxFinalValue" id="FINAL22_value">—</div>
-          </div>
-        </div>
-
-        <div class="luxCell luxHeaderCell">
-          <div>
-            <div class="karatBig">24K</div>
-            <div class="sellWord">SELL</div>
-          </div>
-        </div>
-
-        <div class="luxCell luxMetricCell">
-          <div class="luxMetricTag tagWhite">Sell Price</div>
-          <div class="luxMetricValueWrap">
-            <div class="luxMetricValue luxSellValue" id="SELL24_value">—</div>
-          </div>
-        </div>
-
-        <div class="luxCell luxMetricCell">
-          <div class="luxMetricTag tagRed">Discount</div>
-          <div class="luxMetricValueWrap">
-            <div class="luxMetricValue luxDiscountValue" id="DISC24_value">—</div>
-          </div>
-        </div>
-
-        <div class="luxCell luxMetricCell">
-          <div class="luxMetricTag tagGold">Final Sell Price</div>
-          <div class="luxMetricValueWrap">
-            <div class="luxMetricValue luxFinalValue" id="FINAL24_value">—</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="luxFooter">
-        <div class="luxFooterText">All prices shown in AED</div>
       </div>
     </div>
   </div>
