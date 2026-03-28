@@ -37,6 +37,24 @@
       z-index: 30;
     }
 
+    .notif {
+      position: absolute;
+      left: 50%;
+      top: 10px;
+      transform: translateX(-50%);
+      z-index: 60;
+      background: rgba(255, 59, 48, 0.18);
+      color: #fff;
+      border: 2px solid rgba(255, 59, 48, 0.65);
+      border-radius: 999px;
+      padding: 10px 18px;
+      font-weight: 900;
+      font-size: 14px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      box-shadow: 0 0 18px rgba(255, 59, 48, 0.14);
+    }
+
     .screen {
       position: absolute;
       inset: 0;
@@ -97,6 +115,23 @@
       text-transform: uppercase;
       cursor: pointer;
       box-shadow: 0 0 10px rgba(255, 215, 0, 0.08);
+    }
+
+    .adminBtn {
+      position: absolute;
+      left: 0;
+      top: 0;
+      border: 2px solid #fff;
+      background: rgba(255,255,255,0.10);
+      color: #fff;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-size: clamp(12px, 1.5vw, 16px);
+      font-weight: 900;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255,255,255,0.06);
     }
 
     .luxury3Grid {
@@ -745,6 +780,238 @@
     }
 
     /* ============================
+       PASSWORD / ADMIN / 22K
+    ============================ */
+    .centerScreenWrap {
+      height: 100%;
+      padding: 52px 10px 10px 10px;
+      box-sizing: border-box;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 12px;
+    }
+
+    .centerTopBar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .centerTitle {
+      color: #FFD700;
+      font-size: clamp(26px, 4.4vw, 56px);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      line-height: 1.02;
+    }
+
+    .centerSub {
+      color: rgba(255,255,255,0.72);
+      font-size: clamp(12px, 1.7vw, 18px);
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .centerCardWrap {
+      min-height: 0;
+      display: grid;
+      place-items: center;
+    }
+
+    .adminCard {
+      width: min(860px, 100%);
+      border: 10px solid white;
+      border-radius: 26px;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.05), transparent 34%),
+        linear-gradient(to bottom, rgba(255,255,255,0.02), rgba(255,255,255,0.00)),
+        #000;
+      padding: 18px;
+      box-sizing: border-box;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.06),
+        0 0 22px rgba(255,255,255,0.03);
+    }
+
+    .passwordBox {
+      display: grid;
+      gap: 16px;
+    }
+
+    .passwordLabel {
+      font-size: clamp(18px, 2.2vw, 28px);
+      font-weight: 900;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      text-align: center;
+    }
+
+    .passwordInput {
+      width: 100%;
+      box-sizing: border-box;
+      border: 3px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      border-radius: 18px;
+      padding: 18px;
+      font-size: clamp(22px, 3vw, 38px);
+      font-weight: 900;
+      outline: none;
+      text-align: center;
+      letter-spacing: 6px;
+    }
+
+    .passwordInput:focus {
+      border-color: #FFD700;
+      box-shadow: 0 0 0 2px rgba(255,215,0,0.12);
+    }
+
+    .passwordBtnRow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .primaryBtn {
+      border: 2px solid #FFD700;
+      background: rgba(255,215,0,0.10);
+      color: #FFD700;
+      border-radius: 999px;
+      padding: 14px 18px;
+      font-size: clamp(13px, 1.7vw, 18px);
+      font-weight: 900;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .secondaryBtn {
+      border: 2px solid #fff;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      border-radius: 999px;
+      padding: 14px 18px;
+      font-size: clamp(13px, 1.7vw, 18px);
+      font-weight: 900;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .adminMenuGrid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .adminNavBtn {
+      border: 2px solid #FFD700;
+      background: rgba(255,215,0,0.10);
+      color: #FFD700;
+      border-radius: 22px;
+      min-height: 120px;
+      padding: 18px;
+      font-size: clamp(26px, 4vw, 46px);
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,215,0,0.08),
+        0 0 18px rgba(255,215,0,0.08);
+    }
+
+    .adminNavBtn.disabled {
+      border-color: rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.34);
+      background: rgba(255,255,255,0.04);
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .onhandWrap {
+      height: 100%;
+      padding: 52px 10px 10px 10px;
+      box-sizing: border-box;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 12px;
+    }
+
+    .onhandCard {
+      border: 10px solid white;
+      background: black;
+      border-radius: 24px;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      overflow: hidden;
+    }
+
+    .onhandCols {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr 0.8fr;
+      gap: 10px;
+      padding: 14px 14px 10px 14px;
+      font-size: 14px;
+      font-weight: 900;
+      opacity: 0.75;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .onhandRows {
+      padding: 0 14px 14px 14px;
+      overflow: hidden;
+      display: grid;
+      grid-auto-rows: 1fr;
+      gap: 10px;
+    }
+
+    .onhandRow {
+      background: rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr 0.8fr;
+      gap: 10px;
+      align-items: center;
+      overflow: hidden;
+      font-size: clamp(12px, 2vw, 22px);
+      line-height: 1.15;
+    }
+
+    .onhandCellLabel {
+      font-weight: 900;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #FFD700;
+    }
+
+    .onhandCellValue {
+      font-weight: 900;
+      text-align: right;
+      white-space: nowrap;
+      color: #fff;
+    }
+
+    .onhandStatus {
+      font-size: 16px;
+      font-weight: 800;
+      opacity: 0.80;
+      text-align: right;
+      min-height: 18px;
+    }
+
+    /* ============================
        MOBILE
     ============================ */
     @media (max-width: 600px) {
@@ -771,6 +1038,13 @@
       .diaCalcBtn {
         top: 0;
         right: 0;
+        padding: 8px 12px;
+        font-size: 11px;
+      }
+
+      .adminBtn {
+        top: 0;
+        left: 0;
         padding: 8px 12px;
         font-size: 11px;
       }
@@ -931,6 +1205,45 @@
       .diaCalcResultValue {
         font-size: clamp(30px, 10vw, 58px);
       }
+
+      .centerScreenWrap,
+      .onhandWrap {
+        padding: 50px 8px 8px 8px;
+        gap: 10px;
+      }
+
+      .centerTitle {
+        font-size: clamp(22px, 6vw, 34px);
+      }
+
+      .adminCard,
+      .onhandCard {
+        border-width: 8px;
+        border-radius: 18px;
+      }
+
+      .passwordBtnRow {
+        grid-template-columns: 1fr;
+      }
+
+      .adminMenuGrid {
+        grid-template-columns: 1fr;
+      }
+
+      .adminNavBtn {
+        min-height: 90px;
+        font-size: 24px;
+      }
+
+      .onhandRow {
+        font-size: 14px;
+      }
+
+      .notif {
+        top: 8px;
+        font-size: 12px;
+        padding: 8px 14px;
+      }
     }
   </style>
 </head>
@@ -938,11 +1251,13 @@
 <body>
   <div class="status" id="statusText">Loading…</div>
   <div class="hint" id="hintText">Tap to switch view</div>
+  <div class="notif hidden" id="notifText">NOT ALLOWED</div>
 
   <!-- SCREEN 1 -->
   <div class="screen" id="screen1">
     <div class="luxuryScreenWrap">
       <div class="luxuryHeader">
+        <button class="adminBtn" id="adminOpenBtn" type="button">Admin</button>
         <button class="diaCalcBtn" id="diaCalcOpenBtn" type="button">DIA CALC</button>
         <div class="luxuryTitle">ANVAR LUXURY SELL PRICE</div>
         <div class="luxurySubtitle">LIVE PRICING DASHBOARD</div>
@@ -1148,6 +1463,75 @@
     </div>
   </div>
 
+  <!-- PASSWORD SCREEN -->
+  <div class="screen hidden" id="passwordScreen">
+    <div class="centerScreenWrap">
+      <div>
+        <div class="centerTitle">Admin Access</div>
+        <div class="centerSub">Enter password to continue</div>
+      </div>
+
+      <div class="centerCardWrap">
+        <div class="adminCard">
+          <div class="passwordBox">
+            <div class="passwordLabel">Password</div>
+            <input class="passwordInput" id="adminPasswordInput" type="password" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="••••" />
+            <div class="passwordBtnRow">
+              <button class="primaryBtn" id="adminPasswordSubmitBtn" type="button">Enter</button>
+              <button class="secondaryBtn" id="adminPasswordCancelBtn" type="button">Home</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN SCREEN -->
+  <div class="screen hidden" id="adminScreen">
+    <div class="centerScreenWrap">
+      <div class="centerTopBar">
+        <div>
+          <div class="centerTitle">Admin</div>
+          <div class="centerSub">Select a section</div>
+        </div>
+        <button class="homeBtn" id="adminHomeBtn" type="button">HOME</button>
+      </div>
+
+      <div class="centerCardWrap">
+        <div class="adminCard">
+          <div class="adminMenuGrid">
+            <button class="adminNavBtn" id="admin22kBtn" type="button">22K</button>
+            <div class="adminNavBtn disabled">More Soon</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 22K SCREEN -->
+  <div class="screen hidden" id="screen22k">
+    <div class="onhandWrap">
+      <div class="centerTopBar">
+        <div>
+          <div class="centerTitle">22K</div>
+          <div class="centerSub">On hand items</div>
+        </div>
+        <button class="homeBtn" id="onhand22kHomeBtn" type="button">HOME</button>
+      </div>
+
+      <div class="onhandStatus" id="onhand22kStatus">Loading…</div>
+
+      <div class="onhandCard">
+        <div class="onhandCols">
+          <div>Category</div>
+          <div style="text-align:right">Count</div>
+          <div style="text-align:right">Weight</div>
+        </div>
+        <div class="onhandRows" id="onhand22kRows"></div>
+      </div>
+    </div>
+  </div>
+
 <script>
   async function fetchJSON(url) {
     const r = await fetch(url, { cache: "no-store" });
@@ -1192,29 +1576,58 @@
   let currentScreen = 1;
   const TOTAL_SCREENS = 5;
   let isDiaCalcOpen = false;
+  let isPasswordOpen = false;
+  let isAdminOpen = false;
+  let is22kOpen = false;
+  const ADMIN_PASSWORD = '8123';
+  let notifTimer = null;
 
-  function showScreen(n) {
-    isDiaCalcOpen = false;
-
-    const dia = document.getElementById('diaCalcScreen');
-    if (dia) dia.classList.add('hidden');
-
-    for (let i = 1; i <= TOTAL_SCREENS; i++) {
-      const el = document.getElementById('screen' + i);
-      if (!el) continue;
-      if (i === n) el.classList.remove('hidden');
-      else el.classList.add('hidden');
-    }
-    setText('hintText', 'Tap to switch view');
-  }
-
-  function showDiaCalcScreen() {
-    isDiaCalcOpen = true;
-
+  function hideAllScreens() {
     for (let i = 1; i <= TOTAL_SCREENS; i++) {
       const el = document.getElementById('screen' + i);
       if (el) el.classList.add('hidden');
     }
+
+    const extraIds = ['diaCalcScreen', 'passwordScreen', 'adminScreen', 'screen22k'];
+    for (const id of extraIds) {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('hidden');
+    }
+  }
+
+  function resetSpecialModes() {
+    isDiaCalcOpen = false;
+    isPasswordOpen = false;
+    isAdminOpen = false;
+    is22kOpen = false;
+  }
+
+  function showNotification(text) {
+    const el = document.getElementById('notifText');
+    if (!el) return;
+    el.textContent = text || '';
+    el.classList.remove('hidden');
+
+    if (notifTimer) clearTimeout(notifTimer);
+    notifTimer = setTimeout(() => {
+      el.classList.add('hidden');
+    }, 2500);
+  }
+
+  function showScreen(n) {
+    resetSpecialModes();
+    hideAllScreens();
+
+    const el = document.getElementById('screen' + n);
+    if (el) el.classList.remove('hidden');
+
+    setText('hintText', 'Tap to switch view');
+  }
+
+  function showDiaCalcScreen() {
+    resetSpecialModes();
+    isDiaCalcOpen = true;
+    hideAllScreens();
 
     const dia = document.getElementById('diaCalcScreen');
     if (dia) dia.classList.remove('hidden');
@@ -1223,13 +1636,73 @@
     updateDiamondCalc();
   }
 
-  document.addEventListener('click', (ev) => {
-    const diaBtn = ev.target.closest('#diaCalcOpenBtn');
-    const homeBtn = ev.target.closest('#diaCalcHomeBtn');
-    const clearBtn = ev.target.closest('#diaCalcClearBtn');
+  function showPasswordScreen() {
+    resetSpecialModes();
+    isPasswordOpen = true;
+    hideAllScreens();
 
-    if (diaBtn || homeBtn || clearBtn) return;
-    if (isDiaCalcOpen) return;
+    const el = document.getElementById('passwordScreen');
+    if (el) el.classList.remove('hidden');
+
+    setText('hintText', '');
+
+    const input = document.getElementById('adminPasswordInput');
+    if (input) {
+      input.value = '';
+      setTimeout(() => input.focus(), 20);
+    }
+  }
+
+  function showAdminScreen() {
+    resetSpecialModes();
+    isAdminOpen = true;
+    hideAllScreens();
+
+    const el = document.getElementById('adminScreen');
+    if (el) el.classList.remove('hidden');
+
+    setText('hintText', '');
+  }
+
+  function show22kScreen() {
+    resetSpecialModes();
+    is22kOpen = true;
+    hideAllScreens();
+
+    const el = document.getElementById('screen22k');
+    if (el) el.classList.remove('hidden');
+
+    setText('hintText', '');
+    updateOnhand22k();
+  }
+
+  function goHomeWithNotAllowed() {
+    currentScreen = 1;
+    showScreen(1);
+    updateLuxurySell();
+    showNotification('NOT ALLOWED');
+  }
+
+  function submitAdminPassword() {
+    const input = document.getElementById('adminPasswordInput');
+    const value = input ? String(input.value || '').trim() : '';
+
+    if (value === ADMIN_PASSWORD) {
+      showAdminScreen();
+    } else {
+      goHomeWithNotAllowed();
+    }
+  }
+
+  document.addEventListener('click', (ev) => {
+    const excluded = ev.target.closest(
+      '#diaCalcOpenBtn, #diaCalcHomeBtn, #diaCalcClearBtn, ' +
+      '#adminOpenBtn, #adminPasswordSubmitBtn, #adminPasswordCancelBtn, ' +
+      '#adminHomeBtn, #admin22kBtn, #onhand22kHomeBtn'
+    );
+
+    if (excluded) return;
+    if (isDiaCalcOpen || isPasswordOpen || isAdminOpen || is22kOpen) return;
 
     currentScreen = (currentScreen % TOTAL_SCREENS) + 1;
     showScreen(currentScreen);
@@ -1266,6 +1739,47 @@
     document.getElementById('diamondWeightInput').value = '';
     document.getElementById('colorStoneWeightInput').value = '';
     updateDiamondCalc();
+  });
+
+  document.getElementById('adminOpenBtn').addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    showPasswordScreen();
+  });
+
+  document.getElementById('adminPasswordSubmitBtn').addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    submitAdminPassword();
+  });
+
+  document.getElementById('adminPasswordCancelBtn').addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    currentScreen = 1;
+    showScreen(1);
+    updateLuxurySell();
+  });
+
+  document.getElementById('adminHomeBtn').addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    currentScreen = 1;
+    showScreen(1);
+    updateLuxurySell();
+  });
+
+  document.getElementById('admin22kBtn').addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    show22kScreen();
+  });
+
+  document.getElementById('onhand22kHomeBtn').addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    showAdminScreen();
+  });
+
+  document.getElementById('adminPasswordInput').addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter') {
+      ev.preventDefault();
+      submitAdminPassword();
+    }
   });
 
   async function updateLuxurySell() {
@@ -1429,6 +1943,50 @@
     }
   }
 
+  function renderOnhand22kRows(rows) {
+    const box = document.getElementById('onhand22kRows');
+    if (!box) return;
+    box.innerHTML = '';
+
+    const arr = Array.isArray(rows) ? rows : [];
+    const target = 9;
+
+    for (let i = 0; i < target; i++) {
+      const r = arr[i] || { label: '', count: '—', weight: '—' };
+
+      const row = document.createElement('div');
+      row.className = 'onhandRow';
+
+      const c1 = document.createElement('div');
+      c1.className = 'onhandCellLabel';
+      c1.textContent = r.label ?? '';
+
+      const c2 = document.createElement('div');
+      c2.className = 'onhandCellValue';
+      c2.textContent = r.count ?? '—';
+
+      const c3 = document.createElement('div');
+      c3.className = 'onhandCellValue';
+      c3.textContent = r.weight ?? '—';
+
+      row.appendChild(c1);
+      row.appendChild(c2);
+      row.appendChild(c3);
+      box.appendChild(row);
+    }
+  }
+
+  async function updateOnhand22k() {
+    try {
+      const data = await fetchJSON('/api/onhand-22k');
+      setText('onhand22kStatus', data.status || 'OK');
+      renderOnhand22kRows(data.rows || []);
+    } catch {
+      setText('onhand22kStatus', 'NETWORK ERROR');
+      renderOnhand22kRows([]);
+    }
+  }
+
   document.getElementById('goldWeightInput').addEventListener('input', updateDiamondCalc);
   document.getElementById('diamondWeightInput').addEventListener('input', updateDiamondCalc);
   document.getElementById('colorStoneWeightInput').addEventListener('input', updateDiamondCalc);
@@ -1442,17 +2000,24 @@
   updateSection('LOCAL');
   updateSection('VALCAMBI');
   updateDiamondCalc();
+  updateOnhand22k();
 
   setInterval(() => {
-    if (currentScreen === 1 && !isDiaCalcOpen) updateLuxurySell();
+    if (currentScreen === 1 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen) {
+      updateLuxurySell();
+    }
   }, 5000);
 
   setInterval(() => {
-    if (currentScreen === 2 && !isDiaCalcOpen) updateSquaresAndSilver();
+    if (currentScreen === 2 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen) {
+      updateSquaresAndSilver();
+    }
   }, 5000);
 
   setInterval(() => {
-    if (currentScreen === 2 && !isDiaCalcOpen) updateXrates();
+    if (currentScreen === 2 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen) {
+      updateXrates();
+    }
   }, 15000);
 
   setInterval(() => {
@@ -1460,9 +2025,13 @@
   }, 5000);
 
   setInterval(() => {
-    if (currentScreen === 3 && !isDiaCalcOpen) updateSection('PAMP');
-    else if (currentScreen === 4 && !isDiaCalcOpen) updateSection('LOCAL');
-    else if (currentScreen === 5 && !isDiaCalcOpen) updateSection('VALCAMBI');
+    if (is22kOpen) updateOnhand22k();
+  }, 10000);
+
+  setInterval(() => {
+    if (currentScreen === 3 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen) updateSection('PAMP');
+    else if (currentScreen === 4 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen) updateSection('LOCAL');
+    else if (currentScreen === 5 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen) updateSection('VALCAMBI');
   }, 10000);
 </script>
 </body>

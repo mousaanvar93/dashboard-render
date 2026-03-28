@@ -20,6 +20,7 @@ SHAREPOINT_POLL_SECONDS = 300
 XRATES_POLL_SECONDS = 300
 DISCOUNTS_POLL_SECONDS = 300
 DIAMOND_CALC_POLL_SECONDS = 300
+ONHAND_POLL_SECONDS = 300
 
 # --------------------------
 # YOUR MATH (4 squares)
@@ -72,6 +73,25 @@ DIAMOND_MARGIN_FIELD = "margin"
 DIAMOND_COLORSTONEVALUE_FIELD = "colorstonevalue"
 DIAMOND_CERTVALUE_FIELD = "certvalue"
 DIAMOND_MAKING_FIELD = "making"
+
+# --------------------------
+# ONHAND 22K CONFIG
+# --------------------------
+ONHAND_LIST_NAME = os.environ.get("ONHAND_LIST_NAME", "onhand")
+ONHAND_COUNT_FIELD = os.environ.get("ONHAND_COUNT_FIELD", "count")
+ONHAND_WEIGHT_FIELD = os.environ.get("ONHAND_WEIGHT_FIELD", "weight")
+
+ONHAND_22K_ROWS = [
+    {"label": "CHAIN",     "id": 1,  "weight_divisor": 1000},
+    {"label": "BANGLE",    "id": 4,  "weight_divisor": 1},
+    {"label": "RING",      "id": 7,  "weight_divisor": 1},
+    {"label": "NECKLACE",  "id": 2,  "weight_divisor": 1},
+    {"label": "EARRING",   "id": 3,  "weight_divisor": 1},
+    {"label": "PENDANT",   "id": 6,  "weight_divisor": 1},
+    {"label": "BRACELET",  "id": 5,  "weight_divisor": 1},
+    {"label": "ANKLET",    "id": 67, "weight_divisor": 1},
+    {"label": "BACKCHAIN", "id": 9,  "weight_divisor": 1},
+]
 
 # --------------------------
 # GRAPH / SHAREPOINT CONFIG (Render env vars)
@@ -163,6 +183,12 @@ def fmt2(x):
     if x is None:
         return "INVALID"
     return f"{x:,.2f}"
+
+
+def fmt0_or_dash(x):
+    if x is None:
+        return "—"
+    return f"{x:,.0f}"
 
 
 def parse_successfn_symbol(text: str, symbol: str):
@@ -293,6 +319,26 @@ def fetch_diamond_calc_values(site_id: str):
     }
 
 
+def fetch_onhand_22k_rows(site_id: str):
+    rows = []
+    for cfg in ONHAND_22K_ROWS:
+        fields = fetch_item_fields_from_list(site_id, ONHAND_LIST_NAME, cfg["id"])
+
+        count_val = safe_float(fields.get(ONHAND_COUNT_FIELD))
+        weight_val = safe_float(fields.get(ONHAND_WEIGHT_FIELD))
+
+        divisor = cfg.get("weight_divisor", 1) or 1
+        if weight_val is not None:
+            weight_val = weight_val / divisor
+
+        rows.append({
+            "label": cfg["label"],
+            "count": fmt0_or_dash(count_val),
+            "weight": fmt0_or_dash(weight_val),
+        })
+    return rows
+
+
 def compute_diamond_sell_price(gold_weight, diamond_weight, color_stone_weight, cfg):
     goldvalue = cfg.get("goldvalue")
     diamondvalue = cfg.get("diamondvalue")
@@ -345,6 +391,7 @@ _success_cache = {"gold": None, "silver": None, "ts": 0.0}
 _sharepoint_cache = {"vals": None, "ts": 0.0}
 _xrates_cache = {"items": None, "ts": 0.0}
 _diamond_calc_cache = {"vals": None, "ts": 0.0}
+_onhand_22k_cache = {"rows": None, "ts": 0.0}
 
 _discounts_cache = {
     "PAMP": {"rows": None, "ts": 0.0},
@@ -421,6 +468,17 @@ def get_diamond_calc_values(site_id: str):
     _diamond_calc_cache["vals"] = vals
     _diamond_calc_cache["ts"] = now
     return vals
+
+
+def get_onhand_22k(site_id: str):
+    now = time.time()
+    if _onhand_22k_cache["rows"] is not None and (now - _onhand_22k_cache["ts"]) < ONHAND_POLL_SECONDS:
+        return _onhand_22k_cache["rows"]
+
+    rows = fetch_onhand_22k_rows(site_id)
+    _onhand_22k_cache["rows"] = rows
+    _onhand_22k_cache["ts"] = now
+    return rows
 
 
 def blank_payload(status: str):
@@ -617,4 +675,28 @@ def api_diamond_calc(gold_weight: str = "", diamond_weight: str = "", color_ston
             return JSONResponse({
                 "status": "SHAREPOINT ERROR (DIAMOND CALC)",
                 "diamond_sell_price": "INVALID",
+            })
+
+
+@app.get("/api/onhand-22k")
+def api_onhand_22k():
+    with _lock:
+        try:
+            site_id = ensure_site_id()
+        except Exception:
+            return JSONResponse({
+                "status": "SHAREPOINT ERROR (SITE)",
+                "rows": [],
+            })
+
+        try:
+            rows = get_onhand_22k(site_id)
+            return JSONResponse({
+                "status": "OK",
+                "rows": rows,
+            })
+        except Exception:
+            return JSONResponse({
+                "status": "SHAREPOINT ERROR (ONHAND 22K)",
+                "rows": [],
             })
