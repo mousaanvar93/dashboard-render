@@ -1963,11 +1963,11 @@
 
       const c2 = document.createElement('div');
       c2.className = 'onhandCellValue';
-      c2.textContent = r.count ?? '—';
+      c2.textContent = (r.count && r.count !== '—') ? `${r.count} PCS` : '—';
 
       const c3 = document.createElement('div');
       c3.className = 'onhandCellValue';
-      c3.textContent = r.weight ?? '—';
+      c3.textContent = (r.weight && r.weight !== '—') ? `${r.weight} G` : '—';
 
       row.appendChild(c1);
       row.appendChild(c2);

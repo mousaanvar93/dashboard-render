@@ -82,7 +82,7 @@ ONHAND_COUNT_FIELD = os.environ.get("ONHAND_COUNT_FIELD", "count")
 ONHAND_WEIGHT_FIELD = os.environ.get("ONHAND_WEIGHT_FIELD", "weight")
 
 ONHAND_22K_ROWS = [
-    {"label": "CHAIN",     "id": 1,  "weight_divisor": 1000},
+    {"label": "CHAIN",     "id": 1,  "weight_divisor": 1},
     {"label": "BANGLE",    "id": 4,  "weight_divisor": 1},
     {"label": "RING",      "id": 7,  "weight_divisor": 1},
     {"label": "NECKLACE",  "id": 2,  "weight_divisor": 1},
