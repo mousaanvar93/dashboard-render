@@ -56,11 +56,19 @@ SELL_PRICE_24_ID = 40
 # DISCOUNTS SCREENS CONFIG
 # --------------------------
 DISCOUNTS_SECTIONS = {
-    "PAMP": (11, 21),
-    "LOCAL": (22, 28),
-    "VALCAMBI": (29, 36),
+    "PAMP": {
+        "range": (11, 21),
+        "extra": [43],
+    },
+    "LOCAL": {
+        "range": (22, 28),
+        "extra": [45, 44, 41, 42],
+    },
+    "VALCAMBI": {
+        "range": (29, 36),
+        "extra": [],
+    },
 }
-
 # --------------------------
 # DIAMOND CALCULATOR CONFIG
 # --------------------------
@@ -286,11 +294,16 @@ def fetch_xrates_top10(site_id: str):
 
 
 def fetch_discounts_section(site_id: str, section_name: str):
-    if section_name not in DISCOUNTS_SECTIONS:
+    cfg = DISCOUNTS_SECTIONS.get(section_name)
+    if not cfg:
         return []
 
-    start_id, end_id = DISCOUNTS_SECTIONS[section_name]
+    start_id, end_id = cfg["range"]
+    extra_ids = cfg.get("extra", [])
+
     rows = []
+
+    # Main range
     for item_id in range(start_id, end_id + 1):
         fields = fetch_item_fields(site_id, item_id)
 
@@ -304,6 +317,22 @@ def fetch_discounts_section(site_id: str, section_name: str):
             "disc": disc,
             "cert_charge": cert,
         })
+
+    # Extra IDs (in exact order you provided)
+    for item_id in extra_ids:
+        fields = fetch_item_fields(site_id, item_id)
+
+        typ = safe_str(fields.get("Title") or fields.get("title"))
+        disc = safe_str(fields.get(SP_COLUMN_NAME))
+        cert = safe_str(fields.get(SP_CERTCHARGE_COLUMN))
+
+        rows.append({
+            "id": item_id,
+            "type": typ,
+            "disc": disc,
+            "cert_charge": cert,
+        })
+
     return rows
 
 

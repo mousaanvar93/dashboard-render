@@ -1902,8 +1902,8 @@
       'valcambiRows';
 
     const padTo =
-      sec === 'PAMP' ? 11 :
-      sec === 'LOCAL' ? 7 :
+      sec === 'PAMP' ? 12 :   // 11 + 1 extra
+      sec === 'LOCAL' ? 11 :  // 7 + 4 extras
       8;
 
     try {
