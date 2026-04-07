@@ -21,6 +21,7 @@ XRATES_POLL_SECONDS = 300
 DISCOUNTS_POLL_SECONDS = 300
 DIAMOND_CALC_POLL_SECONDS = 300
 ONHAND_POLL_SECONDS = 300
+BARS_COINS_POLL_SECONDS = 300
 
 # --------------------------
 # YOUR MATH (4 squares)
@@ -69,6 +70,7 @@ DISCOUNTS_SECTIONS = {
         "extra": [],
     },
 }
+
 # --------------------------
 # DIAMOND CALCULATOR CONFIG
 # --------------------------
@@ -100,6 +102,31 @@ ONHAND_22K_ROWS = [
     {"label": "ANKLET",    "id": 67, "weight_divisor": 1},
     {"label": "BACKCHAIN", "id": 9,  "weight_divisor": 1},
 ]
+
+# --------------------------
+# BARS / COINS CONFIG
+# --------------------------
+BARS_COINS_ROW_LABELS = [
+    "1 G",
+    "2.5 G",
+    "5 G",
+    "8 G",
+    "10 G",
+    "20 G",
+    "31.10 G",
+    "31.45 G",
+    "50 G",
+    "100 G",
+]
+
+BARS_COINS_ID_MAP = {
+    "PAMP":     [25, 68, 26, 27, 28, 29, 30, 31, 32, 33],
+    "BAR":      [34, 69, 35, 36, 37, 38, 39, 40, 41, 42],
+    "COIN":     [43, 70, 44, 45, 46, 47, 48, 49, 50, 51],
+    "VALCAMBI": [52, 71, 53, 54, 55, 56, 57, 58, 59, 60],
+}
+
+BARS_COINS_COLUMN_ORDER = ["PAMP", "BAR", "COIN", "VALCAMBI"]
 
 # --------------------------
 # GRAPH / SHAREPOINT CONFIG (Render env vars)
@@ -368,6 +395,23 @@ def fetch_onhand_22k_rows(site_id: str):
     return rows
 
 
+def fetch_bars_coins_rows(site_id: str):
+    rows = []
+
+    for idx, label in enumerate(BARS_COINS_ROW_LABELS):
+        row = {"size": label}
+
+        for col_name in BARS_COINS_COLUMN_ORDER:
+            item_id = BARS_COINS_ID_MAP[col_name][idx]
+            fields = fetch_item_fields_from_list(site_id, ONHAND_LIST_NAME, item_id)
+            count_val = safe_float(fields.get(ONHAND_COUNT_FIELD))
+            row[col_name] = fmt0_or_dash(count_val)
+
+        rows.append(row)
+
+    return rows
+
+
 def compute_diamond_sell_price(gold_weight, diamond_weight, color_stone_weight, cfg):
     goldvalue = cfg.get("goldvalue")
     diamondvalue = cfg.get("diamondvalue")
@@ -421,6 +465,7 @@ _sharepoint_cache = {"vals": None, "ts": 0.0}
 _xrates_cache = {"items": None, "ts": 0.0}
 _diamond_calc_cache = {"vals": None, "ts": 0.0}
 _onhand_22k_cache = {"rows": None, "ts": 0.0}
+_bars_coins_cache = {"rows": None, "ts": 0.0}
 
 _discounts_cache = {
     "PAMP": {"rows": None, "ts": 0.0},
@@ -507,6 +552,17 @@ def get_onhand_22k(site_id: str):
     rows = fetch_onhand_22k_rows(site_id)
     _onhand_22k_cache["rows"] = rows
     _onhand_22k_cache["ts"] = now
+    return rows
+
+
+def get_bars_coins(site_id: str):
+    now = time.time()
+    if _bars_coins_cache["rows"] is not None and (now - _bars_coins_cache["ts"]) < BARS_COINS_POLL_SECONDS:
+        return _bars_coins_cache["rows"]
+
+    rows = fetch_bars_coins_rows(site_id)
+    _bars_coins_cache["rows"] = rows
+    _bars_coins_cache["ts"] = now
     return rows
 
 
@@ -727,5 +783,29 @@ def api_onhand_22k():
         except Exception:
             return JSONResponse({
                 "status": "SHAREPOINT ERROR (ONHAND 22K)",
+                "rows": [],
+            })
+
+
+@app.get("/api/onhand-bars-coins")
+def api_onhand_bars_coins():
+    with _lock:
+        try:
+            site_id = ensure_site_id()
+        except Exception:
+            return JSONResponse({
+                "status": "SHAREPOINT ERROR (SITE)",
+                "rows": [],
+            })
+
+        try:
+            rows = get_bars_coins(site_id)
+            return JSONResponse({
+                "status": "OK",
+                "rows": rows,
+            })
+        except Exception:
+            return JSONResponse({
+                "status": "SHAREPOINT ERROR (BARS / COINS)",
                 "rows": [],
             })

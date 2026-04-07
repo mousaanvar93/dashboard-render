@@ -780,7 +780,7 @@
     }
 
     /* ============================
-       PASSWORD / ADMIN / 22K
+       PASSWORD / ADMIN / 22K / BARS-COINS
     ============================ */
     .centerScreenWrap {
       height: 100%;
@@ -1012,6 +1012,84 @@
     }
 
     /* ============================
+       BARS / COINS TABLE
+    ============================ */
+    .barsCoinsWrap {
+      height: 100%;
+      padding: 52px 10px 10px 10px;
+      box-sizing: border-box;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 12px;
+    }
+
+    .barsCoinsStatus {
+      font-size: 16px;
+      font-weight: 800;
+      opacity: 0.80;
+      text-align: right;
+      min-height: 18px;
+    }
+
+    .barsCoinsCard {
+      border: 10px solid white;
+      background: black;
+      border-radius: 24px;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .barsCoinsCols {
+      display: grid;
+      grid-template-columns: 1fr repeat(4, 1fr);
+      gap: 10px;
+      padding: 14px 14px 10px 14px;
+      font-size: 14px;
+      font-weight: 900;
+      opacity: 0.75;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .barsCoinsRows {
+      padding: 0 14px 14px 14px;
+      overflow: hidden;
+      display: grid;
+      grid-auto-rows: 1fr;
+      gap: 10px;
+    }
+
+    .barsCoinsRow {
+      background: rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1fr repeat(4, 1fr);
+      gap: 10px;
+      align-items: center;
+      overflow: hidden;
+      font-size: clamp(11px, 1.55vw, 19px);
+      line-height: 1.15;
+    }
+
+    .barsCoinsHead {
+      font-weight: 900;
+      color: #FFD700;
+      white-space: nowrap;
+    }
+
+    .barsCoinsCell {
+      font-weight: 900;
+      text-align: center;
+      white-space: nowrap;
+      color: #fff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ============================
        MOBILE
     ============================ */
     @media (max-width: 600px) {
@@ -1207,7 +1285,8 @@
       }
 
       .centerScreenWrap,
-      .onhandWrap {
+      .onhandWrap,
+      .barsCoinsWrap {
         padding: 50px 8px 8px 8px;
         gap: 10px;
       }
@@ -1217,7 +1296,8 @@
       }
 
       .adminCard,
-      .onhandCard {
+      .onhandCard,
+      .barsCoinsCard {
         border-width: 8px;
         border-radius: 18px;
       }
@@ -1237,6 +1317,27 @@
 
       .onhandRow {
         font-size: 14px;
+      }
+
+      .barsCoinsCols,
+      .barsCoinsRow {
+        grid-template-columns: 0.95fr repeat(4, 1fr);
+        gap: 6px;
+      }
+
+      .barsCoinsCols {
+        font-size: 10px;
+        padding: 12px 10px 8px 10px;
+      }
+
+      .barsCoinsRows {
+        padding: 0 10px 10px 10px;
+        gap: 8px;
+      }
+
+      .barsCoinsRow {
+        padding: 10px 8px;
+        font-size: 10px;
       }
 
       .notif {
@@ -1501,7 +1602,7 @@
         <div class="adminCard">
           <div class="adminMenuGrid">
             <button class="adminNavBtn" id="admin22kBtn" type="button">22K</button>
-            <div class="adminNavBtn disabled">More Soon</div>
+            <button class="adminNavBtn" id="adminBarsCoinsBtn" type="button">BARS / COINS</button>
           </div>
         </div>
       </div>
@@ -1528,6 +1629,32 @@
           <div style="text-align:right">Weight</div>
         </div>
         <div class="onhandRows" id="onhand22kRows"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARS / COINS SCREEN -->
+  <div class="screen hidden" id="barsCoinsScreen">
+    <div class="barsCoinsWrap">
+      <div class="centerTopBar">
+        <div>
+          <div class="centerTitle">BARS / COINS</div>
+          <div class="centerSub">On hand counts</div>
+        </div>
+        <button class="homeBtn" id="barsCoinsHomeBtn" type="button">HOME</button>
+      </div>
+
+      <div class="barsCoinsStatus" id="barsCoinsStatus">Loading…</div>
+
+      <div class="barsCoinsCard">
+        <div class="barsCoinsCols">
+          <div></div>
+          <div style="text-align:center">PAMP</div>
+          <div style="text-align:center">BAR</div>
+          <div style="text-align:center">COIN</div>
+          <div style="text-align:center">VALCAMBI</div>
+        </div>
+        <div class="barsCoinsRows" id="barsCoinsRows"></div>
       </div>
     </div>
   </div>
@@ -1579,6 +1706,7 @@
   let isPasswordOpen = false;
   let isAdminOpen = false;
   let is22kOpen = false;
+  let isBarsCoinsOpen = false;
   const ADMIN_PASSWORD = '8123';
   let notifTimer = null;
 
@@ -1588,7 +1716,7 @@
       if (el) el.classList.add('hidden');
     }
 
-    const extraIds = ['diaCalcScreen', 'passwordScreen', 'adminScreen', 'screen22k'];
+    const extraIds = ['diaCalcScreen', 'passwordScreen', 'adminScreen', 'screen22k', 'barsCoinsScreen'];
     for (const id of extraIds) {
       const el = document.getElementById(id);
       if (el) el.classList.add('hidden');
@@ -1600,6 +1728,7 @@
     isPasswordOpen = false;
     isAdminOpen = false;
     is22kOpen = false;
+    isBarsCoinsOpen = false;
   }
 
   function showNotification(text) {
@@ -1676,6 +1805,18 @@
     updateOnhand22k();
   }
 
+  function showBarsCoinsScreen() {
+    resetSpecialModes();
+    isBarsCoinsOpen = true;
+    hideAllScreens();
+
+    const el = document.getElementById('barsCoinsScreen');
+    if (el) el.classList.remove('hidden');
+
+    setText('hintText', '');
+    updateBarsCoins();
+  }
+
   function goHomeWithNotAllowed() {
     currentScreen = 1;
     showScreen(1);
@@ -1698,11 +1839,11 @@
     const excluded = ev.target.closest(
       '#diaCalcOpenBtn, #diaCalcHomeBtn, #diaCalcClearBtn, ' +
       '#adminOpenBtn, #adminPasswordSubmitBtn, #adminPasswordCancelBtn, ' +
-      '#adminHomeBtn, #admin22kBtn, #onhand22kHomeBtn'
+      '#adminHomeBtn, #admin22kBtn, #adminBarsCoinsBtn, #onhand22kHomeBtn, #barsCoinsHomeBtn'
     );
 
     if (excluded) return;
-    if (isDiaCalcOpen || isPasswordOpen || isAdminOpen || is22kOpen) return;
+    if (isDiaCalcOpen || isPasswordOpen || isAdminOpen || is22kOpen || isBarsCoinsOpen) return;
 
     currentScreen = (currentScreen % TOTAL_SCREENS) + 1;
     showScreen(currentScreen);
@@ -1770,7 +1911,17 @@
     show22kScreen();
   });
 
+  document.getElementById('adminBarsCoinsBtn').addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    showBarsCoinsScreen();
+  });
+
   document.getElementById('onhand22kHomeBtn').addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    showAdminScreen();
+  });
+
+  document.getElementById('barsCoinsHomeBtn').addEventListener('click', (ev) => {
     ev.stopPropagation();
     showAdminScreen();
   });
@@ -1902,8 +2053,8 @@
       'valcambiRows';
 
     const padTo =
-      sec === 'PAMP' ? 12 :   // 11 + 1 extra
-      sec === 'LOCAL' ? 11 :  // 7 + 4 extras
+      sec === 'PAMP' ? 12 :
+      sec === 'LOCAL' ? 11 :
       8;
 
     try {
@@ -1987,6 +2138,67 @@
     }
   }
 
+  function renderBarsCoinsRows(rows) {
+    const box = document.getElementById('barsCoinsRows');
+    if (!box) return;
+    box.innerHTML = '';
+
+    const labels = ['1 G', '2.5 G', '5 G', '8 G', '10 G', '20 G', '31.10 G', '31.45 G', '50 G', '100 G'];
+    const arr = Array.isArray(rows) ? rows : [];
+
+    for (let i = 0; i < labels.length; i++) {
+      const r = arr[i] || {
+        size: labels[i],
+        PAMP: '—',
+        BAR: '—',
+        COIN: '—',
+        VALCAMBI: '—'
+      };
+
+      const row = document.createElement('div');
+      row.className = 'barsCoinsRow';
+
+      const c0 = document.createElement('div');
+      c0.className = 'barsCoinsHead';
+      c0.textContent = r.size ?? labels[i];
+
+      const c1 = document.createElement('div');
+      c1.className = 'barsCoinsCell';
+      c1.textContent = (r.PAMP && r.PAMP !== '—') ? `${r.PAMP} PCS` : '—';
+
+      const c2 = document.createElement('div');
+      c2.className = 'barsCoinsCell';
+      c2.textContent = (r.BAR && r.BAR !== '—') ? `${r.BAR} PCS` : '—';
+
+      const c3 = document.createElement('div');
+      c3.className = 'barsCoinsCell';
+      c3.textContent = (r.COIN && r.COIN !== '—') ? `${r.COIN} PCS` : '—';
+
+      const c4 = document.createElement('div');
+      c4.className = 'barsCoinsCell';
+      c4.textContent = (r.VALCAMBI && r.VALCAMBI !== '—') ? `${r.VALCAMBI} PCS` : '—';
+
+      row.appendChild(c0);
+      row.appendChild(c1);
+      row.appendChild(c2);
+      row.appendChild(c3);
+      row.appendChild(c4);
+
+      box.appendChild(row);
+    }
+  }
+
+  async function updateBarsCoins() {
+    try {
+      const data = await fetchJSON('/api/onhand-bars-coins');
+      setText('barsCoinsStatus', data.status || 'OK');
+      renderBarsCoinsRows(data.rows || []);
+    } catch {
+      setText('barsCoinsStatus', 'NETWORK ERROR');
+      renderBarsCoinsRows([]);
+    }
+  }
+
   document.getElementById('goldWeightInput').addEventListener('input', updateDiamondCalc);
   document.getElementById('diamondWeightInput').addEventListener('input', updateDiamondCalc);
   document.getElementById('colorStoneWeightInput').addEventListener('input', updateDiamondCalc);
@@ -2001,21 +2213,22 @@
   updateSection('VALCAMBI');
   updateDiamondCalc();
   updateOnhand22k();
+  updateBarsCoins();
 
   setInterval(() => {
-    if (currentScreen === 1 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen) {
+    if (currentScreen === 1 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) {
       updateLuxurySell();
     }
   }, 5000);
 
   setInterval(() => {
-    if (currentScreen === 2 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen) {
+    if (currentScreen === 2 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) {
       updateSquaresAndSilver();
     }
   }, 5000);
 
   setInterval(() => {
-    if (currentScreen === 2 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen) {
+    if (currentScreen === 2 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) {
       updateXrates();
     }
   }, 15000);
@@ -2029,9 +2242,13 @@
   }, 10000);
 
   setInterval(() => {
-    if (currentScreen === 3 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen) updateSection('PAMP');
-    else if (currentScreen === 4 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen) updateSection('LOCAL');
-    else if (currentScreen === 5 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen) updateSection('VALCAMBI');
+    if (isBarsCoinsOpen) updateBarsCoins();
+  }, 10000);
+
+  setInterval(() => {
+    if (currentScreen === 3 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('PAMP');
+    else if (currentScreen === 4 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('LOCAL');
+    else if (currentScreen === 5 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('VALCAMBI');
   }, 10000);
 </script>
 </body>
