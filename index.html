@@ -1012,7 +1012,7 @@
     }
 
     /* ============================
-       BARS / COINS TABLE
+       BARS / COINS CLEAN TABLE
     ============================ */
     .barsCoinsWrap {
       height: 100%;
@@ -1036,57 +1036,84 @@
       background: black;
       border-radius: 24px;
       display: grid;
-      grid-template-rows: auto 1fr;
+      grid-template-rows: 1fr;
       overflow: hidden;
       min-height: 0;
-    }
-
-    .barsCoinsCols {
-      display: grid;
-      grid-template-columns: 1fr repeat(4, 1fr);
-      gap: 10px;
-      padding: 14px 14px 10px 14px;
-      font-size: 14px;
-      font-weight: 900;
-      opacity: 0.75;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-
-    .barsCoinsRows {
-      padding: 0 14px 14px 14px;
-      overflow: hidden;
-      display: grid;
-      grid-auto-rows: 1fr;
-      gap: 10px;
-    }
-
-    .barsCoinsRow {
-      background: rgba(255,255,255,0.08);
-      border-radius: 14px;
       padding: 12px;
-      display: grid;
-      grid-template-columns: 1fr repeat(4, 1fr);
-      gap: 10px;
-      align-items: center;
+      box-sizing: border-box;
+    }
+
+    .barsCoinsTableWrap {
+      min-height: 0;
       overflow: hidden;
-      font-size: clamp(11px, 1.55vw, 19px);
-      line-height: 1.15;
+      border: 2px solid rgba(255,255,255,0.18);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.03);
     }
 
-    .barsCoinsHead {
-      font-weight: 900;
+    .barsCoinsTable {
+      width: 100%;
+      height: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .barsCoinsTable thead th {
+      background: rgba(255,215,0,0.12);
       color: #FFD700;
-      white-space: nowrap;
-    }
-
-    .barsCoinsCell {
+      font-size: clamp(12px, 1.3vw, 18px);
       font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 14px 10px;
+      border-right: 1px solid rgba(255,255,255,0.16);
+      border-bottom: 2px solid rgba(255,255,255,0.18);
       text-align: center;
       white-space: nowrap;
+    }
+
+    .barsCoinsTable thead th:first-child {
+      text-align: left;
+      padding-left: 16px;
+    }
+
+    .barsCoinsTable thead th:last-child {
+      border-right: none;
+    }
+
+    .barsCoinsTable tbody tr {
+      background: rgba(255,255,255,0.04);
+    }
+
+    .barsCoinsTable tbody tr:nth-child(even) {
+      background: rgba(255,255,255,0.07);
+    }
+
+    .barsCoinsTable tbody td {
+      font-size: clamp(12px, 1.5vw, 20px);
+      font-weight: 900;
       color: #fff;
+      padding: 12px 10px;
+      border-right: 1px solid rgba(255,255,255,0.14);
+      border-bottom: 1px solid rgba(255,255,255,0.14);
+      text-align: center;
+      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+    .barsCoinsTable tbody td:first-child {
+      color: #FFD700;
+      text-align: left;
+      padding-left: 16px;
+    }
+
+    .barsCoinsTable tbody td:last-child {
+      border-right: none;
+    }
+
+    .barsCoinsTable tbody tr:last-child td {
+      border-bottom: none;
     }
 
     /* ============================
@@ -1319,25 +1346,27 @@
         font-size: 14px;
       }
 
-      .barsCoinsCols,
-      .barsCoinsRow {
-        grid-template-columns: 0.95fr repeat(4, 1fr);
-        gap: 6px;
+      .barsCoinsCard {
+        padding: 8px;
       }
 
-      .barsCoinsCols {
+      .barsCoinsTableWrap {
+        border-radius: 14px;
+      }
+
+      .barsCoinsTable thead th {
         font-size: 10px;
-        padding: 12px 10px 8px 10px;
+        padding: 10px 6px;
       }
 
-      .barsCoinsRows {
-        padding: 0 10px 10px 10px;
-        gap: 8px;
-      }
-
-      .barsCoinsRow {
-        padding: 10px 8px;
+      .barsCoinsTable tbody td {
         font-size: 10px;
+        padding: 9px 6px;
+      }
+
+      .barsCoinsTable thead th:first-child,
+      .barsCoinsTable tbody td:first-child {
+        padding-left: 10px;
       }
 
       .notif {
@@ -1647,14 +1676,20 @@
       <div class="barsCoinsStatus" id="barsCoinsStatus">Loading…</div>
 
       <div class="barsCoinsCard">
-        <div class="barsCoinsCols">
-          <div></div>
-          <div style="text-align:center">PAMP</div>
-          <div style="text-align:center">BAR</div>
-          <div style="text-align:center">COIN</div>
-          <div style="text-align:center">VALCAMBI</div>
+        <div class="barsCoinsTableWrap">
+          <table class="barsCoinsTable">
+            <thead>
+              <tr>
+                <th></th>
+                <th>PAMP</th>
+                <th>BAR</th>
+                <th>COIN</th>
+                <th>VALCAMBI</th>
+              </tr>
+            </thead>
+            <tbody id="barsCoinsTbody"></tbody>
+          </table>
         </div>
-        <div class="barsCoinsRows" id="barsCoinsRows"></div>
       </div>
     </div>
   </div>
@@ -2139,9 +2174,9 @@
   }
 
   function renderBarsCoinsRows(rows) {
-    const box = document.getElementById('barsCoinsRows');
-    if (!box) return;
-    box.innerHTML = '';
+    const tbody = document.getElementById('barsCoinsTbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
 
     const labels = ['1 G', '2.5 G', '5 G', '8 G', '10 G', '20 G', '31.10 G', '31.45 G', '50 G', '100 G'];
     const arr = Array.isArray(rows) ? rows : [];
@@ -2155,36 +2190,30 @@
         VALCAMBI: '—'
       };
 
-      const row = document.createElement('div');
-      row.className = 'barsCoinsRow';
+      const tr = document.createElement('tr');
 
-      const c0 = document.createElement('div');
-      c0.className = 'barsCoinsHead';
+      const c0 = document.createElement('td');
       c0.textContent = r.size ?? labels[i];
 
-      const c1 = document.createElement('div');
-      c1.className = 'barsCoinsCell';
-      c1.textContent = (r.PAMP && r.PAMP !== '—') ? `${r.PAMP} PCS` : '—';
+      const c1 = document.createElement('td');
+      c1.textContent = r.PAMP ?? '—';
 
-      const c2 = document.createElement('div');
-      c2.className = 'barsCoinsCell';
-      c2.textContent = (r.BAR && r.BAR !== '—') ? `${r.BAR} PCS` : '—';
+      const c2 = document.createElement('td');
+      c2.textContent = r.BAR ?? '—';
 
-      const c3 = document.createElement('div');
-      c3.className = 'barsCoinsCell';
-      c3.textContent = (r.COIN && r.COIN !== '—') ? `${r.COIN} PCS` : '—';
+      const c3 = document.createElement('td');
+      c3.textContent = r.COIN ?? '—';
 
-      const c4 = document.createElement('div');
-      c4.className = 'barsCoinsCell';
-      c4.textContent = (r.VALCAMBI && r.VALCAMBI !== '—') ? `${r.VALCAMBI} PCS` : '—';
+      const c4 = document.createElement('td');
+      c4.textContent = r.VALCAMBI ?? '—';
 
-      row.appendChild(c0);
-      row.appendChild(c1);
-      row.appendChild(c2);
-      row.appendChild(c3);
-      row.appendChild(c4);
+      tr.appendChild(c0);
+      tr.appendChild(c1);
+      tr.appendChild(c2);
+      tr.appendChild(c3);
+      tr.appendChild(c4);
 
-      box.appendChild(row);
+      tbody.appendChild(tr);
     }
   }
 
