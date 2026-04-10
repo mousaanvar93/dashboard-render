@@ -118,7 +118,7 @@ BARS_COINS_ROW_LABELS = [
     "10 G",
     "20 G",
     "31.10 G",
-    "31.45 G",
+    "15.55 G",
     "50 G",
     "100 G",
 ]
@@ -128,9 +128,10 @@ BARS_COINS_ID_MAP = {
     "BAR":      [34, 69, 35, 36, 37, 38, 39, 40, 41, 42],
     "COIN":     [43, 70, 44, 45, 46, 47, 48, 49, 50, 51],
     "VALCAMBI": [52, 71, 53, 54, 55, 56, 57, 58, 59, 60],
+    "EMIRATES": [82, 83, 84, 85, 86, 87, 88, 91, 89, 90],
 }
 
-BARS_COINS_COLUMN_ORDER = ["PAMP", "BAR", "COIN", "VALCAMBI"]
+BARS_COINS_COLUMN_ORDER = ["PAMP", "BAR", "COIN", "VALCAMBI", "EMIRATES"]
 
 # --------------------------
 # GRAPH / SHAREPOINT CONFIG (Render env vars)

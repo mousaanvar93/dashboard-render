@@ -1702,6 +1702,7 @@
                 <th>BAR</th>
                 <th>COIN</th>
                 <th>VALCAMBI</th>
+                <th>EMIRATES</th>
               </tr>
             </thead>
             <tbody id="barsCoinsTbody"></tbody>
@@ -2200,7 +2201,7 @@
     if (!tbody) return;
     tbody.innerHTML = '';
 
-    const labels = ['1 G', '2.5 G', '5 G', '8 G', '10 G', '20 G', '31.10 G', '31.45 G', '50 G', '100 G'];
+    const labels = ['1 G', '2.5 G', '5 G', '8 G', '10 G', '20 G', '31.10 G', '15.55 G', '50 G', '100 G'];
     const arr = Array.isArray(rows) ? rows : [];
 
     for (let i = 0; i < labels.length; i++) {
@@ -2209,7 +2210,8 @@
         PAMP: '—',
         BAR: '—',
         COIN: '—',
-        VALCAMBI: '—'
+        VALCAMBI: '—',
+        EMIRATES: '—'
       };
 
       const tr = document.createElement('tr');
@@ -2229,11 +2231,15 @@
       const c4 = document.createElement('td');
       c4.textContent = r.VALCAMBI ?? '—';
 
+      const c5 = document.createElement('td');
+      c5.textContent = r.EMIRATES ?? '—';
+
       tr.appendChild(c0);
       tr.appendChild(c1);
       tr.appendChild(c2);
       tr.appendChild(c3);
       tr.appendChild(c4);
+      tr.appendChild(c5);
 
       tbody.appendChild(tr);
     }
