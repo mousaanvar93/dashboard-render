@@ -502,7 +502,7 @@
     }
 
     /* ============================
-       SCREENS 3/4/5 tables
+       SCREENS 3/4/5/6 tables
     ============================ */
     .screenTableWrap {
       height: 100%;
@@ -1548,6 +1548,23 @@
     </div>
   </div>
 
+  <!-- SCREEN 6 -->
+  <div class="screen hidden" id="screen6">
+    <div class="screenTableWrap">
+      <div class="tableHeaderBar">
+        <div class="bigTitle">EMIRATES</div>
+        <div class="tableStatus" id="emiratesStatus">Loading…</div>
+      </div>
+
+      <div class="tableCard">
+        <div class="cols3">
+          <div>Type</div><div style="text-align:right">Disc</div><div style="text-align:right">Cert Charge</div>
+        </div>
+        <div class="rows3" id="emiratesRows"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- DIA CALC SCREEN -->
   <div class="screen hidden" id="diaCalcScreen">
     <div class="diaCalcScreenWrap">
@@ -1736,7 +1753,7 @@
   }
 
   let currentScreen = 1;
-  const TOTAL_SCREENS = 5;
+  const TOTAL_SCREENS = 6;
   let isDiaCalcOpen = false;
   let isPasswordOpen = false;
   let isAdminOpen = false;
@@ -1894,6 +1911,8 @@
       updateSection('LOCAL');
     } else if (currentScreen === 5) {
       updateSection('VALCAMBI');
+    } else if (currentScreen === 6) {
+      updateSection('EMIRATES');
     }
   }, { passive: true });
 
@@ -2080,17 +2099,20 @@
     const statusId =
       sec === 'PAMP' ? 'pampStatus' :
       sec === 'LOCAL' ? 'localStatus' :
-      'valcambiStatus';
+      sec === 'VALCAMBI' ? 'valcambiStatus' :
+      'emiratesStatus';
 
     const rowsId =
       sec === 'PAMP' ? 'pampRows' :
       sec === 'LOCAL' ? 'localRows' :
-      'valcambiRows';
+      sec === 'VALCAMBI' ? 'valcambiRows' :
+      'emiratesRows';
 
     const padTo =
       sec === 'PAMP' ? 12 :
       sec === 'LOCAL' ? 11 :
-      8;
+      sec === 'VALCAMBI' ? 8 :
+      10;
 
     try {
       const data = await fetchJSON('/api/discounts/' + encodeURIComponent(sec));
@@ -2240,6 +2262,7 @@
   updateSection('PAMP');
   updateSection('LOCAL');
   updateSection('VALCAMBI');
+  updateSection('EMIRATES');
   updateDiamondCalc();
   updateOnhand22k();
   updateBarsCoins();
@@ -2278,6 +2301,7 @@
     if (currentScreen === 3 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('PAMP');
     else if (currentScreen === 4 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('LOCAL');
     else if (currentScreen === 5 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('VALCAMBI');
+    else if (currentScreen === 6 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('EMIRATES');
   }, 10000);
 </script>
 </body>

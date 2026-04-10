@@ -69,6 +69,10 @@ DISCOUNTS_SECTIONS = {
         "range": (29, 36),
         "extra": [],
     },
+    "EMIRATES": {
+        "range": (46, 55),
+        "extra": [],
+    },
 }
 
 # --------------------------
@@ -471,6 +475,7 @@ _discounts_cache = {
     "PAMP": {"rows": None, "ts": 0.0},
     "LOCAL": {"rows": None, "ts": 0.0},
     "VALCAMBI": {"rows": None, "ts": 0.0},
+    "EMIRATES": {"rows": None, "ts": 0.0},
 }
 
 
