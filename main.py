@@ -37,6 +37,11 @@ ITEMS = {
     "BR": {"id": 4, "use_0916": False, "tag": "24CASH", "color": "#00FF66"},
 }
 
+CASH_VARIANT_ITEMS = {
+    "C18": {"id": 58, "multiplier": 0.750, "tag": "18CASH", "color": "#3399FF"},
+    "C21": {"id": 57, "multiplier": 0.875, "tag": "21CASH", "color": "#3399FF"},
+}
+
 # --------------------------
 # SILVER BOXES CONFIG
 # --------------------------
@@ -257,6 +262,12 @@ def compute_final_4squares(gold_val, sp_val, use_0916):
     base = (gold_val / DIVISOR) * MULT_A
     if use_0916:
         base *= MULT_B
+    return base - sp_val
+
+
+def compute_cash_variant(gold_val, sp_val, multiplier):
+    base = (gold_val / DIVISOR) * MULT_A
+    base *= multiplier
     return base - sp_val
 
 
@@ -502,6 +513,9 @@ def get_sharepoint_values(site_id: str):
     for key, cfg in ITEMS.items():
         vals[key] = fetch_setval(site_id, cfg["id"])
 
+    for key, cfg in CASH_VARIANT_ITEMS.items():
+        vals[key] = fetch_setval(site_id, cfg["id"])
+
     vals["SILVER_BUY_ID5"] = fetch_setval(site_id, SILVER_BUY_ID)
     vals["SILVER_SELL_ID6"] = fetch_setval(site_id, SILVER_SELL_ID)
 
@@ -588,6 +602,8 @@ def blank_payload(status: str):
         "TR": {"tag": ITEMS["TR"]["tag"], "value": "—"},
         "BL": {"tag": ITEMS["BL"]["tag"], "value": "—"},
         "BR": {"tag": ITEMS["BR"]["tag"], "value": "—"},
+        "C18": {"tag": CASH_VARIANT_ITEMS["C18"]["tag"], "value": "—"},
+        "C21": {"tag": CASH_VARIANT_ITEMS["C21"]["tag"], "value": "—"},
 
         "silver_buy": "—",
         "silver_sell": "—",
@@ -637,6 +653,15 @@ def api_values():
                     out[key] = {"tag": cfg["tag"], "value": "INVALID"}
                     continue
                 final = compute_final_4squares(gold_val, sp_val, cfg["use_0916"])
+                out[key] = {"tag": cfg["tag"], "value": f"{final:,.0f}"}
+
+            # New 18CASH / 21CASH boxes
+            for key, cfg in CASH_VARIANT_ITEMS.items():
+                sp_val = safe_float(raw_map.get(key))
+                if sp_val is None:
+                    out[key] = {"tag": cfg["tag"], "value": "INVALID"}
+                    continue
+                final = compute_cash_variant(gold_val, sp_val, cfg["multiplier"])
                 out[key] = {"tag": cfg["tag"], "value": f"{final:,.0f}"}
 
             # Existing silver values - now AED/GRAM instead of AED/KG

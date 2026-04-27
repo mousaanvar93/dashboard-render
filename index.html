@@ -343,7 +343,7 @@
     .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
       gap: 10px;
       overflow: hidden;
     }
@@ -1504,6 +1504,22 @@
             </div>
             <div class="tag" id="BR_tag" style="color:#00FF66">24CASH</div>
           </div>
+
+          <div class="quad">
+            <div class="value" style="color:#3399FF">
+              <span class="num" id="C18_value">—</span>
+              <span class="unit">AED/GRAM</span>
+            </div>
+            <div class="tag" id="C18_tag" style="color:#3399FF">18CASH</div>
+          </div>
+
+          <div class="quad">
+            <div class="value" style="color:#3399FF">
+              <span class="num" id="C21_value">—</span>
+              <span class="unit">AED/GRAM</span>
+            </div>
+            <div class="tag" id="C21_tag" style="color:#3399FF">21CASH</div>
+          </div>
         </div>
 
         <div class="silverGrid">
@@ -2056,7 +2072,7 @@
       const data = await fetchJSON('/api/values');
       setText('statusText', data.status || 'OK');
 
-      for (const key of ['TL','TR','BL','BR']) {
+      for (const key of ['TL','TR','BL','BR','C18','C21']) {
         setText(key + '_tag', data[key]?.tag ?? '');
         setText(key + '_value', data[key]?.value ?? '—');
       }
@@ -2065,6 +2081,9 @@
       setText('SILVER_SELL_value', data.silver_sell ?? '—');
     } catch {
       setText('statusText', 'NETWORK ERROR');
+      for (const key of ['TL','TR','BL','BR','C18','C21']) {
+        setText(key + '_value', '—');
+      }
       setText('SILVER_BUY_value', '—');
       setText('SILVER_SELL_value', '—');
     }
