@@ -320,14 +320,15 @@
     }
 
     /* ============================
-       SCREEN 2 (old original screen 1)
+       SCREEN 2 — GOLD / SILVER BOXES ONLY
     ============================ */
     .page {
       height: 100%;
       display: grid;
-      grid-template-rows: 50% 50%;
+      grid-template-rows: 1fr auto;
       gap: 10px;
       padding: 10px;
+      padding-top: 52px;
       box-sizing: border-box;
     }
 
@@ -443,21 +444,45 @@
       letter-spacing: 0.5px;
     }
 
+    /* ============================
+       SCREEN 3 — FOREIGN RATES
+    ============================ */
+    .xratesScreenWrap {
+      height: 100%;
+      padding: 52px 10px 10px 10px;
+      box-sizing: border-box;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 12px;
+    }
+
+    .xratesTitle {
+      font-size: clamp(34px, 6vw, 64px);
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #FFD700;
+    }
+
     .xpanel {
       border: 10px solid white;
       background: black;
       padding: 12px;
       box-sizing: border-box;
       display: grid;
-      grid-template-rows: auto 1fr;
+      grid-template-rows: 1fr;
       gap: 8px;
       overflow: hidden;
+      border-radius: 24px;
+      min-height: 0;
     }
 
     .xstatus {
       font-size: 16px;
       opacity: 0.8;
       min-height: 18px;
+      font-weight: 800;
+      text-align: right;
     }
 
     .xgrid {
@@ -499,14 +524,15 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       width: 100%;
+      box-sizing: border-box;
     }
 
     /* ============================
-       SCREENS 3/4/5/6 tables
+       SCREENS 4/5/6/7 tables
     ============================ */
     .screenTableWrap {
       height: 100%;
-      padding: 10px;
+      padding: 52px 10px 10px 10px;
       box-sizing: border-box;
       display: grid;
       grid-template-rows: auto auto 1fr;
@@ -1212,9 +1238,9 @@
       }
 
       .page {
-        grid-template-rows: 50% 50%;
+        grid-template-rows: 1fr auto;
         gap: 8px;
-        padding: 8px;
+        padding: 50px 8px 8px 8px;
       }
 
       .topWrap { gap: 8px; }
@@ -1224,7 +1250,12 @@
       .silverGrid { gap: 8px; min-height: 110px; }
       .silverBox { border-width: 8px; }
 
-      .xpanel { border-width: 8px; padding: 10px; }
+      .xratesScreenWrap {
+        padding: 50px 8px 8px 8px;
+        gap: 10px;
+      }
+
+      .xpanel { border-width: 8px; padding: 10px; border-radius: 18px; }
       .xgrid { gap: 8px; }
 
       .xrow {
@@ -1253,6 +1284,10 @@
       .value, .silverValue {
         flex-wrap: wrap;
         row-gap: 2px;
+      }
+
+      .screenTableWrap {
+        padding: 50px 8px 8px 8px;
       }
 
       .tableCard { border-width: 8px; }
@@ -1489,16 +1524,27 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3 FOREIGN RATES -->
+  <div class="screen hidden" id="screen3">
+    <div class="xratesScreenWrap">
+      <div class="tableHeaderBar">
+        <div class="xratesTitle">FOREIGN RATES</div>
+        <div class="xstatus" id="xratesStatus"></div>
+      </div>
+
+      <div></div>
 
       <div class="xpanel">
-        <div class="xstatus" id="xratesStatus"></div>
         <div class="xgrid" id="xratesGrid"></div>
       </div>
     </div>
   </div>
 
-  <!-- SCREEN 3 -->
-  <div class="screen hidden" id="screen3">
+  <!-- SCREEN 4 -->
+  <div class="screen hidden" id="screen4">
     <div class="screenTableWrap">
       <div class="tableHeaderBar">
         <div class="bigTitle">PAMP</div>
@@ -1514,8 +1560,8 @@
     </div>
   </div>
 
-  <!-- SCREEN 4 -->
-  <div class="screen hidden" id="screen4">
+  <!-- SCREEN 5 -->
+  <div class="screen hidden" id="screen5">
     <div class="screenTableWrap">
       <div class="tableHeaderBar">
         <div class="bigTitle">LOCAL</div>
@@ -1531,8 +1577,8 @@
     </div>
   </div>
 
-  <!-- SCREEN 5 -->
-  <div class="screen hidden" id="screen5">
+  <!-- SCREEN 6 -->
+  <div class="screen hidden" id="screen6">
     <div class="screenTableWrap">
       <div class="tableHeaderBar">
         <div class="bigTitle">VALCAMBI</div>
@@ -1548,8 +1594,8 @@
     </div>
   </div>
 
-  <!-- SCREEN 6 -->
-  <div class="screen hidden" id="screen6">
+  <!-- SCREEN 7 -->
+  <div class="screen hidden" id="screen7">
     <div class="screenTableWrap">
       <div class="tableHeaderBar">
         <div class="bigTitle">EMIRATES</div>
@@ -1754,7 +1800,7 @@
   }
 
   let currentScreen = 1;
-  const TOTAL_SCREENS = 6;
+  const TOTAL_SCREENS = 7;
   let isDiaCalcOpen = false;
   let isPasswordOpen = false;
   let isAdminOpen = false;
@@ -1905,14 +1951,15 @@
       updateLuxurySell();
     } else if (currentScreen === 2) {
       updateSquaresAndSilver();
-      updateXrates();
     } else if (currentScreen === 3) {
-      updateSection('PAMP');
+      updateXrates();
     } else if (currentScreen === 4) {
-      updateSection('LOCAL');
+      updateSection('PAMP');
     } else if (currentScreen === 5) {
-      updateSection('VALCAMBI');
+      updateSection('LOCAL');
     } else if (currentScreen === 6) {
+      updateSection('VALCAMBI');
+    } else if (currentScreen === 7) {
       updateSection('EMIRATES');
     }
   }, { passive: true });
@@ -2286,7 +2333,7 @@
   }, 5000);
 
   setInterval(() => {
-    if (currentScreen === 2 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) {
+    if (currentScreen === 3 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) {
       updateXrates();
     }
   }, 15000);
@@ -2304,10 +2351,10 @@
   }, 10000);
 
   setInterval(() => {
-    if (currentScreen === 3 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('PAMP');
-    else if (currentScreen === 4 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('LOCAL');
-    else if (currentScreen === 5 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('VALCAMBI');
-    else if (currentScreen === 6 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('EMIRATES');
+    if (currentScreen === 4 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('PAMP');
+    else if (currentScreen === 5 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('LOCAL');
+    else if (currentScreen === 6 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('VALCAMBI');
+    else if (currentScreen === 7 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('EMIRATES');
   }, 10000);
 </script>
 </body>
