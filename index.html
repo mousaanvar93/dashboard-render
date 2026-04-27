@@ -343,7 +343,7 @@
     .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr 1fr;
+      grid-template-rows: repeat(4, 1fr);
       gap: 10px;
       overflow: hidden;
     }
@@ -360,7 +360,7 @@
 
     .value {
       font-weight: 800;
-      font-size: clamp(22px, 8vw, 110px);
+      font-size: clamp(20px, 6.4vw, 86px);
       text-align: center;
       line-height: 1;
       padding: 10px;
@@ -1475,6 +1475,38 @@
         <div class="grid">
           <div class="quad">
             <div class="value" style="color:#FFD700">
+              <span class="num" id="E18_value">—</span>
+              <span class="unit">AED/GRAM</span>
+            </div>
+            <div class="tag" id="E18_tag" style="color:#FFD700">18EXCH</div>
+          </div>
+
+          <div class="quad">
+            <div class="value" style="color:#00FF66">
+              <span class="num" id="C18_value">—</span>
+              <span class="unit">AED/GRAM</span>
+            </div>
+            <div class="tag" id="C18_tag" style="color:#00FF66">18CASH</div>
+          </div>
+
+          <div class="quad">
+            <div class="value" style="color:#FFD700">
+              <span class="num" id="E21_value">—</span>
+              <span class="unit">AED/GRAM</span>
+            </div>
+            <div class="tag" id="E21_tag" style="color:#FFD700">21EXCH</div>
+          </div>
+
+          <div class="quad">
+            <div class="value" style="color:#00FF66">
+              <span class="num" id="C21_value">—</span>
+              <span class="unit">AED/GRAM</span>
+            </div>
+            <div class="tag" id="C21_tag" style="color:#00FF66">21CASH</div>
+          </div>
+
+          <div class="quad">
+            <div class="value" style="color:#FFD700">
               <span class="num" id="TL_value">—</span>
               <span class="unit">AED/GRAM</span>
             </div>
@@ -1504,24 +1536,7 @@
             </div>
             <div class="tag" id="BR_tag" style="color:#00FF66">24CASH</div>
           </div>
-
-          <div class="quad">
-            <div class="value" style="color:#3399FF">
-              <span class="num" id="C18_value">—</span>
-              <span class="unit">AED/GRAM</span>
-            </div>
-            <div class="tag" id="C18_tag" style="color:#3399FF">18CASH</div>
-          </div>
-
-          <div class="quad">
-            <div class="value" style="color:#3399FF">
-              <span class="num" id="C21_value">—</span>
-              <span class="unit">AED/GRAM</span>
-            </div>
-            <div class="tag" id="C21_tag" style="color:#3399FF">21CASH</div>
-          </div>
         </div>
-
         <div class="silverGrid">
           <div class="silverBox">
             <div class="silverValue">
@@ -2072,7 +2087,7 @@
       const data = await fetchJSON('/api/values');
       setText('statusText', data.status || 'OK');
 
-      for (const key of ['TL','TR','BL','BR','C18','C21']) {
+      for (const key of ['E18','C18','E21','C21','TL','TR','BL','BR']) {
         setText(key + '_tag', data[key]?.tag ?? '');
         setText(key + '_value', data[key]?.value ?? '—');
       }
@@ -2081,7 +2096,7 @@
       setText('SILVER_SELL_value', data.silver_sell ?? '—');
     } catch {
       setText('statusText', 'NETWORK ERROR');
-      for (const key of ['TL','TR','BL','BR','C18','C21']) {
+      for (const key of ['E18','C18','E21','C21','TL','TR','BL','BR']) {
         setText(key + '_value', '—');
       }
       setText('SILVER_BUY_value', '—');

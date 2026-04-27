@@ -37,9 +37,11 @@ ITEMS = {
     "BR": {"id": 4, "use_0916": False, "tag": "24CASH", "color": "#00FF66"},
 }
 
-CASH_VARIANT_ITEMS = {
-    "C18": {"id": 58, "multiplier": 0.750, "tag": "18CASH", "color": "#3399FF"},
-    "C21": {"id": 57, "multiplier": 0.875, "tag": "21CASH", "color": "#3399FF"},
+KARAT_VARIANT_ITEMS = {
+    "E18": {"id": 60, "multiplier": 0.750, "tag": "18EXCH", "color": "#FFD700"},
+    "C18": {"id": 58, "multiplier": 0.750, "tag": "18CASH", "color": "#00FF66"},
+    "E21": {"id": 59, "multiplier": 0.875, "tag": "21EXCH", "color": "#FFD700"},
+    "C21": {"id": 57, "multiplier": 0.875, "tag": "21CASH", "color": "#00FF66"},
 }
 
 # --------------------------
@@ -513,7 +515,7 @@ def get_sharepoint_values(site_id: str):
     for key, cfg in ITEMS.items():
         vals[key] = fetch_setval(site_id, cfg["id"])
 
-    for key, cfg in CASH_VARIANT_ITEMS.items():
+    for key, cfg in KARAT_VARIANT_ITEMS.items():
         vals[key] = fetch_setval(site_id, cfg["id"])
 
     vals["SILVER_BUY_ID5"] = fetch_setval(site_id, SILVER_BUY_ID)
@@ -602,8 +604,10 @@ def blank_payload(status: str):
         "TR": {"tag": ITEMS["TR"]["tag"], "value": "—"},
         "BL": {"tag": ITEMS["BL"]["tag"], "value": "—"},
         "BR": {"tag": ITEMS["BR"]["tag"], "value": "—"},
-        "C18": {"tag": CASH_VARIANT_ITEMS["C18"]["tag"], "value": "—"},
-        "C21": {"tag": CASH_VARIANT_ITEMS["C21"]["tag"], "value": "—"},
+        "E18": {"tag": KARAT_VARIANT_ITEMS["E18"]["tag"], "value": "—"},
+        "C18": {"tag": KARAT_VARIANT_ITEMS["C18"]["tag"], "value": "—"},
+        "E21": {"tag": KARAT_VARIANT_ITEMS["E21"]["tag"], "value": "—"},
+        "C21": {"tag": KARAT_VARIANT_ITEMS["C21"]["tag"], "value": "—"},
 
         "silver_buy": "—",
         "silver_sell": "—",
@@ -655,8 +659,8 @@ def api_values():
                 final = compute_final_4squares(gold_val, sp_val, cfg["use_0916"])
                 out[key] = {"tag": cfg["tag"], "value": f"{final:,.0f}"}
 
-            # New 18CASH / 21CASH boxes
-            for key, cfg in CASH_VARIANT_ITEMS.items():
+            # New 18/21 EXCH and CASH boxes
+            for key, cfg in KARAT_VARIANT_ITEMS.items():
                 sp_val = safe_float(raw_map.get(key))
                 if sp_val is None:
                     out[key] = {"tag": cfg["tag"], "value": "INVALID"}
