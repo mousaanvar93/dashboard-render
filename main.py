@@ -2,6 +2,7 @@
 import os
 import time
 import threading
+import re
 import requests
 import msal
 
@@ -9,11 +10,14 @@ from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, JSONResponse
 
 # --------------------------
-# SUCCESSFN
+# SUCCESSFN + FALLBACK GOLDPRICE.ORG
 # --------------------------
 SUCCESSFN_API_URL = "https://www.successfn.com/wp-content/themes/neve/page-templates/getprice.php?site=cfgs"
 SUCCESSFN_GOLD_SYMBOL = "LLGUSD"   # Gold for 4 squares
 SUCCESSFN_SILVER_SYMBOL = "LLSUSD" # Silver for kilo silver boxes
+
+# Fallback source for GOLD ounce price only, used when SuccessFN gold fails.
+GOLDPRICE_FALLBACK_URL = "https://goldprice.org/live-gold-price.html"
 
 SUCCESSFN_POLL_SECONDS = 15
 SHAREPOINT_POLL_SECONDS = 300
@@ -260,6 +264,49 @@ def fetch_successfn_prices():
     return gold, silver
 
 
+def fetch_goldprice_org_gold_ounce():
+    """
+    Fallback parser for https://goldprice.org/live-gold-price.html
+
+    Expected HTML example:
+    <span class="gpoticker-price">4,584.06</span>
+
+    The first gpoticker-price span inside this page is treated as the live GOLD ounce price.
+    """
+    r = requests.get(
+        GOLDPRICE_FALLBACK_URL,
+        headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                          "(KHTML, like Gecko) Chrome/120.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        },
+        timeout=20,
+    )
+    r.raise_for_status()
+
+    html = r.text
+
+    # Main method: first span with class gpoticker-price. This matches the element you inspected.
+    m = re.search(
+        r'<span[^>]*class=["\'][^"\']*gpoticker-price[^"\']*["\'][^>]*>\s*([0-9,]+(?:\.\d+)?)\s*</span>',
+        html,
+        flags=re.IGNORECASE,
+    )
+    if m:
+        return safe_float(m.group(1))
+
+    # Backup method: find the tick-value price-value block, then look for a number inside it.
+    m = re.search(
+        r'<div[^>]*class=["\'][^"\']*price-value[^"\']*["\'][^>]*>.*?([0-9,]+(?:\.\d+)?)',
+        html,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    if m:
+        return safe_float(m.group(1))
+
+    return None
+
+
 def compute_final_4squares(gold_val, sp_val, use_0916):
     base = (gold_val / DIVISOR) * MULT_A
     if use_0916:
@@ -478,7 +525,7 @@ def home():
 # --------------------------
 _lock = threading.Lock()
 
-_success_cache = {"gold": None, "silver": None, "ts": 0.0}
+_success_cache = {"gold": None, "silver": None, "gold_source": "NONE", "ts": 0.0}
 _sharepoint_cache = {"vals": None, "ts": 0.0}
 _xrates_cache = {"items": None, "ts": 0.0}
 _diamond_calc_cache = {"vals": None, "ts": 0.0}
@@ -494,15 +541,57 @@ _discounts_cache = {
 
 
 def get_success_values():
+    """
+    Primary: SuccessFN for both gold and silver.
+    Fallback: goldprice.org for GOLD only if SuccessFN errors or does not return LLGUSD.
+
+    Important behavior:
+    - Keeps trying SuccessFN after cache expires.
+    - If SuccessFN fails, gold falls back to goldprice.org.
+    - If silver is unavailable, silver remains None or old cached value; the page still works.
+    """
     now = time.time()
     if _success_cache["gold"] is not None and (now - _success_cache["ts"]) < SUCCESSFN_POLL_SECONDS:
-        return _success_cache["gold"], _success_cache["silver"]
+        return _success_cache["gold"], _success_cache["silver"], _success_cache.get("gold_source", "CACHE")
 
-    gold, silver = fetch_successfn_prices()
-    _success_cache["gold"] = gold
-    _success_cache["silver"] = silver
-    _success_cache["ts"] = now
-    return gold, silver
+    old_gold = _success_cache.get("gold")
+    old_silver = _success_cache.get("silver")
+
+    # 1) Try SuccessFN first every time cache expires.
+    try:
+        gold, silver = fetch_successfn_prices()
+        if gold is None:
+            raise RuntimeError("SuccessFN returned no LLGUSD gold value")
+
+        _success_cache["gold"] = gold
+        _success_cache["silver"] = silver if silver is not None else old_silver
+        _success_cache["gold_source"] = "SUCCESSFN"
+        _success_cache["ts"] = now
+        return _success_cache["gold"], _success_cache["silver"], _success_cache["gold_source"]
+
+    except Exception:
+        # 2) If SuccessFN fails, try goldprice.org for GOLD ounce price.
+        try:
+            fallback_gold = fetch_goldprice_org_gold_ounce()
+            if fallback_gold is None:
+                raise RuntimeError("goldprice.org returned no parseable gold value")
+
+            _success_cache["gold"] = fallback_gold
+            _success_cache["silver"] = old_silver
+            _success_cache["gold_source"] = "GOLDPRICE.ORG"
+            _success_cache["ts"] = now
+            return _success_cache["gold"], _success_cache["silver"], _success_cache["gold_source"]
+
+        except Exception:
+            # 3) Last protection: if both sources fail, use old cached value if available.
+            if old_gold is not None:
+                _success_cache["gold"] = old_gold
+                _success_cache["silver"] = old_silver
+                _success_cache["gold_source"] = "OLD CACHE"
+                _success_cache["ts"] = now
+                return _success_cache["gold"], _success_cache["silver"], _success_cache["gold_source"]
+
+            return None, old_silver, "NO GOLD SOURCE"
 
 
 def get_sharepoint_values(site_id: str):
@@ -611,6 +700,7 @@ def blank_payload(status: str):
 
         "silver_buy": "—",
         "silver_sell": "—",
+        "gold_source": "NONE",
     }
 
 
@@ -623,14 +713,12 @@ def api_values():
             return JSONResponse(blank_payload("SHAREPOINT ERROR (SITE)"))
 
         try:
-            gold_val, silver_val = get_success_values()
+            gold_val, silver_val, gold_source = get_success_values()
             if gold_val is None:
-                return JSONResponse(blank_payload("SUCCESSFN ERROR (LLGUSD)"))
-            if silver_val is None:
-                return JSONResponse(blank_payload("SUCCESSFN ERROR (LLSUSD)"))
+                return JSONResponse(blank_payload("GOLD PRICE ERROR"))
 
             raw_map = get_sharepoint_values(site_id)
-            out = {"status": "OK"}
+            out = {"status": "OK", "gold_source": gold_source}
 
             # New luxury sell screen values
             sell22 = safe_float(raw_map.get("SELL_PRICE_22_ID39"))
@@ -668,12 +756,17 @@ def api_values():
                 final = compute_cash_variant(gold_val, sp_val, cfg["multiplier"])
                 out[key] = {"tag": cfg["tag"], "value": f"{final:,.0f}"}
 
-            # Existing silver values - now AED/GRAM instead of AED/KG
+            # Existing silver values - AED/GRAM.
+            # Silver has no goldprice.org fallback. If SuccessFN silver is unavailable, only silver boxes show INVALID.
             id5 = safe_float(raw_map.get("SILVER_BUY_ID5"))
             id6 = safe_float(raw_map.get("SILVER_SELL_ID6"))
 
-            out["silver_buy"] = "INVALID" if id5 is None else f"{(compute_kilo_silver(silver_val, -id5) / 1000):,.2f}"
-            out["silver_sell"] = "INVALID" if id6 is None else f"{(compute_kilo_silver(silver_val, +id6) / 1000):,.2f}"
+            if silver_val is None:
+                out["silver_buy"] = "INVALID"
+                out["silver_sell"] = "INVALID"
+            else:
+                out["silver_buy"] = "INVALID" if id5 is None else f"{(compute_kilo_silver(silver_val, -id5) / 1000):,.2f}"
+                out["silver_sell"] = "INVALID" if id6 is None else f"{(compute_kilo_silver(silver_val, +id6) / 1000):,.2f}"
 
             return JSONResponse(out)
 
