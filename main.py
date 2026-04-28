@@ -18,6 +18,7 @@ SUCCESSFN_GOLD_SYMBOL = "LLGUSD"
 SUCCESSFN_SILVER_SYMBOL = "LLSUSD"
 
 KITCO_GOLD_URL = "https://www.kitco.com/charts/gold"
+KITCO_SILVER_URL = "https://www.kitco.com/charts/silver"
 
 SUCCESSFN_POLL_SECONDS = 15
 SHAREPOINT_POLL_SECONDS = 300
@@ -233,9 +234,9 @@ def fetch_successfn_prices():
     return gold, silver
 
 
-def fetch_kitco_gold_ounce():
+def fetch_kitco_ounce_price(url: str):
     r = requests.get(
-        KITCO_GOLD_URL,
+        url,
         headers={
             "User-Agent": "Mozilla/5.0",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -246,8 +247,6 @@ def fetch_kitco_gold_ounce():
 
     html = unescape(r.text)
 
-    # Primary parser: looks for the visible Kitco row:
-    # ounce 4,582.40
     patterns = [
         r'(?is)>\s*ounce\s*<.*?>\s*([0-9][0-9,]*\.\d+)\s*<',
         r'(?is)\bounce\b\s*</p>\s*<p[^>]*>\s*([0-9][0-9,]*\.\d+)\s*</p>',
@@ -260,7 +259,6 @@ def fetch_kitco_gold_ounce():
             if val is not None:
                 return val
 
-    # Fallback parser: strip HTML and search text near "ounce"
     flat = re.sub(r"<[^>]+>", " ", html)
     flat = re.sub(r"\s+", " ", flat)
 
@@ -270,24 +268,46 @@ def fetch_kitco_gold_ounce():
         if val is not None:
             return val
 
-    raise RuntimeError("Could not parse Kitco gold ounce price")
+    raise RuntimeError(f"Could not parse Kitco ounce price from {url}")
 
 
-def fetch_gold_with_fallback():
-    """
-    SuccessFN is primary.
-    Kitco is used only if SuccessFN fails or SuccessFN gold is missing.
-    Silver only comes from SuccessFN. If SuccessFN fails, silver will be None.
-    """
+def fetch_kitco_gold_ounce():
+    return fetch_kitco_ounce_price(KITCO_GOLD_URL)
+
+
+def fetch_kitco_silver_ounce():
+    return fetch_kitco_ounce_price(KITCO_SILVER_URL)
+
+
+def fetch_prices_with_fallback():
+    gold = None
+    silver = None
+    gold_source = ""
+    silver_source = ""
+
     try:
-        gold, silver = fetch_successfn_prices()
-        if gold is not None:
-            return gold, silver, "SUCCESSFN"
+        success_gold, success_silver = fetch_successfn_prices()
+
+        if success_gold is not None:
+            gold = success_gold
+            gold_source = "SUCCESSFN"
+
+        if success_silver is not None:
+            silver = success_silver
+            silver_source = "SUCCESSFN"
+
     except Exception:
         pass
 
-    gold = fetch_kitco_gold_ounce()
-    return gold, None, "KITCO"
+    if gold is None:
+        gold = fetch_kitco_gold_ounce()
+        gold_source = "KITCO"
+
+    if silver is None:
+        silver = fetch_kitco_silver_ounce()
+        silver_source = "KITCO"
+
+    return gold, silver, gold_source, silver_source
 
 
 def compute_final_4squares(gold_val, sp_val, use_0916):
@@ -510,7 +530,8 @@ _lock = threading.Lock()
 _success_cache = {
     "gold": None,
     "silver": None,
-    "source": "",
+    "gold_source": "",
+    "silver_source": "",
     "ts": 0.0,
 }
 
@@ -531,17 +552,23 @@ _discounts_cache = {
 def get_success_values():
     now = time.time()
 
-    if _success_cache["gold"] is not None and (now - _success_cache["ts"]) < SUCCESSFN_POLL_SECONDS:
-        return _success_cache["gold"], _success_cache["silver"], _success_cache["source"]
+    if _success_cache["gold"] is not None and _success_cache["silver"] is not None and (now - _success_cache["ts"]) < SUCCESSFN_POLL_SECONDS:
+        return (
+            _success_cache["gold"],
+            _success_cache["silver"],
+            _success_cache["gold_source"],
+            _success_cache["silver_source"],
+        )
 
-    gold, silver, source = fetch_gold_with_fallback()
+    gold, silver, gold_source, silver_source = fetch_prices_with_fallback()
 
     _success_cache["gold"] = gold
     _success_cache["silver"] = silver
-    _success_cache["source"] = source
+    _success_cache["gold_source"] = gold_source
+    _success_cache["silver_source"] = silver_source
     _success_cache["ts"] = now
 
-    return gold, silver, source
+    return gold, silver, gold_source, silver_source
 
 
 def get_sharepoint_values(site_id: str):
@@ -648,6 +675,7 @@ def blank_payload(status: str):
     return {
         "status": status,
         "gold_source": "—",
+        "silver_source": "—",
 
         "sell_price_22": "—",
         "discount_22": "—",
@@ -681,16 +709,19 @@ def api_values():
             return JSONResponse(blank_payload("SHAREPOINT ERROR (SITE)"))
 
         try:
-            gold_val, silver_val, gold_source = get_success_values()
+            gold_val, silver_val, gold_source, silver_source = get_success_values()
 
             if gold_val is None:
                 return JSONResponse(blank_payload("GOLD PRICE ERROR"))
 
             raw_map = get_sharepoint_values(site_id)
 
+            fallback_used = gold_source == "KITCO" or silver_source == "KITCO"
+
             out = {
-                "status": "OK" if gold_source == "SUCCESSFN" else "OK - KITCO GOLD FALLBACK",
+                "status": "OK - KITCO FALLBACK" if fallback_used else "OK",
                 "gold_source": gold_source,
+                "silver_source": silver_source,
             }
 
             sell22 = safe_float(raw_map.get("SELL_PRICE_22_ID39"))
