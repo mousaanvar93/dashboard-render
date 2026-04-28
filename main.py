@@ -2,22 +2,22 @@
 import os
 import time
 import threading
-import re
 import requests
 import msal
+import re
+from html import unescape
 
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, JSONResponse
 
 # --------------------------
-# SUCCESSFN + FALLBACK GOLDPRICE.ORG
+# SUCCESSFN / KITCO FALLBACK
 # --------------------------
 SUCCESSFN_API_URL = "https://www.successfn.com/wp-content/themes/neve/page-templates/getprice.php?site=cfgs"
-SUCCESSFN_GOLD_SYMBOL = "LLGUSD"   # Gold for 4 squares
-SUCCESSFN_SILVER_SYMBOL = "LLSUSD" # Silver for kilo silver boxes
+SUCCESSFN_GOLD_SYMBOL = "LLGUSD"
+SUCCESSFN_SILVER_SYMBOL = "LLSUSD"
 
-# Fallback source for GOLD ounce price only, used when SuccessFN gold fails.
-GOLDPRICE_FALLBACK_URL = "https://goldprice.org/live-gold-price.html"
+KITCO_GOLD_URL = "https://www.kitco.com/charts/gold"
 
 SUCCESSFN_POLL_SECONDS = 15
 SHAREPOINT_POLL_SECONDS = 300
@@ -28,7 +28,7 @@ ONHAND_POLL_SECONDS = 300
 BARS_COINS_POLL_SECONDS = 300
 
 # --------------------------
-# YOUR MATH (4 squares)
+# YOUR MATH
 # --------------------------
 DIVISOR = 31.1035
 MULT_A = 3.674
@@ -48,47 +48,23 @@ KARAT_VARIANT_ITEMS = {
     "C21": {"id": 57, "multiplier": 0.875, "tag": "21CASH", "color": "#00FF66"},
 }
 
-# --------------------------
-# SILVER BOXES CONFIG
-# --------------------------
 SILVER_BUY_ID = 5
 SILVER_SELL_ID = 6
 SILVER_MULT = 3.674
 SILVER_TO_KILO = 32.15
 
-# --------------------------
-# NEW LUXURY SELL SCREEN CONFIG
-# --------------------------
 DISCOUNT_22_ID = 37
 DISCOUNT_24_ID = 38
 SELL_PRICE_22_ID = 39
 SELL_PRICE_24_ID = 40
 
-# --------------------------
-# DISCOUNTS SCREENS CONFIG
-# --------------------------
 DISCOUNTS_SECTIONS = {
-    "PAMP": {
-        "range": (11, 21),
-        "extra": [43],
-    },
-    "LOCAL": {
-        "range": (22, 28),
-        "extra": [45, 44, 41, 42],
-    },
-    "VALCAMBI": {
-        "range": (29, 36),
-        "extra": [],
-    },
-    "EMIRATES": {
-        "range": (46, 55),
-        "extra": [],
-    },
+    "PAMP": {"range": (11, 21), "extra": [43]},
+    "LOCAL": {"range": (22, 28), "extra": [45, 44, 41, 42]},
+    "VALCAMBI": {"range": (29, 36), "extra": []},
+    "EMIRATES": {"range": (46, 55), "extra": []},
 }
 
-# --------------------------
-# DIAMOND CALCULATOR CONFIG
-# --------------------------
 DIAMOND_LIST_NAME = "diamondpricecalculator"
 DIAMOND_ITEM_ID = 1
 
@@ -99,45 +75,31 @@ DIAMOND_COLORSTONEVALUE_FIELD = "colorstonevalue"
 DIAMOND_CERTVALUE_FIELD = "certvalue"
 DIAMOND_MAKING_FIELD = "making"
 
-# --------------------------
-# ONHAND 22K CONFIG
-# --------------------------
 ONHAND_LIST_NAME = os.environ.get("ONHAND_LIST_NAME", "onhand")
 ONHAND_COUNT_FIELD = os.environ.get("ONHAND_COUNT_FIELD", "count")
 ONHAND_WEIGHT_FIELD = os.environ.get("ONHAND_WEIGHT_FIELD", "weight")
 
 ONHAND_22K_ROWS = [
-    {"label": "CHAIN",     "id": 1,  "weight_divisor": 1},
-    {"label": "BANGLE",    "id": 4,  "weight_divisor": 1},
-    {"label": "RING",      "id": 7,  "weight_divisor": 1},
-    {"label": "NECKLACE",  "id": 2,  "weight_divisor": 1},
-    {"label": "EARRING",   "id": 3,  "weight_divisor": 1},
-    {"label": "PENDANT",   "id": 6,  "weight_divisor": 1},
-    {"label": "BRACELET",  "id": 5,  "weight_divisor": 1},
-    {"label": "ANKLET",    "id": 67, "weight_divisor": 1},
-    {"label": "BACKCHAIN", "id": 9,  "weight_divisor": 1},
+    {"label": "CHAIN", "id": 1, "weight_divisor": 1},
+    {"label": "BANGLE", "id": 4, "weight_divisor": 1},
+    {"label": "RING", "id": 7, "weight_divisor": 1},
+    {"label": "NECKLACE", "id": 2, "weight_divisor": 1},
+    {"label": "EARRING", "id": 3, "weight_divisor": 1},
+    {"label": "PENDANT", "id": 6, "weight_divisor": 1},
+    {"label": "BRACELET", "id": 5, "weight_divisor": 1},
+    {"label": "ANKLET", "id": 67, "weight_divisor": 1},
+    {"label": "BACKCHAIN", "id": 9, "weight_divisor": 1},
 ]
 
-# --------------------------
-# BARS / COINS CONFIG
-# --------------------------
 BARS_COINS_ROW_LABELS = [
-    "1 G",
-    "2.5 G",
-    "5 G",
-    "8 G",
-    "10 G",
-    "20 G",
-    "31.10 G",
-    "15.55 G",
-    "50 G",
-    "100 G",
+    "1 G", "2.5 G", "5 G", "8 G", "10 G",
+    "20 G", "31.10 G", "15.55 G", "50 G", "100 G",
 ]
 
 BARS_COINS_ID_MAP = {
-    "PAMP":     [25, 68, 26, 27, 28, 29, 30, 31, 32, 33],
-    "BAR":      [34, 69, 35, 36, 37, 38, 39, 40, 41, 42],
-    "COIN":     [43, 70, 44, 45, 46, 47, 48, 49, 50, 51],
+    "PAMP": [25, 68, 26, 27, 28, 29, 30, 31, 32, 33],
+    "BAR": [34, 69, 35, 36, 37, 38, 39, 40, 41, 42],
+    "COIN": [43, 70, 44, 45, 46, 47, 48, 49, 50, 51],
     "VALCAMBI": [52, 71, 53, 54, 55, 56, 57, 58, 59, 60],
     "EMIRATES": [82, 83, 84, 85, 86, 87, 88, 91, 89, 90],
 }
@@ -145,7 +107,7 @@ BARS_COINS_ID_MAP = {
 BARS_COINS_COLUMN_ORDER = ["PAMP", "BAR", "COIN", "VALCAMBI", "EMIRATES"]
 
 # --------------------------
-# GRAPH / SHAREPOINT CONFIG (Render env vars)
+# GRAPH / SHAREPOINT CONFIG
 # --------------------------
 TENANT_ID = os.environ["TENANT_ID"]
 CLIENT_ID = os.environ["CLIENT_ID"]
@@ -154,12 +116,10 @@ CLIENT_SECRET = os.environ["CLIENT_SECRET"]
 SP_HOST = os.environ.get("SP_HOST", "anvarluxuryjewellery.sharepoint.com")
 SP_SITE_PATH = os.environ.get("SP_SITE_PATH", "/sites/PRODUCTENTRY")
 
-# list for values (IDs 1..6, 11..36, 37..40)
 SP_LIST_NAME = os.environ.get("SP_LIST_NAME", "staffinstructions")
 SP_COLUMN_NAME = os.environ.get("SP_COLUMN_NAME", "setval")
 SP_CERTCHARGE_COLUMN = os.environ.get("SP_CERTCHARGE_COLUMN", "certcharge")
 
-# list for xrates (top 10)
 XRATES_LIST_NAME = os.environ.get("XRATES_LIST_NAME", "xrates")
 XRATES_RATE_FIELD = os.environ.get("XRATES_RATE_FIELD", "rate")
 XRATES_TYPE_FIELD = os.environ.get("XRATES_TYPE_FIELD", "type")
@@ -180,10 +140,12 @@ _token_expires_at = 0
 def get_access_token() -> str:
     global _access_token, _token_expires_at
     now = int(time.time())
+
     if _access_token and now < (_token_expires_at - 60):
         return _access_token
 
     result = msal_app.acquire_token_for_client(scopes=SCOPE)
+
     if "access_token" not in result:
         raise RuntimeError(f"Token error: {result}")
 
@@ -206,9 +168,12 @@ def graph_get(url: str, timeout=25):
 def safe_float(x):
     if x is None:
         return None
+
     s = str(x).strip().replace(",", "")
+
     if not s:
         return None
+
     try:
         v = float(s)
         if v != v or v in (float("inf"), float("-inf")):
@@ -244,10 +209,12 @@ def fmt0_or_dash(x):
 
 def parse_successfn_symbol(text: str, symbol: str):
     records = text.replace("\r", "\n").split()
+
     for rec in records:
         parts = [p.strip() for p in rec.split(",")]
         if len(parts) >= 2 and parts[0] == symbol:
             return safe_float(parts[1])
+
     return None
 
 
@@ -258,59 +225,77 @@ def fetch_successfn_prices():
         timeout=20,
     )
     r.raise_for_status()
+
     text = r.text.strip()
     gold = parse_successfn_symbol(text, SUCCESSFN_GOLD_SYMBOL)
     silver = parse_successfn_symbol(text, SUCCESSFN_SILVER_SYMBOL)
+
     return gold, silver
 
 
-def fetch_goldprice_org_gold_ounce():
-    """
-    Fallback parser for https://goldprice.org/live-gold-price.html
-
-    Expected HTML example:
-    <span class="gpoticker-price">4,584.06</span>
-
-    The first gpoticker-price span inside this page is treated as the live GOLD ounce price.
-    """
+def fetch_kitco_gold_ounce():
     r = requests.get(
-        GOLDPRICE_FALLBACK_URL,
+        KITCO_GOLD_URL,
         headers={
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                          "(KHTML, like Gecko) Chrome/120.0 Safari/537.36",
+            "User-Agent": "Mozilla/5.0",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         },
         timeout=20,
     )
     r.raise_for_status()
 
-    html = r.text
+    html = unescape(r.text)
 
-    # Main method: first span with class gpoticker-price. This matches the element you inspected.
-    m = re.search(
-        r'<span[^>]*class=["\'][^"\']*gpoticker-price[^"\']*["\'][^>]*>\s*([0-9,]+(?:\.\d+)?)\s*</span>',
-        html,
-        flags=re.IGNORECASE,
-    )
+    # Primary parser: looks for the visible Kitco row:
+    # ounce 4,582.40
+    patterns = [
+        r'(?is)>\s*ounce\s*<.*?>\s*([0-9][0-9,]*\.\d+)\s*<',
+        r'(?is)\bounce\b\s*</p>\s*<p[^>]*>\s*([0-9][0-9,]*\.\d+)\s*</p>',
+    ]
+
+    for pattern in patterns:
+        m = re.search(pattern, html)
+        if m:
+            val = safe_float(m.group(1))
+            if val is not None:
+                return val
+
+    # Fallback parser: strip HTML and search text near "ounce"
+    flat = re.sub(r"<[^>]+>", " ", html)
+    flat = re.sub(r"\s+", " ", flat)
+
+    m = re.search(r"(?i)\bounce\b\s+([0-9][0-9,]*\.\d+)", flat)
     if m:
-        return safe_float(m.group(1))
+        val = safe_float(m.group(1))
+        if val is not None:
+            return val
 
-    # Backup method: find the tick-value price-value block, then look for a number inside it.
-    m = re.search(
-        r'<div[^>]*class=["\'][^"\']*price-value[^"\']*["\'][^>]*>.*?([0-9,]+(?:\.\d+)?)',
-        html,
-        flags=re.IGNORECASE | re.DOTALL,
-    )
-    if m:
-        return safe_float(m.group(1))
+    raise RuntimeError("Could not parse Kitco gold ounce price")
 
-    return None
+
+def fetch_gold_with_fallback():
+    """
+    SuccessFN is primary.
+    Kitco is used only if SuccessFN fails or SuccessFN gold is missing.
+    Silver only comes from SuccessFN. If SuccessFN fails, silver will be None.
+    """
+    try:
+        gold, silver = fetch_successfn_prices()
+        if gold is not None:
+            return gold, silver, "SUCCESSFN"
+    except Exception:
+        pass
+
+    gold = fetch_kitco_gold_ounce()
+    return gold, None, "KITCO"
 
 
 def compute_final_4squares(gold_val, sp_val, use_0916):
     base = (gold_val / DIVISOR) * MULT_A
+
     if use_0916:
         base *= MULT_B
+
     return base - sp_val
 
 
@@ -325,7 +310,7 @@ def compute_kilo_silver(silver_val: float, delta: float):
 
 
 # --------------------------
-# SHAREPOINT (Graph)
+# SHAREPOINT
 # --------------------------
 _site_id_cache = None
 
@@ -337,8 +322,10 @@ def fetch_site_id():
 
 def ensure_site_id():
     global _site_id_cache
+
     if not _site_id_cache:
         _site_id_cache = fetch_site_id()
+
     return _site_id_cache
 
 
@@ -374,19 +361,21 @@ def fetch_xrates_top10(site_id: str):
         f"/items?$top=10&$orderby=id asc&expand=fields"
     )
     data = graph_get(url)
-    items = data.get("value", [])
+
     out = []
-    for it in items:
+    for it in data.get("value", []):
         fields = it.get("fields", {}) or {}
         out.append({
             "rate": "" if fields.get(XRATES_RATE_FIELD) is None else str(fields.get(XRATES_RATE_FIELD)),
             "type": "" if fields.get(XRATES_TYPE_FIELD) is None else str(fields.get(XRATES_TYPE_FIELD)),
         })
+
     return out
 
 
 def fetch_discounts_section(site_id: str, section_name: str):
     cfg = DISCOUNTS_SECTIONS.get(section_name)
+
     if not cfg:
         return []
 
@@ -395,34 +384,24 @@ def fetch_discounts_section(site_id: str, section_name: str):
 
     rows = []
 
-    # Main range
     for item_id in range(start_id, end_id + 1):
         fields = fetch_item_fields(site_id, item_id)
 
-        typ = safe_str(fields.get("Title") or fields.get("title"))
-        disc = safe_str(fields.get(SP_COLUMN_NAME))
-        cert = safe_str(fields.get(SP_CERTCHARGE_COLUMN))
-
         rows.append({
             "id": item_id,
-            "type": typ,
-            "disc": disc,
-            "cert_charge": cert,
+            "type": safe_str(fields.get("Title") or fields.get("title")),
+            "disc": safe_str(fields.get(SP_COLUMN_NAME)),
+            "cert_charge": safe_str(fields.get(SP_CERTCHARGE_COLUMN)),
         })
 
-    # Extra IDs (in exact order you provided)
     for item_id in extra_ids:
         fields = fetch_item_fields(site_id, item_id)
 
-        typ = safe_str(fields.get("Title") or fields.get("title"))
-        disc = safe_str(fields.get(SP_COLUMN_NAME))
-        cert = safe_str(fields.get(SP_CERTCHARGE_COLUMN))
-
         rows.append({
             "id": item_id,
-            "type": typ,
-            "disc": disc,
-            "cert_charge": cert,
+            "type": safe_str(fields.get("Title") or fields.get("title")),
+            "disc": safe_str(fields.get(SP_COLUMN_NAME)),
+            "cert_charge": safe_str(fields.get(SP_CERTCHARGE_COLUMN)),
         })
 
     return rows
@@ -430,6 +409,7 @@ def fetch_discounts_section(site_id: str, section_name: str):
 
 def fetch_diamond_calc_values(site_id: str):
     fields = fetch_item_fields_from_list(site_id, DIAMOND_LIST_NAME, DIAMOND_ITEM_ID)
+
     return {
         "goldvalue": safe_float(fields.get(DIAMOND_GOLDVALUE_FIELD)),
         "diamondvalue": safe_float(fields.get(DIAMOND_DIAMONDVALUE_FIELD)),
@@ -442,6 +422,7 @@ def fetch_diamond_calc_values(site_id: str):
 
 def fetch_onhand_22k_rows(site_id: str):
     rows = []
+
     for cfg in ONHAND_22K_ROWS:
         fields = fetch_item_fields_from_list(site_id, ONHAND_LIST_NAME, cfg["id"])
 
@@ -449,6 +430,7 @@ def fetch_onhand_22k_rows(site_id: str):
         weight_val = safe_float(fields.get(ONHAND_WEIGHT_FIELD))
 
         divisor = cfg.get("weight_divisor", 1) or 1
+
         if weight_val is not None:
             weight_val = weight_val / divisor
 
@@ -457,6 +439,7 @@ def fetch_onhand_22k_rows(site_id: str):
             "count": fmt0_or_dash(count_val),
             "weight": fmt0_or_dash(weight_val),
         })
+
     return rows
 
 
@@ -504,8 +487,7 @@ def compute_diamond_sell_price(gold_weight, diamond_weight, color_stone_weight, 
     result_d = color_stone_weight * colorstonevalue * 3.674
     result_e = result_a + result_b + result_c + result_d + certvalue
 
-    final_price = result_e * margin
-    return final_price
+    return result_e * margin
 
 
 # --------------------------
@@ -525,7 +507,13 @@ def home():
 # --------------------------
 _lock = threading.Lock()
 
-_success_cache = {"gold": None, "silver": None, "gold_source": "NONE", "ts": 0.0}
+_success_cache = {
+    "gold": None,
+    "silver": None,
+    "source": "",
+    "ts": 0.0,
+}
+
 _sharepoint_cache = {"vals": None, "ts": 0.0}
 _xrates_cache = {"items": None, "ts": 0.0}
 _diamond_calc_cache = {"vals": None, "ts": 0.0}
@@ -541,61 +529,24 @@ _discounts_cache = {
 
 
 def get_success_values():
-    """
-    Primary: SuccessFN for both gold and silver.
-    Fallback: goldprice.org for GOLD only if SuccessFN errors or does not return LLGUSD.
-
-    Important behavior:
-    - Keeps trying SuccessFN after cache expires.
-    - If SuccessFN fails, gold falls back to goldprice.org.
-    - If silver is unavailable, silver remains None or old cached value; the page still works.
-    """
     now = time.time()
+
     if _success_cache["gold"] is not None and (now - _success_cache["ts"]) < SUCCESSFN_POLL_SECONDS:
-        return _success_cache["gold"], _success_cache["silver"], _success_cache.get("gold_source", "CACHE")
+        return _success_cache["gold"], _success_cache["silver"], _success_cache["source"]
 
-    old_gold = _success_cache.get("gold")
-    old_silver = _success_cache.get("silver")
+    gold, silver, source = fetch_gold_with_fallback()
 
-    # 1) Try SuccessFN first every time cache expires.
-    try:
-        gold, silver = fetch_successfn_prices()
-        if gold is None:
-            raise RuntimeError("SuccessFN returned no LLGUSD gold value")
+    _success_cache["gold"] = gold
+    _success_cache["silver"] = silver
+    _success_cache["source"] = source
+    _success_cache["ts"] = now
 
-        _success_cache["gold"] = gold
-        _success_cache["silver"] = silver if silver is not None else old_silver
-        _success_cache["gold_source"] = "SUCCESSFN"
-        _success_cache["ts"] = now
-        return _success_cache["gold"], _success_cache["silver"], _success_cache["gold_source"]
-
-    except Exception:
-        # 2) If SuccessFN fails, try goldprice.org for GOLD ounce price.
-        try:
-            fallback_gold = fetch_goldprice_org_gold_ounce()
-            if fallback_gold is None:
-                raise RuntimeError("goldprice.org returned no parseable gold value")
-
-            _success_cache["gold"] = fallback_gold
-            _success_cache["silver"] = old_silver
-            _success_cache["gold_source"] = "GOLDPRICE.ORG"
-            _success_cache["ts"] = now
-            return _success_cache["gold"], _success_cache["silver"], _success_cache["gold_source"]
-
-        except Exception:
-            # 3) Last protection: if both sources fail, use old cached value if available.
-            if old_gold is not None:
-                _success_cache["gold"] = old_gold
-                _success_cache["silver"] = old_silver
-                _success_cache["gold_source"] = "OLD CACHE"
-                _success_cache["ts"] = now
-                return _success_cache["gold"], _success_cache["silver"], _success_cache["gold_source"]
-
-            return None, old_silver, "NO GOLD SOURCE"
+    return gold, silver, source
 
 
 def get_sharepoint_values(site_id: str):
     now = time.time()
+
     if _sharepoint_cache["vals"] is not None and (now - _sharepoint_cache["ts"]) < SHAREPOINT_POLL_SECONDS:
         return _sharepoint_cache["vals"]
 
@@ -617,69 +568,86 @@ def get_sharepoint_values(site_id: str):
 
     _sharepoint_cache["vals"] = vals
     _sharepoint_cache["ts"] = now
+
     return vals
 
 
 def get_xrates(site_id: str):
     now = time.time()
+
     if _xrates_cache["items"] is not None and (now - _xrates_cache["ts"]) < XRATES_POLL_SECONDS:
         return _xrates_cache["items"]
 
     items = fetch_xrates_top10(site_id)
+
     _xrates_cache["items"] = items
     _xrates_cache["ts"] = now
+
     return items
 
 
 def get_discounts_section(site_id: str, section_name: str):
     now = time.time()
     cache = _discounts_cache.get(section_name)
+
     if cache and cache["rows"] is not None and (now - cache["ts"]) < DISCOUNTS_POLL_SECONDS:
         return cache["rows"]
 
     rows = fetch_discounts_section(site_id, section_name)
+
     if cache is not None:
         cache["rows"] = rows
         cache["ts"] = now
+
     return rows
 
 
 def get_diamond_calc_values(site_id: str):
     now = time.time()
+
     if _diamond_calc_cache["vals"] is not None and (now - _diamond_calc_cache["ts"]) < DIAMOND_CALC_POLL_SECONDS:
         return _diamond_calc_cache["vals"]
 
     vals = fetch_diamond_calc_values(site_id)
+
     _diamond_calc_cache["vals"] = vals
     _diamond_calc_cache["ts"] = now
+
     return vals
 
 
 def get_onhand_22k(site_id: str):
     now = time.time()
+
     if _onhand_22k_cache["rows"] is not None and (now - _onhand_22k_cache["ts"]) < ONHAND_POLL_SECONDS:
         return _onhand_22k_cache["rows"]
 
     rows = fetch_onhand_22k_rows(site_id)
+
     _onhand_22k_cache["rows"] = rows
     _onhand_22k_cache["ts"] = now
+
     return rows
 
 
 def get_bars_coins(site_id: str):
     now = time.time()
+
     if _bars_coins_cache["rows"] is not None and (now - _bars_coins_cache["ts"]) < BARS_COINS_POLL_SECONDS:
         return _bars_coins_cache["rows"]
 
     rows = fetch_bars_coins_rows(site_id)
+
     _bars_coins_cache["rows"] = rows
     _bars_coins_cache["ts"] = now
+
     return rows
 
 
 def blank_payload(status: str):
     return {
         "status": status,
+        "gold_source": "—",
 
         "sell_price_22": "—",
         "discount_22": "—",
@@ -693,6 +661,7 @@ def blank_payload(status: str):
         "TR": {"tag": ITEMS["TR"]["tag"], "value": "—"},
         "BL": {"tag": ITEMS["BL"]["tag"], "value": "—"},
         "BR": {"tag": ITEMS["BR"]["tag"], "value": "—"},
+
         "E18": {"tag": KARAT_VARIANT_ITEMS["E18"]["tag"], "value": "—"},
         "C18": {"tag": KARAT_VARIANT_ITEMS["C18"]["tag"], "value": "—"},
         "E21": {"tag": KARAT_VARIANT_ITEMS["E21"]["tag"], "value": "—"},
@@ -700,7 +669,6 @@ def blank_payload(status: str):
 
         "silver_buy": "—",
         "silver_sell": "—",
-        "gold_source": "NONE",
     }
 
 
@@ -714,13 +682,17 @@ def api_values():
 
         try:
             gold_val, silver_val, gold_source = get_success_values()
+
             if gold_val is None:
                 return JSONResponse(blank_payload("GOLD PRICE ERROR"))
 
             raw_map = get_sharepoint_values(site_id)
-            out = {"status": "OK", "gold_source": gold_source}
 
-            # New luxury sell screen values
+            out = {
+                "status": "OK" if gold_source == "SUCCESSFN" else "OK - KITCO GOLD FALLBACK",
+                "gold_source": gold_source,
+            }
+
             sell22 = safe_float(raw_map.get("SELL_PRICE_22_ID39"))
             disc22 = safe_float(raw_map.get("DISCOUNT_22_ID37"))
             sell24 = safe_float(raw_map.get("SELL_PRICE_24_ID40"))
@@ -738,26 +710,26 @@ def api_values():
                 "INVALID" if sell24 is None or disc24 is None else fmt2(sell24 - disc24)
             )
 
-            # Existing 4 squares
             for key, cfg in ITEMS.items():
                 sp_val = safe_float(raw_map.get(key))
+
                 if sp_val is None:
                     out[key] = {"tag": cfg["tag"], "value": "INVALID"}
                     continue
+
                 final = compute_final_4squares(gold_val, sp_val, cfg["use_0916"])
                 out[key] = {"tag": cfg["tag"], "value": f"{final:,.0f}"}
 
-            # New 18/21 EXCH and CASH boxes
             for key, cfg in KARAT_VARIANT_ITEMS.items():
                 sp_val = safe_float(raw_map.get(key))
+
                 if sp_val is None:
                     out[key] = {"tag": cfg["tag"], "value": "INVALID"}
                     continue
+
                 final = compute_cash_variant(gold_val, sp_val, cfg["multiplier"])
                 out[key] = {"tag": cfg["tag"], "value": f"{final:,.0f}"}
 
-            # Existing silver values - AED/GRAM.
-            # Silver has no goldprice.org fallback. If SuccessFN silver is unavailable, only silver boxes show INVALID.
             id5 = safe_float(raw_map.get("SILVER_BUY_ID5"))
             id6 = safe_float(raw_map.get("SILVER_SELL_ID6"))
 
@@ -765,8 +737,12 @@ def api_values():
                 out["silver_buy"] = "INVALID"
                 out["silver_sell"] = "INVALID"
             else:
-                out["silver_buy"] = "INVALID" if id5 is None else f"{(compute_kilo_silver(silver_val, -id5) / 1000):,.2f}"
-                out["silver_sell"] = "INVALID" if id6 is None else f"{(compute_kilo_silver(silver_val, +id6) / 1000):,.2f}"
+                out["silver_buy"] = (
+                    "INVALID" if id5 is None else f"{(compute_kilo_silver(silver_val, -id5) / 1000):,.2f}"
+                )
+                out["silver_sell"] = (
+                    "INVALID" if id6 is None else f"{(compute_kilo_silver(silver_val, +id6) / 1000):,.2f}"
+                )
 
             return JSONResponse(out)
 
@@ -792,6 +768,7 @@ def api_xrates():
 @app.get("/api/discounts/{section_name}")
 def api_discounts(section_name: str):
     sec = (section_name or "").strip().upper()
+
     with _lock:
         try:
             site_id = ensure_site_id()
@@ -842,7 +819,11 @@ def api_diamond_config():
 
 
 @app.get("/api/diamond-calc")
-def api_diamond_calc(gold_weight: str = "", diamond_weight: str = "", color_stone_weight: str = ""):
+def api_diamond_calc(
+    gold_weight: str = "",
+    diamond_weight: str = "",
+    color_stone_weight: str = "",
+):
     with _lock:
         try:
             site_id = ensure_site_id()
@@ -853,8 +834,11 @@ def api_diamond_calc(gold_weight: str = "", diamond_weight: str = "", color_ston
             })
 
         try:
-            # If ANY input is blank, show 0 AED
-            if not str(gold_weight).strip() or not str(diamond_weight).strip() or not str(color_stone_weight).strip():
+            if (
+                not str(gold_weight).strip()
+                or not str(diamond_weight).strip()
+                or not str(color_stone_weight).strip()
+            ):
                 return JSONResponse({
                     "status": "OK",
                     "diamond_sell_price": "0",
