@@ -4,6 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet">
 
   <style>
     html, body {
@@ -1408,6 +1411,512 @@
         top: 8px;
         font-size: 12px;
         padding: 8px 14px;
+      }
+    }
+
+    /* ============================
+       PROFESSIONAL VISUAL POLISH
+    ============================ */
+    :root {
+      --bg: #070707;
+      --panel: #101010;
+      --panel-2: #151515;
+      --line: rgba(255,255,255,0.18);
+      --line-strong: rgba(255,255,255,0.42);
+      --text: #f7f4ea;
+      --muted: rgba(247,244,234,0.62);
+      --gold: #f2c94c;
+      --gold-soft: rgba(242,201,76,0.14);
+      --green: #37d67a;
+      --green-soft: rgba(55,214,122,0.13);
+      --red: #ff5a52;
+      --red-soft: rgba(255,90,82,0.13);
+      --radius: 8px;
+      --gap: 14px;
+      --page-pad: 18px;
+      --top-pad: 58px;
+      --shadow: 0 16px 42px rgba(0,0,0,0.34);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      font-family: "Roboto", Arial, sans-serif !important;
+      font-weight: 400 !important;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    html,
+    body {
+      background:
+        linear-gradient(135deg, rgba(242,201,76,0.06) 0%, transparent 34%),
+        linear-gradient(225deg, rgba(55,214,122,0.045) 0%, transparent 30%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    input::placeholder {
+      color: rgba(247,244,234,0.36);
+      opacity: 1;
+      text-transform: uppercase;
+    }
+
+    button {
+      transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.72), transparent 84%);
+    }
+
+    .status,
+    .hint {
+      top: 16px;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(16,16,16,0.78);
+      color: var(--muted);
+      backdrop-filter: blur(12px);
+      line-height: 1;
+      box-shadow: var(--shadow);
+    }
+
+    .status {
+      left: 18px;
+      font-size: 12px;
+      max-width: 46vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .hint {
+      right: 18px;
+      font-size: 12px;
+      opacity: 1;
+    }
+
+    .notif {
+      top: 16px;
+      border: 1px solid rgba(255,90,82,0.48);
+      border-radius: var(--radius);
+      background: rgba(45,14,12,0.92);
+      color: #ffd8d5;
+      box-shadow: 0 16px 42px rgba(255,90,82,0.14);
+    }
+
+    .luxuryScreenWrap,
+    .page,
+    .xratesScreenWrap,
+    .screenTableWrap,
+    .diaCalcScreenWrap,
+    .centerScreenWrap,
+    .onhandWrap,
+    .barsCoinsWrap {
+      position: relative;
+      z-index: 1;
+      padding: var(--top-pad) var(--page-pad) var(--page-pad);
+      gap: var(--gap);
+    }
+
+    .luxuryHeader,
+    .tableHeaderBar,
+    .diaCalcTopBar,
+    .centerTopBar {
+      min-height: 54px;
+      align-items: center;
+    }
+
+    .luxuryTitle,
+    .xratesTitle,
+    .bigTitle,
+    .diaCalcTitle,
+    .centerTitle {
+      color: var(--gold);
+      font-size: clamp(28px, 4.8vw, 62px);
+      line-height: 0.96;
+      text-shadow: none;
+    }
+
+    .luxurySubtitle,
+    .diaCalcSub,
+    .centerSub,
+    .xstatus,
+    .tableStatus,
+    .diaCalcStatus,
+    .onhandStatus,
+    .barsCoinsStatus {
+      color: var(--muted);
+      font-size: clamp(11px, 1.2vw, 15px);
+      line-height: 1.2;
+      opacity: 1;
+    }
+
+    .adminBtn,
+    .diaCalcBtn,
+    .homeBtn,
+    .clearBtn,
+    .primaryBtn,
+    .secondaryBtn {
+      border-radius: var(--radius);
+      border-width: 1px;
+      padding: 12px 16px;
+      font-size: clamp(11px, 1.15vw, 14px);
+      line-height: 1;
+      box-shadow: none;
+    }
+
+    .diaCalcBtn,
+    .primaryBtn {
+      border-color: rgba(242,201,76,0.54);
+      background: var(--gold-soft);
+      color: var(--gold);
+    }
+
+    .adminBtn,
+    .homeBtn,
+    .secondaryBtn {
+      border-color: var(--line-strong);
+      background: rgba(255,255,255,0.07);
+      color: var(--text);
+    }
+
+    .clearBtn {
+      border-color: rgba(255,90,82,0.56);
+      background: var(--red-soft);
+      color: #ff9a94;
+    }
+
+    .luxury3Grid,
+    .luxuryLeftCol,
+    .topWrap,
+    .grid,
+    .silverGrid,
+    .xgrid,
+    .rows3,
+    .onhandRows,
+    .adminMenuGrid,
+    .passwordBtnRow {
+      gap: var(--gap);
+    }
+
+    .luxuryCard,
+    .quad,
+    .silverBox,
+    .xpanel,
+    .tableCard,
+    .diaCalcCard,
+    .diaCalcResultBox,
+    .adminCard,
+    .onhandCard,
+    .barsCoinsCard {
+      border-width: 1px;
+      border-radius: var(--radius);
+      border-color: var(--line-strong);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.018)),
+        var(--panel);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+
+    .afterBox,
+    .diaCalcResultBox {
+      border-color: rgba(242,201,76,0.62);
+      background:
+        linear-gradient(180deg, rgba(242,201,76,0.14), rgba(242,201,76,0.035)),
+        var(--panel);
+    }
+
+    .luxuryCard::after {
+      display: none;
+    }
+
+    .karatBadge,
+    .boxLabel,
+    .diaCalcResultLabel,
+    .xtype {
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.065);
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    .afterBox .karatBadge,
+    .afterBox .boxLabel,
+    .diaCalcResultLabel {
+      border-color: rgba(242,201,76,0.32);
+      background: var(--gold-soft);
+      color: var(--gold);
+    }
+
+    .karatBadge {
+      padding: 9px 13px;
+      font-size: clamp(15px, 1.7vw, 22px);
+    }
+
+    .boxLabel,
+    .diaCalcResultLabel {
+      padding: 8px 12px;
+      font-size: clamp(11px, 1.05vw, 14px);
+    }
+
+    .luxuryMainValue,
+    .value,
+    .silverValue,
+    .diaCalcResultValue {
+      letter-spacing: 0.035em;
+      text-shadow: none;
+    }
+
+    .luxuryMainValue {
+      font-size: clamp(42px, 7.6vw, 96px);
+    }
+
+    .tall24Box .luxuryMainValue,
+    .diaCalcResultValue {
+      font-size: clamp(52px, 9.5vw, 124px);
+    }
+
+    .luxuryUnit,
+    .unit,
+    .unit-silver,
+    .diaAed {
+      color: var(--muted);
+      opacity: 1;
+      letter-spacing: 0.12em;
+    }
+
+    .quad,
+    .silverBox {
+      border-color: var(--line);
+    }
+
+    .quad:nth-child(odd) {
+      background:
+        linear-gradient(180deg, rgba(242,201,76,0.105), rgba(255,255,255,0.018)),
+        var(--panel);
+    }
+
+    .quad:nth-child(even) {
+      background:
+        linear-gradient(180deg, rgba(55,214,122,0.095), rgba(255,255,255,0.018)),
+        var(--panel);
+    }
+
+    .silverBox {
+      background:
+        linear-gradient(180deg, rgba(220,226,232,0.12), rgba(255,255,255,0.018)),
+        var(--panel);
+    }
+
+    .tag,
+    .silverTag {
+      right: 14px;
+      bottom: 12px;
+      padding: 7px 10px;
+      border-radius: var(--radius);
+      background: rgba(0,0,0,0.32);
+      font-size: clamp(12px, 2.2vw, 34px);
+      line-height: 1;
+    }
+
+    .xpanel,
+    .tableCard,
+    .onhandCard,
+    .barsCoinsCard {
+      padding: 14px;
+    }
+
+    .xrow,
+    .row3,
+    .onhandRow {
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.055);
+    }
+
+    .xrow.left {
+      background: linear-gradient(90deg, rgba(242,201,76,0.14), rgba(255,255,255,0.045));
+    }
+
+    .xrow.right {
+      background: linear-gradient(90deg, rgba(55,214,122,0.13), rgba(255,255,255,0.045));
+    }
+
+    .xrate,
+    .cellDisc,
+    .cellCert,
+    .onhandCellValue,
+    .barsCoinsTable tbody td {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .cols3,
+    .onhandCols,
+    .barsCoinsTable thead th {
+      color: var(--muted);
+      opacity: 1;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .rows3,
+    .onhandRows {
+      padding: 12px 0 0;
+    }
+
+    .row3,
+    .onhandRow {
+      padding: 13px 14px;
+    }
+
+    .cellType,
+    .onhandCellLabel,
+    .barsCoinsTable tbody td:first-child {
+      color: var(--gold);
+    }
+
+    .cellDisc {
+      color: #ff8e88;
+    }
+
+    .cellCert {
+      color: #76eba4;
+    }
+
+    .diaInput,
+    .passwordInput {
+      border-width: 1px;
+      border-radius: var(--radius);
+      border-color: var(--line);
+      background: rgba(255,255,255,0.07);
+      color: var(--text);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    .diaInput:focus,
+    .passwordInput:focus {
+      border-color: rgba(242,201,76,0.7);
+      box-shadow: 0 0 0 3px rgba(242,201,76,0.13);
+    }
+
+    .inputLabel,
+    .passwordLabel {
+      color: var(--muted);
+      font-size: clamp(13px, 1.45vw, 19px);
+    }
+
+    .adminNavBtn {
+      border-radius: var(--radius);
+      border-width: 1px;
+      border-color: rgba(242,201,76,0.46);
+      background:
+        linear-gradient(180deg, rgba(242,201,76,0.15), rgba(242,201,76,0.045)),
+        var(--panel);
+      color: var(--gold);
+      min-height: 132px;
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+
+    .barsCoinsTableWrap {
+      border-width: 1px;
+      border-radius: var(--radius);
+      border-color: var(--line);
+      background: rgba(255,255,255,0.035);
+    }
+
+    .barsCoinsTable thead th {
+      background: rgba(242,201,76,0.12);
+      color: var(--gold);
+      border-color: rgba(255,255,255,0.12);
+    }
+
+    .barsCoinsTable tbody tr {
+      background: rgba(255,255,255,0.035);
+    }
+
+    .barsCoinsTable tbody tr:nth-child(even) {
+      background: rgba(255,255,255,0.065);
+    }
+
+    .barsCoinsTable tbody td {
+      border-color: rgba(255,255,255,0.10);
+    }
+
+    @media (max-width: 600px) {
+      :root {
+        --page-pad: 10px;
+        --top-pad: 54px;
+        --gap: 10px;
+      }
+
+      .status,
+      .hint {
+        top: 9px;
+        font-size: 10px;
+        padding: 8px 9px;
+      }
+
+      .status {
+        left: 10px;
+        max-width: 50vw;
+      }
+
+      .hint {
+        right: 10px;
+      }
+
+      .luxuryHeader {
+        padding-top: 40px;
+      }
+
+      .luxuryTitle,
+      .xratesTitle,
+      .bigTitle,
+      .diaCalcTitle,
+      .centerTitle {
+        font-size: clamp(22px, 6vw, 34px);
+      }
+
+      .luxuryMainValue {
+        font-size: clamp(30px, 9.2vw, 48px);
+      }
+
+      .tall24Box .luxuryMainValue,
+      .diaCalcResultValue {
+        font-size: clamp(36px, 10vw, 58px);
+      }
+
+      .tag,
+      .silverTag {
+        right: 9px;
+        bottom: 9px;
+        font-size: clamp(10px, 2.5vw, 16px);
+      }
+
+      .xpanel,
+      .tableCard,
+      .onhandCard,
+      .barsCoinsCard {
+        padding: 10px;
       }
     }
   </style>
