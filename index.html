@@ -2315,9 +2315,8 @@
   <div class="screen hidden" id="attendanceScreen">
     <div class="attendanceScreenWrap">
       <div class="attendanceStatus" id="attendanceStatus">Loading...</div>
-      <button class="homeBtn attendanceHomeBtn" id="attendanceHomeBtn" type="button">HOME</button>
 
-      <div class="attendanceStage" aria-label="Attendance">
+      <div class="attendanceStage" id="attendanceStage" aria-label="Attendance" role="button" tabindex="0">
         <div class="attendanceValue" id="att_break" style="left:16.35%; top:24.1%;">---</div>
         <div class="attendanceValue" id="att_offduty" style="left:38.15%; top:24.1%;">---</div>
         <div class="attendanceValue" id="att_leave" style="left:60.25%; top:24.1%;">---</div>
@@ -2639,7 +2638,7 @@
   document.addEventListener('click', (ev) => {
     const excluded = ev.target.closest(
       '#diaCalcOpenBtn, #diaCalcHomeBtn, #diaCalcClearBtn, ' +
-      '#attendanceOpenBtn, #attendanceHomeBtn, ' +
+      '#attendanceOpenBtn, #attendanceStage, ' +
       '#adminOpenBtn, #adminPasswordSubmitBtn, #adminPasswordCancelBtn, ' +
       '#adminHomeBtn, #admin22kBtn, #adminBarsCoinsBtn, #onhand22kHomeBtn, #barsCoinsHomeBtn'
     );
@@ -2684,11 +2683,21 @@
     showAttendanceScreen();
   });
 
-  document.getElementById('attendanceHomeBtn').addEventListener('click', (ev) => {
+  document.getElementById('attendanceStage').addEventListener('click', (ev) => {
     ev.stopPropagation();
     currentScreen = 1;
     showScreen(1);
     updateLuxurySell();
+  });
+
+  document.getElementById('attendanceStage').addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter' || ev.key === ' ') {
+      ev.preventDefault();
+      ev.stopPropagation();
+      currentScreen = 1;
+      showScreen(1);
+      updateLuxurySell();
+    }
   });
 
   document.getElementById('diaCalcClearBtn').addEventListener('click', (ev) => {
