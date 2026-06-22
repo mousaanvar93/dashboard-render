@@ -213,6 +213,21 @@ def safe_str(x) -> str:
     return str(x).strip()
 
 
+def public_error_detail(exc: Exception) -> str:
+    if isinstance(exc, requests.HTTPError) and exc.response is not None:
+        try:
+            data = exc.response.json()
+            message = data.get("error", {}).get("message")
+            if message:
+                return f"{exc.response.status_code}: {message}"
+        except Exception:
+            pass
+
+        return f"{exc.response.status_code}: {exc.response.reason}"
+
+    return str(exc)[:180]
+
+
 def fmt0(x):
     if x is None:
         return "INVALID"
@@ -356,6 +371,7 @@ def compute_kilo_silver(silver_val: float, delta: float):
 # SHAREPOINT
 # --------------------------
 _site_id_cache = None
+_list_id_cache = {}
 
 
 def fetch_site_id():
@@ -372,6 +388,37 @@ def ensure_site_id():
     return _site_id_cache
 
 
+def fetch_list_id(site_id: str, list_name: str):
+    url = (
+        f"https://graph.microsoft.com/v1.0/sites/{site_id}"
+        f"/lists?$select=id,displayName,name,webUrl"
+    )
+    data = graph_get(url)
+    wanted = (list_name or "").strip().lower()
+
+    for item in data.get("value", []):
+        names = [
+            safe_str(item.get("id")).lower(),
+            safe_str(item.get("displayName")).lower(),
+            safe_str(item.get("name")).lower(),
+        ]
+        web_url = safe_str(item.get("webUrl")).lower()
+
+        if wanted in names or f"/lists/{wanted}/" in web_url or web_url.endswith(f"/lists/{wanted}"):
+            return item.get("id")
+
+    raise RuntimeError(f"SharePoint list not found: {list_name}")
+
+
+def ensure_list_id(site_id: str, list_name: str):
+    key = f"{site_id}:{list_name}".lower()
+
+    if key not in _list_id_cache:
+        _list_id_cache[key] = fetch_list_id(site_id, list_name)
+
+    return _list_id_cache[key]
+
+
 def fetch_item_fields(site_id: str, item_id: int):
     url = (
         f"https://graph.microsoft.com/v1.0/sites/{site_id}"
@@ -383,9 +430,10 @@ def fetch_item_fields(site_id: str, item_id: int):
 
 
 def fetch_item_fields_from_list(site_id: str, list_name: str, item_id: int):
+    list_id = ensure_list_id(site_id, list_name)
     url = (
         f"https://graph.microsoft.com/v1.0/sites/{site_id}"
-        f"/lists/{list_name}"
+        f"/lists/{list_id}"
         f"/items/{item_id}?expand=fields"
     )
     data = graph_get(url)
@@ -1022,8 +1070,9 @@ def api_attendance():
                 "status": "OK",
                 "values": vals,
             })
-        except Exception:
+        except Exception as exc:
             return JSONResponse({
                 "status": "SHAREPOINT ERROR (ATTENDANCE)",
+                "detail": public_error_detail(exc),
                 "values": {},
             })

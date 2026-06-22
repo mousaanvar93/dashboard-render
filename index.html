@@ -2951,7 +2951,7 @@
   async function updateAttendance() {
     try {
       const data = await fetchJSON('/api/attendance');
-      setText('attendanceStatus', data.status || 'OK');
+      setText('attendanceStatus', data.detail ? `${data.status || 'ERROR'} - ${data.detail}` : (data.status || 'OK'));
 
       const values = data.values || {};
       for (const [fieldName, elementId] of Object.entries(attendanceFieldMap)) {
