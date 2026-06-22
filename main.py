@@ -8,7 +8,7 @@ import re
 from html import unescape
 
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 
 # --------------------------
 # SUCCESSFN / KITCO FALLBACK
@@ -27,6 +27,7 @@ DISCOUNTS_POLL_SECONDS = 300
 DIAMOND_CALC_POLL_SECONDS = 300
 ONHAND_POLL_SECONDS = 300
 BARS_COINS_POLL_SECONDS = 300
+ATTENDANCE_POLL_SECONDS = 300
 
 # --------------------------
 # YOUR MATH
@@ -75,6 +76,28 @@ DIAMOND_MARGIN_FIELD = "margin"
 DIAMOND_COLORSTONEVALUE_FIELD = "colorstonevalue"
 DIAMOND_CERTVALUE_FIELD = "certvalue"
 DIAMOND_MAKING_FIELD = "making"
+
+ATTENDANCE_LIST_NAME = os.environ.get("ATTENDANCE_LIST_NAME", "totalstaffdataformainscreen")
+ATTENDANCE_ITEM_ID = int(os.environ.get("ATTENDANCE_ITEM_ID", "1"))
+ATTENDANCE_FIELDS = [
+    "onduty",
+    "offduty",
+    "break",
+    "leave",
+    "sick",
+    "ondutyshopone",
+    "ondutyshoptwo",
+    "ondutyshopthree",
+    "adminondutyshopone",
+    "adminondutyshoptwo",
+    "adminondutyshopthree",
+    "nonadminondutyshopone",
+    "nonadminondutyshoptwo",
+    "nonadminondutyshopthree",
+    "onbreakshopone",
+    "onbreakshoptwo",
+    "onbreakshopthree",
+]
 
 ONHAND_LIST_NAME = os.environ.get("ONHAND_LIST_NAME", "onhand")
 ONHAND_COUNT_FIELD = os.environ.get("ONHAND_COUNT_FIELD", "count")
@@ -480,6 +503,14 @@ def fetch_bars_coins_rows(site_id: str):
     return rows
 
 
+def fetch_attendance_values(site_id: str):
+    fields = fetch_item_fields_from_list(site_id, ATTENDANCE_LIST_NAME, ATTENDANCE_ITEM_ID)
+    return {
+        field_name: safe_str(fields.get(field_name)) or "---"
+        for field_name in ATTENDANCE_FIELDS
+    }
+
+
 def compute_diamond_sell_price(gold_weight, diamond_weight, color_stone_weight, cfg):
     goldvalue = cfg.get("goldvalue")
     diamondvalue = cfg.get("diamondvalue")
@@ -522,6 +553,11 @@ def home():
         return f.read()
 
 
+@app.get("/ATTENDANCEBACKGROUND.png")
+def attendance_background():
+    return FileResponse("ATTENDANCEBACKGROUND.png", media_type="image/png")
+
+
 # --------------------------
 # CACHES
 # --------------------------
@@ -540,6 +576,7 @@ _xrates_cache = {"items": None, "ts": 0.0}
 _diamond_calc_cache = {"vals": None, "ts": 0.0}
 _onhand_22k_cache = {"rows": None, "ts": 0.0}
 _bars_coins_cache = {"rows": None, "ts": 0.0}
+_attendance_cache = {"vals": None, "ts": 0.0}
 
 _discounts_cache = {
     "PAMP": {"rows": None, "ts": 0.0},
@@ -669,6 +706,20 @@ def get_bars_coins(site_id: str):
     _bars_coins_cache["ts"] = now
 
     return rows
+
+
+def get_attendance(site_id: str):
+    now = time.time()
+
+    if _attendance_cache["vals"] is not None and (now - _attendance_cache["ts"]) < ATTENDANCE_POLL_SECONDS:
+        return _attendance_cache["vals"]
+
+    vals = fetch_attendance_values(site_id)
+
+    _attendance_cache["vals"] = vals
+    _attendance_cache["ts"] = now
+
+    return vals
 
 
 def blank_payload(status: str):
@@ -951,4 +1002,28 @@ def api_onhand_bars_coins():
             return JSONResponse({
                 "status": "SHAREPOINT ERROR (BARS / COINS)",
                 "rows": [],
+            })
+
+
+@app.get("/api/attendance")
+def api_attendance():
+    with _lock:
+        try:
+            site_id = ensure_site_id()
+        except Exception:
+            return JSONResponse({
+                "status": "SHAREPOINT ERROR (SITE)",
+                "values": {},
+            })
+
+        try:
+            vals = get_attendance(site_id)
+            return JSONResponse({
+                "status": "OK",
+                "values": vals,
+            })
+        except Exception:
+            return JSONResponse({
+                "status": "SHAREPOINT ERROR (ATTENDANCE)",
+                "values": {},
             })

@@ -83,6 +83,7 @@
       text-align: center;
       align-content: start;
       position: relative;
+      padding-top: 56px;
     }
 
     .luxuryTitle {
@@ -135,6 +136,29 @@
       text-transform: uppercase;
       cursor: pointer;
       box-shadow: 0 0 10px rgba(255,255,255,0.06);
+    }
+
+    .attendanceBtn {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
+      border: 3px solid #00FF66;
+      background: rgba(0,255,102,0.12);
+      color: #00FF66;
+      border-radius: 999px;
+      padding: 14px 30px;
+      font-size: clamp(16px, 2.3vw, 28px);
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 0 14px rgba(0,255,102,0.12);
+      white-space: nowrap;
+    }
+
+    .attendanceBtn:hover {
+      transform: translateX(-50%) translateY(-1px);
     }
 
     .luxury3Grid {
@@ -809,6 +833,80 @@
     }
 
     /* ============================
+       ATTENDANCE SCREEN
+    ============================ */
+    #attendanceScreen::before {
+      display: none;
+    }
+
+    .attendanceScreenWrap {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      background: #000;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .attendanceHomeBtn {
+      position: absolute;
+      right: 16px;
+      top: 16px;
+      z-index: 40;
+      backdrop-filter: blur(10px);
+    }
+
+    .attendanceStatus {
+      position: absolute;
+      left: 16px;
+      top: 16px;
+      z-index: 40;
+      border: 1px solid rgba(255,255,255,0.22);
+      background: rgba(0,0,0,0.62);
+      color: rgba(255,255,255,0.82);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    .attendanceStage {
+      position: relative;
+      width: min(100vw, 150vh);
+      aspect-ratio: 3 / 2;
+      max-width: 100vw;
+      max-height: 100vh;
+      background: url("/ATTENDANCEBACKGROUND.png") center / contain no-repeat;
+    }
+
+    .attendanceValue {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      width: 13.4%;
+      height: 4.6%;
+      display: grid;
+      place-items: center;
+      color: #FFD700;
+      font-size: clamp(16px, 3.2vw, 44px);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: 0;
+      text-align: center;
+      text-shadow: 0 0 12px rgba(255,215,0,0.25), 0 2px 2px rgba(0,0,0,0.75);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .attendanceValue.small {
+      width: 8.6%;
+      height: 4.2%;
+      font-size: clamp(12px, 2.2vw, 30px);
+    }
+
+    /* ============================
        PASSWORD / ADMIN / 22K / BARS-COINS
     ============================ */
     .centerScreenWrap {
@@ -1181,6 +1279,12 @@
         left: 0;
         padding: 8px 12px;
         font-size: 11px;
+      }
+
+      .attendanceBtn {
+        padding: 9px 13px;
+        font-size: 12px;
+        border-width: 2px;
       }
 
       .luxury3Grid {
@@ -1572,6 +1676,7 @@
 
     .adminBtn,
     .diaCalcBtn,
+    .attendanceBtn,
     .homeBtn,
     .clearBtn,
     .primaryBtn,
@@ -1585,6 +1690,7 @@
     }
 
     .diaCalcBtn,
+    .attendanceBtn,
     .primaryBtn {
       border-color: rgba(242,201,76,0.54);
       background: var(--gold-soft);
@@ -1597,6 +1703,19 @@
       border-color: var(--line-strong);
       background: rgba(255,255,255,0.07);
       color: var(--text);
+    }
+
+    .attendanceBtn {
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 16px 34px;
+      font-size: clamp(16px, 2.2vw, 28px);
+      border-width: 2px;
+      white-space: nowrap;
+    }
+
+    .attendanceBtn:hover {
+      transform: translateX(-50%) translateY(-1px);
     }
 
     .clearBtn {
@@ -1885,7 +2004,7 @@
       }
 
       .luxuryHeader {
-        padding-top: 40px;
+        padding-top: 42px;
       }
 
       .luxuryTitle,
@@ -1932,6 +2051,7 @@
     <div class="luxuryScreenWrap">
       <div class="luxuryHeader">
         <button class="adminBtn" id="adminOpenBtn" type="button">Admin</button>
+        <button class="attendanceBtn" id="attendanceOpenBtn" type="button">ATTENDANCE</button>
         <button class="diaCalcBtn" id="diaCalcOpenBtn" type="button">DIA CALC</button>
         <div class="luxuryTitle">ANVAR LUXURY SELL PRICE</div>
         <div class="luxurySubtitle">LIVE PRICING DASHBOARD</div>
@@ -2196,6 +2316,39 @@
     </div>
   </div>
 
+  <!-- ATTENDANCE SCREEN -->
+  <div class="screen hidden" id="attendanceScreen">
+    <div class="attendanceScreenWrap">
+      <div class="attendanceStatus" id="attendanceStatus">Loading...</div>
+      <button class="homeBtn attendanceHomeBtn" id="attendanceHomeBtn" type="button">HOME</button>
+
+      <div class="attendanceStage" aria-label="Attendance">
+        <div class="attendanceValue" id="att_break" style="left:16.35%; top:24.1%;">---</div>
+        <div class="attendanceValue" id="att_offduty" style="left:38.15%; top:24.1%;">---</div>
+        <div class="attendanceValue" id="att_leave" style="left:60.25%; top:24.1%;">---</div>
+        <div class="attendanceValue" id="att_sick" style="left:82.05%; top:24.1%;">---</div>
+
+        <div class="attendanceValue" id="att_onduty" style="left:49.4%; top:48.8%;">---</div>
+
+        <div class="attendanceValue" id="att_ondutyshopone" style="left:17.95%; top:73.6%;">---</div>
+        <div class="attendanceValue" id="att_ondutyshoptwo" style="left:49.2%; top:73.6%;">---</div>
+        <div class="attendanceValue" id="att_ondutyshopthree" style="left:80.4%; top:73.6%;">---</div>
+
+        <div class="attendanceValue small" id="att_adminondutyshopone" style="left:7.8%; top:95.7%;">---</div>
+        <div class="attendanceValue small" id="att_nonadminondutyshopone" style="left:18.0%; top:95.7%;">---</div>
+        <div class="attendanceValue small" id="att_onbreakshopone" style="left:28.1%; top:95.7%;">---</div>
+
+        <div class="attendanceValue small" id="att_adminondutyshoptwo" style="left:39.6%; top:95.7%;">---</div>
+        <div class="attendanceValue small" id="att_nonadminondutyshoptwo" style="left:49.4%; top:95.7%;">---</div>
+        <div class="attendanceValue small" id="att_onbreakshoptwo" style="left:59.5%; top:95.7%;">---</div>
+
+        <div class="attendanceValue small" id="att_adminondutyshopthree" style="left:70.6%; top:95.7%;">---</div>
+        <div class="attendanceValue small" id="att_nonadminondutyshopthree" style="left:80.4%; top:95.7%;">---</div>
+        <div class="attendanceValue small" id="att_onbreakshopthree" style="left:90.5%; top:95.7%;">---</div>
+      </div>
+    </div>
+  </div>
+
   <!-- PASSWORD SCREEN -->
   <div class="screen hidden" id="passwordScreen">
     <div class="centerScreenWrap">
@@ -2342,6 +2495,7 @@
   let currentScreen = 1;
   const TOTAL_SCREENS = 7;
   let isDiaCalcOpen = false;
+  let isAttendanceOpen = false;
   let isPasswordOpen = false;
   let isAdminOpen = false;
   let is22kOpen = false;
@@ -2355,7 +2509,7 @@
       if (el) el.classList.add('hidden');
     }
 
-    const extraIds = ['diaCalcScreen', 'passwordScreen', 'adminScreen', 'screen22k', 'barsCoinsScreen'];
+    const extraIds = ['diaCalcScreen', 'attendanceScreen', 'passwordScreen', 'adminScreen', 'screen22k', 'barsCoinsScreen'];
     for (const id of extraIds) {
       const el = document.getElementById(id);
       if (el) el.classList.add('hidden');
@@ -2364,6 +2518,7 @@
 
   function resetSpecialModes() {
     isDiaCalcOpen = false;
+    isAttendanceOpen = false;
     isPasswordOpen = false;
     isAdminOpen = false;
     is22kOpen = false;
@@ -2402,6 +2557,18 @@
 
     setText('hintText', '');
     updateDiamondCalc();
+  }
+
+  function showAttendanceScreen() {
+    resetSpecialModes();
+    isAttendanceOpen = true;
+    hideAllScreens();
+
+    const el = document.getElementById('attendanceScreen');
+    if (el) el.classList.remove('hidden');
+
+    setText('hintText', '');
+    updateAttendance();
   }
 
   function showPasswordScreen() {
@@ -2477,12 +2644,13 @@
   document.addEventListener('click', (ev) => {
     const excluded = ev.target.closest(
       '#diaCalcOpenBtn, #diaCalcHomeBtn, #diaCalcClearBtn, ' +
+      '#attendanceOpenBtn, #attendanceHomeBtn, ' +
       '#adminOpenBtn, #adminPasswordSubmitBtn, #adminPasswordCancelBtn, ' +
       '#adminHomeBtn, #admin22kBtn, #adminBarsCoinsBtn, #onhand22kHomeBtn, #barsCoinsHomeBtn'
     );
 
     if (excluded) return;
-    if (isDiaCalcOpen || isPasswordOpen || isAdminOpen || is22kOpen || isBarsCoinsOpen) return;
+    if (isDiaCalcOpen || isAttendanceOpen || isPasswordOpen || isAdminOpen || is22kOpen || isBarsCoinsOpen) return;
 
     currentScreen = (currentScreen % TOTAL_SCREENS) + 1;
     showScreen(currentScreen);
@@ -2510,6 +2678,18 @@
   });
 
   document.getElementById('diaCalcHomeBtn').addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    currentScreen = 1;
+    showScreen(1);
+    updateLuxurySell();
+  });
+
+  document.getElementById('attendanceOpenBtn').addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    showAttendanceScreen();
+  });
+
+  document.getElementById('attendanceHomeBtn').addEventListener('click', (ev) => {
     ev.stopPropagation();
     currentScreen = 1;
     showScreen(1);
@@ -2742,6 +2922,48 @@
     }
   }
 
+  const attendanceFieldMap = {
+    onduty: 'att_onduty',
+    offduty: 'att_offduty',
+    break: 'att_break',
+    leave: 'att_leave',
+    sick: 'att_sick',
+    ondutyshopone: 'att_ondutyshopone',
+    ondutyshoptwo: 'att_ondutyshoptwo',
+    ondutyshopthree: 'att_ondutyshopthree',
+    adminondutyshopone: 'att_adminondutyshopone',
+    adminondutyshoptwo: 'att_adminondutyshoptwo',
+    adminondutyshopthree: 'att_adminondutyshopthree',
+    nonadminondutyshopone: 'att_nonadminondutyshopone',
+    nonadminondutyshoptwo: 'att_nonadminondutyshoptwo',
+    nonadminondutyshopthree: 'att_nonadminondutyshopthree',
+    onbreakshopone: 'att_onbreakshopone',
+    onbreakshoptwo: 'att_onbreakshoptwo',
+    onbreakshopthree: 'att_onbreakshopthree'
+  };
+
+  function clearAttendanceValues() {
+    for (const id of Object.values(attendanceFieldMap)) {
+      setText(id, '---');
+    }
+  }
+
+  async function updateAttendance() {
+    try {
+      const data = await fetchJSON('/api/attendance');
+      setText('attendanceStatus', data.status || 'OK');
+
+      const values = data.values || {};
+      for (const [fieldName, elementId] of Object.entries(attendanceFieldMap)) {
+        const value = values[fieldName];
+        setText(elementId, value === undefined || value === null || value === '' ? '---' : value);
+      }
+    } catch {
+      setText('attendanceStatus', 'NETWORK ERROR');
+      clearAttendanceValues();
+    }
+  }
+
   function renderOnhand22kRows(rows) {
     const box = document.getElementById('onhand22kRows');
     if (!box) return;
@@ -2860,23 +3082,24 @@
   updateSection('VALCAMBI');
   updateSection('EMIRATES');
   updateDiamondCalc();
+  updateAttendance();
   updateOnhand22k();
   updateBarsCoins();
 
   setInterval(() => {
-    if (currentScreen === 1 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) {
+    if (currentScreen === 1 && !isDiaCalcOpen && !isAttendanceOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) {
       updateLuxurySell();
     }
   }, 5000);
 
   setInterval(() => {
-    if (currentScreen === 2 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) {
+    if (currentScreen === 2 && !isDiaCalcOpen && !isAttendanceOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) {
       updateSquaresAndSilver();
     }
   }, 5000);
 
   setInterval(() => {
-    if (currentScreen === 3 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) {
+    if (currentScreen === 3 && !isDiaCalcOpen && !isAttendanceOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) {
       updateXrates();
     }
   }, 15000);
@@ -2884,6 +3107,10 @@
   setInterval(() => {
     if (isDiaCalcOpen) updateDiamondCalc();
   }, 5000);
+
+  setInterval(() => {
+    if (isAttendanceOpen) updateAttendance();
+  }, 10000);
 
   setInterval(() => {
     if (is22kOpen) updateOnhand22k();
@@ -2894,10 +3121,10 @@
   }, 10000);
 
   setInterval(() => {
-    if (currentScreen === 4 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('PAMP');
-    else if (currentScreen === 5 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('LOCAL');
-    else if (currentScreen === 6 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('VALCAMBI');
-    else if (currentScreen === 7 && !isDiaCalcOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('EMIRATES');
+    if (currentScreen === 4 && !isDiaCalcOpen && !isAttendanceOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('PAMP');
+    else if (currentScreen === 5 && !isDiaCalcOpen && !isAttendanceOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('LOCAL');
+    else if (currentScreen === 6 && !isDiaCalcOpen && !isAttendanceOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('VALCAMBI');
+    else if (currentScreen === 7 && !isDiaCalcOpen && !isAttendanceOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) updateSection('EMIRATES');
   }, 10000);
 </script>
 </body>
