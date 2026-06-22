@@ -553,10 +553,42 @@ def fetch_bars_coins_rows(site_id: str):
 
 def fetch_attendance_values(site_id: str):
     fields = fetch_item_fields_from_list(site_id, ATTENDANCE_LIST_NAME, ATTENDANCE_ITEM_ID)
-    return {
-        field_name: safe_str(fields.get(field_name)) or "---"
+
+    def attendance_value(field_name: str):
+        raw = fields.get(field_name)
+        num = safe_float(raw)
+
+        if num is not None:
+            return f"{num:,.0f}"
+
+        return safe_str(raw) or "---"
+
+    def attendance_sum(*field_names: str):
+        total = 0.0
+        has_number = False
+
+        for field_name in field_names:
+            num = safe_float(fields.get(field_name))
+            if num is not None:
+                total += num
+                has_number = True
+
+        if has_number:
+            return f"{total:,.0f}"
+
+        return "---"
+
+    vals = {
+        field_name: attendance_value(field_name)
         for field_name in ATTENDANCE_FIELDS
     }
+
+    vals["onduty"] = attendance_sum("onduty", "break")
+    vals["ondutyshopone"] = attendance_sum("ondutyshopone", "onbreakshopone")
+    vals["ondutyshoptwo"] = attendance_sum("ondutyshoptwo", "onbreakshoptwo")
+    vals["ondutyshopthree"] = attendance_sum("ondutyshopthree", "onbreakshopthree")
+
+    return vals
 
 
 def compute_diamond_sell_price(gold_weight, diamond_weight, color_stone_weight, cfg):

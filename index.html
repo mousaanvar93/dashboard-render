@@ -875,11 +875,9 @@
 
     .attendanceStage {
       position: relative;
-      width: min(100vw, 150vh);
-      aspect-ratio: 3 / 2;
-      max-width: 100vw;
-      max-height: 100vh;
-      background: url("/ATTENDANCEBACKGROUND.png") center / contain no-repeat;
+      width: 100vw;
+      height: 100vh;
+      background: url("/ATTENDANCEBACKGROUND.png") center / 100% 100% no-repeat;
     }
 
     .attendanceValue {
@@ -2948,6 +2946,13 @@
     }
   }
 
+  function fmtAttendanceValue(value) {
+    if (value === undefined || value === null || value === '') return '---';
+    const n = toNumber(value);
+    if (n === null) return value;
+    return String(Math.round(n));
+  }
+
   async function updateAttendance() {
     try {
       const data = await fetchJSON('/api/attendance');
@@ -2955,8 +2960,7 @@
 
       const values = data.values || {};
       for (const [fieldName, elementId] of Object.entries(attendanceFieldMap)) {
-        const value = values[fieldName];
-        setText(elementId, value === undefined || value === null || value === '' ? '---' : value);
+        setText(elementId, fmtAttendanceValue(values[fieldName]));
       }
     } catch {
       setText('attendanceStatus', 'NETWORK ERROR');
