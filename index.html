@@ -4,9 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dashboard</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet">
 
   <style>
     html, body {
@@ -14,10 +11,12 @@
       height: 100%;
       background: #000;
       color: #fff;
-      font-family: Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Roboto, Arial, sans-serif;
       overflow: hidden;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
+      --phone-top-safe: max(env(safe-area-inset-top), 30px);
+      --phone-bottom-nav: 20vh;
     }
 
     .hint {
@@ -65,6 +64,34 @@
 
     .hidden { display: none !important; }
 
+    .globalActions {
+      position: absolute;
+      left: 50%;
+      top: 48px;
+      transform: translateX(-50%);
+      z-index: 80;
+      display: grid;
+      grid-template-columns: auto auto auto;
+      gap: 10px;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .globalActions > button {
+      position: static;
+      transform: none;
+      pointer-events: auto;
+      white-space: nowrap;
+    }
+
+    .globalActions .attendanceBtn {
+      transform: none;
+    }
+
+    .globalActions .attendanceBtn:hover {
+      transform: translateY(-1px);
+    }
+
     /* =========================================
        SCREEN 1 — BEAUTIFIED LUXURY SELL PRICE
     ========================================= */
@@ -83,7 +110,13 @@
       text-align: center;
       align-content: start;
       position: relative;
-      padding-top: 56px;
+      padding-top: 68px;
+    }
+
+    .page,
+    .xratesScreenWrap,
+    .screenTableWrap {
+      padding-top: 108px;
     }
 
     .luxuryTitle {
@@ -1542,7 +1575,7 @@
 
     *, *::before, *::after {
       box-sizing: border-box;
-      font-family: "Roboto", Arial, sans-serif !important;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Roboto, Arial, sans-serif !important;
       font-weight: 400 !important;
       text-transform: uppercase;
       letter-spacing: 0.08em;
@@ -1976,6 +2009,30 @@
     }
 
     @media (max-width: 600px) {
+      .globalActions {
+        top: 42px;
+        width: calc(100vw - 20px);
+        grid-template-columns: 1fr 1.25fr 1fr;
+        gap: 6px;
+      }
+
+      .globalActions > button {
+        width: 100%;
+        min-width: 0;
+        padding-left: 7px;
+        padding-right: 7px;
+      }
+
+      .page,
+      .xratesScreenWrap,
+      .screenTableWrap {
+        padding-top: 96px;
+      }
+
+      .luxuryHeader {
+        padding-top: 58px;
+      }
+
       :root {
         --page-pad: 10px;
         --top-pad: 54px;
@@ -2033,6 +2090,1634 @@
         padding: 10px;
       }
     }
+
+    /* ============================
+       ANDROID APP VISUAL UPGRADE
+    ============================ */
+    :root {
+      --ink: #f8f1dc;
+      --ink-dim: rgba(248,241,220,0.68);
+      --ink-faint: rgba(248,241,220,0.42);
+      --charcoal: #0b0d0d;
+      --charcoal-2: #111514;
+      --charcoal-3: #171b1a;
+      --champagne: #ffe082;
+      --amber: #f0b93a;
+      --emerald: #33e28a;
+      --cyan: #66d9ef;
+      --danger: #ff6b61;
+      --glass: rgba(255,255,255,0.072);
+      --glass-2: rgba(255,255,255,0.105);
+      --stroke: rgba(255,255,255,0.16);
+      --stroke-hot: rgba(255,224,130,0.48);
+      --deep-shadow: 0 22px 58px rgba(0,0,0,0.44);
+      --inner-light: inset 0 1px 0 rgba(255,255,255,0.11);
+    }
+
+    html,
+    body {
+      background:
+        linear-gradient(180deg, rgba(255,224,130,0.055), transparent 24%),
+        linear-gradient(135deg, rgba(102,217,239,0.052), transparent 38%),
+        linear-gradient(225deg, rgba(51,226,138,0.042), transparent 34%),
+        #050606;
+      color: var(--ink);
+    }
+
+    .screen::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(to bottom, rgba(255,255,255,0.045), transparent 10%, transparent 88%, rgba(0,0,0,0.28)),
+        repeating-linear-gradient(to bottom, rgba(255,255,255,0.018) 0, rgba(255,255,255,0.018) 1px, transparent 1px, transparent 5px);
+      opacity: 0.42;
+      mix-blend-mode: screen;
+    }
+
+    .status,
+    .hint {
+      border-color: rgba(255,224,130,0.24);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.105), rgba(255,255,255,0.04)),
+        rgba(5,6,6,0.82);
+      color: var(--ink-dim);
+      box-shadow: 0 12px 34px rgba(0,0,0,0.34), var(--inner-light);
+      font-weight: 700 !important;
+      letter-spacing: 0.1em;
+    }
+
+    .status {
+      color: var(--champagne);
+    }
+
+    .luxuryTitle,
+    .xratesTitle,
+    .bigTitle,
+    .diaCalcTitle,
+    .centerTitle {
+      color: var(--champagne);
+      font-weight: 900 !important;
+      letter-spacing: 0.085em;
+      text-shadow:
+        0 0 16px rgba(255,224,130,0.16),
+        0 3px 16px rgba(0,0,0,0.42);
+    }
+
+    .luxurySubtitle,
+    .diaCalcSub,
+    .centerSub {
+      color: var(--ink-dim);
+      font-weight: 700 !important;
+    }
+
+    .adminBtn,
+    .diaCalcBtn,
+    .attendanceBtn,
+    .homeBtn,
+    .clearBtn,
+    .primaryBtn,
+    .secondaryBtn,
+    .adminNavBtn {
+      position: relative;
+      overflow: hidden;
+      font-weight: 900 !important;
+      letter-spacing: 0.12em;
+      border-color: var(--stroke);
+      box-shadow: 0 12px 26px rgba(0,0,0,0.22), var(--inner-light);
+    }
+
+    .adminBtn::before,
+    .diaCalcBtn::before,
+    .attendanceBtn::before,
+    .homeBtn::before,
+    .clearBtn::before,
+    .primaryBtn::before,
+    .secondaryBtn::before,
+    .adminNavBtn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(115deg, transparent, rgba(255,255,255,0.18), transparent);
+      transform: translateX(-120%);
+      transition: transform 420ms ease;
+    }
+
+    .adminBtn:hover::before,
+    .diaCalcBtn:hover::before,
+    .attendanceBtn:hover::before,
+    .homeBtn:hover::before,
+    .clearBtn:hover::before,
+    .primaryBtn:hover::before,
+    .secondaryBtn:hover::before,
+    .adminNavBtn:hover::before {
+      transform: translateX(120%);
+    }
+
+    .diaCalcBtn,
+    .primaryBtn {
+      border-color: rgba(255,224,130,0.56);
+      background:
+        linear-gradient(180deg, rgba(255,224,130,0.23), rgba(240,185,58,0.09)),
+        rgba(22,18,8,0.92);
+      color: var(--champagne);
+    }
+
+    .attendanceBtn {
+      border-color: rgba(51,226,138,0.54);
+      background:
+        linear-gradient(180deg, rgba(51,226,138,0.20), rgba(51,226,138,0.07)),
+        rgba(6,22,15,0.90);
+      color: #aaffce;
+    }
+
+    .adminBtn,
+    .homeBtn,
+    .secondaryBtn {
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.045)),
+        rgba(12,14,14,0.92);
+      color: var(--ink);
+    }
+
+    .luxuryCard,
+    .quad,
+    .silverBox,
+    .xpanel,
+    .tableCard,
+    .diaCalcCard,
+    .diaCalcResultBox,
+    .adminCard,
+    .onhandCard,
+    .barsCoinsCard {
+      border-color: rgba(255,255,255,0.14);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.115), rgba(255,255,255,0.036)),
+        linear-gradient(135deg, rgba(255,224,130,0.045), transparent 38%),
+        var(--charcoal-2);
+      box-shadow: var(--deep-shadow), var(--inner-light);
+    }
+
+    .luxuryCard,
+    .quad,
+    .silverBox {
+      isolation: isolate;
+    }
+
+    .luxuryCard::before,
+    .quad::before,
+    .silverBox::before,
+    .xpanel::before,
+    .tableCard::before,
+    .diaCalcCard::before,
+    .adminCard::before,
+    .onhandCard::before,
+    .barsCoinsCard::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border-radius: inherit;
+      background:
+        linear-gradient(120deg, rgba(255,255,255,0.18), transparent 28%, transparent 72%, rgba(255,224,130,0.08));
+      opacity: 0.42;
+      z-index: 0;
+    }
+
+    .luxuryCard > *,
+    .quad > *,
+    .silverBox > *,
+    .xpanel > *,
+    .tableCard > *,
+    .diaCalcCard > *,
+    .adminCard > *,
+    .onhandCard > *,
+    .barsCoinsCard > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .beforeBox,
+    .tall24Box {
+      border-color: rgba(248,241,220,0.24);
+    }
+
+    .afterBox,
+    .diaCalcResultBox {
+      border-color: var(--stroke-hot);
+      background:
+        linear-gradient(180deg, rgba(255,224,130,0.22), rgba(240,185,58,0.065)),
+        linear-gradient(135deg, rgba(255,255,255,0.07), transparent 38%),
+        var(--charcoal-2);
+    }
+
+    .karatBadge,
+    .boxLabel,
+    .diaCalcResultLabel,
+    .xtype,
+    .tag,
+    .silverTag {
+      font-weight: 900 !important;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.13), rgba(255,255,255,0.046)),
+        rgba(0,0,0,0.22);
+      border-color: rgba(255,255,255,0.13);
+    }
+
+    .afterBox .karatBadge,
+    .afterBox .boxLabel,
+    .diaCalcResultLabel {
+      color: var(--champagne);
+      border-color: rgba(255,224,130,0.38);
+      background:
+        linear-gradient(180deg, rgba(255,224,130,0.23), rgba(255,224,130,0.07)),
+        rgba(26,20,7,0.80);
+    }
+
+    .luxuryMainValue,
+    .value .num,
+    .silverValue .num,
+    .xrate,
+    .diaCalcResultValue,
+    .attendanceValue,
+    .cellDisc,
+    .cellCert,
+    .onhandCellValue,
+    .barsCoinsTable tbody td {
+      font-weight: 900 !important;
+      letter-spacing: 0.025em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .luxuryMainValue,
+    .diaCalcResultValue {
+      color: var(--ink);
+      text-shadow: 0 8px 28px rgba(0,0,0,0.34);
+    }
+
+    .afterBox .luxuryMainValue,
+    .diaCalcResultValue {
+      color: var(--champagne);
+    }
+
+    .quad:nth-child(odd) .num,
+    .quad:nth-child(odd) .tag {
+      color: var(--champagne) !important;
+    }
+
+    .quad:nth-child(even) .num,
+    .quad:nth-child(even) .tag {
+      color: #aaffce !important;
+    }
+
+    .silverValue .num,
+    .silverTag {
+      color: #dfe8f1 !important;
+    }
+
+    .unit,
+    .unit-silver,
+    .luxuryUnit,
+    .diaAed {
+      color: var(--ink-faint);
+      font-weight: 700 !important;
+    }
+
+    .xrow,
+    .row3,
+    .onhandRow {
+      border-color: rgba(255,255,255,0.105);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.082), rgba(255,255,255,0.036)),
+        rgba(255,255,255,0.018);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.055);
+    }
+
+    .xrow.left,
+    .row3:nth-child(odd),
+    .onhandRow:nth-child(odd) {
+      background:
+        linear-gradient(90deg, rgba(255,224,130,0.16), rgba(255,255,255,0.044)),
+        rgba(255,255,255,0.018);
+    }
+
+    .xrow.right,
+    .row3:nth-child(even),
+    .onhandRow:nth-child(even) {
+      background:
+        linear-gradient(90deg, rgba(51,226,138,0.12), rgba(255,255,255,0.044)),
+        rgba(255,255,255,0.018);
+    }
+
+    .cellType,
+    .onhandCellLabel,
+    .barsCoinsTable tbody td:first-child {
+      font-weight: 900 !important;
+      color: var(--champagne);
+    }
+
+    .cellDisc {
+      color: #ffafa9;
+    }
+
+    .cellCert {
+      color: #aaffce;
+    }
+
+    .cols3,
+    .onhandCols,
+    .barsCoinsTable thead th {
+      font-weight: 900 !important;
+      color: var(--ink-dim);
+      letter-spacing: 0.14em;
+    }
+
+    .barsCoinsTable thead th {
+      background:
+        linear-gradient(180deg, rgba(255,224,130,0.22), rgba(255,224,130,0.07)),
+        rgba(18,14,5,0.84);
+      color: var(--champagne);
+    }
+
+    .barsCoinsTable tbody tr:nth-child(odd) {
+      background: rgba(255,255,255,0.052);
+    }
+
+    .barsCoinsTable tbody tr:nth-child(even) {
+      background: rgba(255,224,130,0.055);
+    }
+
+    .diaInput,
+    .passwordInput {
+      font-weight: 900 !important;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.045)),
+        rgba(0,0,0,0.28);
+      border-color: rgba(255,255,255,0.17);
+      color: var(--champagne);
+    }
+
+    .attendanceStage {
+      filter: drop-shadow(0 24px 54px rgba(0,0,0,0.52));
+    }
+
+    .attendanceValue {
+      min-width: 36px;
+      padding: 3px 7px;
+      border-radius: 6px;
+      background: rgba(0,0,0,0.40);
+      color: #ffffff;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.65);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.12), 0 10px 18px rgba(0,0,0,0.22);
+    }
+
+    .attendanceValue.small {
+      min-width: 24px;
+      padding: 2px 5px;
+    }
+
+    .adminNavBtn {
+      background:
+        linear-gradient(180deg, rgba(255,224,130,0.21), rgba(255,224,130,0.065)),
+        linear-gradient(135deg, rgba(51,226,138,0.06), transparent 44%),
+        var(--charcoal-2);
+      color: var(--champagne);
+      font-size: clamp(24px, 4vw, 46px);
+    }
+
+    @media (max-width: 600px) {
+      .adminBtn,
+      .diaCalcBtn,
+      .attendanceBtn,
+      .homeBtn,
+      .clearBtn,
+      .primaryBtn,
+      .secondaryBtn {
+        padding: 10px 11px;
+        font-size: 10px;
+      }
+
+      .luxuryCard,
+      .quad,
+      .silverBox,
+      .xpanel,
+      .tableCard,
+      .diaCalcCard,
+      .adminCard,
+      .onhandCard,
+      .barsCoinsCard {
+        box-shadow: 0 14px 30px rgba(0,0,0,0.38), var(--inner-light);
+      }
+
+      .attendanceValue {
+        min-width: 26px;
+        padding: 2px 5px;
+      }
+
+      .adminNavBtn {
+        min-height: 104px;
+      }
+    }
+
+    /* ============================
+       FOREIGN RATES BANKNOTE CARDS
+    ============================ */
+    #screen3 .xratesScreenWrap {
+      grid-template-rows: auto 1fr;
+      gap: 12px;
+    }
+
+    #screen3 .xratesScreenWrap > div:nth-child(2) {
+      display: none;
+    }
+
+    #screen3 .tableHeaderBar {
+      align-items: end;
+      padding: 0 4px;
+    }
+
+    #screen3 .xratesTitle {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    #screen3 .xratesTitle::before {
+      content: "";
+      width: 12px;
+      height: 42px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--champagne), var(--emerald));
+      box-shadow: 0 0 24px rgba(255,224,130,0.24);
+    }
+
+    #screen3 .xpanel {
+      padding: 12px;
+      border-color: rgba(255,224,130,0.36);
+      background:
+        linear-gradient(180deg, rgba(255,224,130,0.11), rgba(255,255,255,0.025)),
+        radial-gradient(circle at 18% 8%, rgba(51,226,138,0.12), transparent 34%),
+        rgba(7,8,8,0.96);
+    }
+
+    #screen3 .xgrid {
+      gap: 10px;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: repeat(5, minmax(0, 1fr));
+    }
+
+    #screen3 .xrow {
+      position: relative;
+      isolation: isolate;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: center;
+      gap: 8px;
+      min-height: 0;
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 8px;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(0,0,0,0.84), rgba(0,0,0,0.28)),
+        var(--note-img),
+        linear-gradient(135deg, rgba(255,224,130,0.20), rgba(51,226,138,0.09));
+      background-size: 100% 100%, contain, 100% 100%;
+      background-position: center, center, center;
+      background-repeat: no-repeat, no-repeat, no-repeat;
+      box-shadow: 0 14px 28px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.13);
+    }
+
+    #screen3 .xrow::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.08), transparent 46%),
+        linear-gradient(90deg, rgba(0,0,0,0.78), rgba(0,0,0,0.20) 58%, rgba(0,0,0,0.52));
+    }
+
+    #screen3 .xrow::after {
+      content: "";
+      position: absolute;
+      right: -26px;
+      top: -36px;
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: rgba(255,224,130,0.10);
+      box-shadow: 0 0 0 1px rgba(255,224,130,0.12) inset;
+      pointer-events: none;
+    }
+
+    #screen3 .xrow.left {
+      border-color: rgba(255,224,130,0.30);
+    }
+
+    #screen3 .xrow.right {
+      border-color: rgba(51,226,138,0.26);
+    }
+
+    #screen3 .xrate {
+      width: 100%;
+      flex: 1 1 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 7px 9px;
+      border-radius: 7px;
+      background: rgba(0,0,0,0.52);
+      color: #fff4c8;
+      font-size: clamp(25px, 4.2vw, 54px);
+      line-height: 1;
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.10);
+    }
+
+    #screen3 .xtype {
+      width: 100%;
+      flex: 0 0 auto;
+      padding: 7px 10px;
+      border-radius: 7px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(6,8,8,0.62);
+      color: var(--ink);
+      font-size: clamp(13px, 1.9vw, 24px);
+      line-height: 1.05;
+      text-align: center;
+      white-space: normal;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    #screen3 .xrow.empty {
+      opacity: 0.38;
+      filter: grayscale(0.55);
+    }
+
+    @media (max-width: 600px) {
+      #screen3 .xpanel {
+        padding: 8px;
+      }
+
+      #screen3 .xgrid {
+        gap: 7px;
+      }
+
+      #screen3 .xrow {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 8px;
+      }
+
+      #screen3 .xrate {
+        font-size: clamp(20px, 6.2vw, 34px);
+        padding: 6px;
+      }
+
+      #screen3 .xtype {
+        font-size: clamp(10px, 3.1vw, 15px);
+        padding: 6px;
+      }
+    }
+
+    /* ============================
+       FULL HEIGHT PREMIUM TABLE SCREENS
+    ============================ */
+    #screen3 .xratesScreenWrap {
+      grid-template-rows: 1fr !important;
+      gap: 0 !important;
+    }
+
+    #screen3 .tableHeaderBar {
+      display: none !important;
+    }
+
+    #screen3 .xpanel {
+      padding: 8px !important;
+      border-width: 0 !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+
+    #screen3 .xgrid {
+      gap: 8px !important;
+    }
+
+    #screen3 .xrow {
+      border-radius: 10px !important;
+      border-color: rgba(255,224,130,0.22) !important;
+    }
+
+    #screen4 .screenTableWrap,
+    #screen5 .screenTableWrap,
+    #screen6 .screenTableWrap,
+    #screen7 .screenTableWrap {
+      grid-template-rows: 1fr !important;
+      gap: 0 !important;
+    }
+
+    #screen4 .tableHeaderBar,
+    #screen5 .tableHeaderBar,
+    #screen6 .tableHeaderBar,
+    #screen7 .tableHeaderBar,
+    #screen4 .cols3,
+    #screen5 .cols3,
+    #screen6 .cols3,
+    #screen7 .cols3 {
+      display: none !important;
+    }
+
+    #screen4 .tableCard,
+    #screen5 .tableCard,
+    #screen6 .tableCard,
+    #screen7 .tableCard {
+      display: block !important;
+      padding: 8px !important;
+      border-width: 0 !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      overflow: hidden;
+    }
+
+    #screen4 .rows3,
+    #screen5 .rows3,
+    #screen6 .rows3,
+    #screen7 .rows3 {
+      height: 100%;
+      padding: 0 !important;
+      display: grid;
+      grid-auto-rows: minmax(0, 1fr);
+      gap: 8px !important;
+      overflow: hidden;
+    }
+
+    #screen4 .row3,
+    #screen5 .row3,
+    #screen6 .row3,
+    #screen7 .row3 {
+      position: relative;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(54px, 0.42fr) minmax(70px, 0.58fr) !important;
+      align-items: center;
+      gap: 7px !important;
+      padding: 9px 12px !important;
+      border-radius: 10px !important;
+      border: 1px solid rgba(255,255,255,0.14) !important;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.072), rgba(255,255,255,0.026)),
+        rgba(9,12,11,0.82) !important;
+      box-shadow:
+        0 10px 22px rgba(0,0,0,0.28),
+        inset 0 1px 0 rgba(255,255,255,0.08) !important;
+    }
+
+    #screen4 .row3:nth-child(odd),
+    #screen5 .row3:nth-child(odd),
+    #screen6 .row3:nth-child(odd),
+    #screen7 .row3:nth-child(odd) {
+      background:
+        linear-gradient(90deg, rgba(255,224,130,0.20), rgba(255,255,255,0.035)),
+        rgba(13,13,10,0.86) !important;
+    }
+
+    #screen4 .row3:nth-child(even),
+    #screen5 .row3:nth-child(even),
+    #screen6 .row3:nth-child(even),
+    #screen7 .row3:nth-child(even) {
+      background:
+        linear-gradient(90deg, rgba(51,226,138,0.16), rgba(255,255,255,0.035)),
+        rgba(7,15,12,0.86) !important;
+    }
+
+    #screen4 .cellType,
+    #screen5 .cellType,
+    #screen6 .cellType,
+    #screen7 .cellType {
+      color: var(--champagne);
+      font-size: clamp(17px, 3.1vw, 36px);
+      line-height: 1.04;
+      letter-spacing: 0.04em;
+      white-space: normal !important;
+      overflow: hidden;
+      text-overflow: clip;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    #screen4 .cellDisc,
+    #screen5 .cellDisc,
+    #screen6 .cellDisc,
+    #screen7 .cellDisc,
+    #screen4 .cellCert,
+    #screen5 .cellCert,
+    #screen6 .cellCert,
+    #screen7 .cellCert {
+      justify-self: stretch;
+      min-width: 0;
+      padding: 7px 5px;
+      border-radius: 8px;
+      font-size: clamp(19px, 3.3vw, 38px);
+      line-height: 1;
+      text-align: center !important;
+      background: rgba(0,0,0,0.28);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+    }
+
+    #screen4 .cellDisc,
+    #screen5 .cellDisc,
+    #screen6 .cellDisc,
+    #screen7 .cellDisc {
+      color: #ffbbb7;
+    }
+
+    #screen4 .cellCert,
+    #screen5 .cellCert,
+    #screen6 .cellCert,
+    #screen7 .cellCert {
+      color: #aaffcf;
+    }
+
+    @media (max-width: 600px) {
+      #screen3 .xpanel,
+      #screen4 .tableCard,
+      #screen5 .tableCard,
+      #screen6 .tableCard,
+      #screen7 .tableCard {
+        padding: 6px !important;
+      }
+
+      #screen4 .rows3,
+      #screen5 .rows3,
+      #screen6 .rows3,
+      #screen7 .rows3 {
+        gap: 7px !important;
+      }
+
+      #screen4 .row3,
+      #screen5 .row3,
+      #screen6 .row3,
+      #screen7 .row3 {
+        grid-template-columns: minmax(0, 1.45fr) minmax(48px, 0.42fr) minmax(62px, 0.58fr) !important;
+        padding: 8px 10px !important;
+      }
+
+      #screen4 .cellType,
+      #screen5 .cellType,
+      #screen6 .cellType,
+      #screen7 .cellType {
+        font-size: clamp(16px, 4.9vw, 27px);
+      }
+
+      #screen4 .cellDisc,
+      #screen5 .cellDisc,
+      #screen6 .cellDisc,
+      #screen7 .cellDisc,
+      #screen4 .cellCert,
+      #screen5 .cellCert,
+      #screen6 .cellCert,
+      #screen7 .cellCert {
+        font-size: clamp(18px, 5.2vw, 29px);
+        padding: 6px 4px;
+      }
+    }
+
+    /* ============================
+       ADMIN ROTATION VISUAL UPGRADE
+    ============================ */
+    #screen22k .onhandWrap,
+    #barsCoinsScreen .barsCoinsWrap {
+      grid-template-rows: 1fr !important;
+      gap: 0 !important;
+    }
+
+    #screen22k .centerTopBar,
+    #screen22k .onhandStatus,
+    #screen22k .onhandCols,
+    #barsCoinsScreen .centerTopBar,
+    #barsCoinsScreen .barsCoinsStatus,
+    #barsCoinsScreen .barsCoinsTable thead {
+      display: none !important;
+    }
+
+    #screen22k .onhandCard,
+    #barsCoinsScreen .barsCoinsCard {
+      display: block !important;
+      padding: 7px !important;
+      border-width: 0 !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      overflow: hidden;
+    }
+
+    #screen22k .onhandRows {
+      height: 100%;
+      padding: 0 !important;
+      display: grid;
+      grid-auto-rows: minmax(0, 1fr);
+      gap: 8px !important;
+      overflow: hidden;
+    }
+
+    #screen22k .onhandRow {
+      min-height: 0;
+      grid-template-columns: minmax(0, 1.22fr) minmax(92px, 0.9fr) minmax(92px, 0.9fr) !important;
+      gap: 7px !important;
+      padding: 9px 12px !important;
+      border-radius: 10px !important;
+      border: 1px solid rgba(255,255,255,0.14) !important;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.08) !important;
+    }
+
+    #screen22k .onhandCellLabel {
+      color: var(--champagne);
+      font-size: clamp(18px, 3.4vw, 38px);
+      line-height: 1.02;
+      letter-spacing: 0.04em;
+    }
+
+    #screen22k .onhandCellValue {
+      padding: 7px 5px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.25);
+      color: #f8f3e6;
+      font-size: clamp(17px, 3vw, 34px);
+      line-height: 1;
+      text-align: center !important;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+    }
+
+    #barsCoinsScreen .barsCoinsTableWrap {
+      height: 100%;
+      min-height: 0;
+      border: 0 !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      overflow: hidden;
+    }
+
+    #barsCoinsScreen .barsCoinsTable,
+    #barsCoinsScreen .barsCoinsTable tbody {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-collapse: separate;
+    }
+
+    #barsCoinsScreen .barsCoinsTable tbody {
+      display: grid;
+      grid-template-rows: repeat(10, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    #barsCoinsScreen .barsCoinsTable tbody tr {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(58px, 0.72fr) repeat(5, minmax(0, 1fr));
+      gap: 5px;
+      padding: 6px;
+      border: 1px solid rgba(255,255,255,0.13);
+      border-radius: 10px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.025)),
+        rgba(9,12,11,0.82) !important;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    #barsCoinsScreen .barsCoinsTable tbody tr:nth-child(odd) {
+      background:
+        linear-gradient(90deg, rgba(255,224,130,0.17), rgba(255,255,255,0.032)),
+        rgba(13,13,10,0.86) !important;
+    }
+
+    #barsCoinsScreen .barsCoinsTable tbody tr:nth-child(even) {
+      background:
+        linear-gradient(90deg, rgba(51,226,138,0.13), rgba(255,255,255,0.032)),
+        rgba(7,15,12,0.86) !important;
+    }
+
+    #barsCoinsScreen .barsCoinsTable tbody td {
+      min-width: 0;
+      height: 100%;
+      padding: 4px 3px !important;
+      border: 0 !important;
+      border-radius: 7px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      background: rgba(0,0,0,0.22);
+      color: #f8f3e6;
+      font-size: clamp(14px, 2.7vw, 30px);
+      line-height: 1;
+      text-align: center !important;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.07);
+    }
+
+    #barsCoinsScreen .barsCoinsTable tbody td::before {
+      content: attr(data-label);
+      color: rgba(255,244,200,0.62);
+      font-size: clamp(7px, 1.65vw, 12px);
+      line-height: 1;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #barsCoinsScreen .barsCoinsTable tbody td:first-child {
+      align-items: flex-start;
+      padding-left: 8px !important;
+      background: rgba(255,224,130,0.10);
+      color: var(--champagne);
+      font-size: clamp(15px, 3vw, 32px);
+      letter-spacing: 0.03em;
+    }
+
+    #barsCoinsScreen .barsCoinsTable tbody td:first-child::before {
+      content: "SIZE";
+    }
+
+    @media (max-width: 600px) {
+      #screen22k .onhandCard,
+      #barsCoinsScreen .barsCoinsCard {
+        padding: 6px !important;
+      }
+
+      #screen22k .onhandRows {
+        gap: 7px !important;
+      }
+
+      #screen22k .onhandRow {
+        grid-template-columns: minmax(0, 1.1fr) minmax(82px, 0.9fr) minmax(82px, 0.9fr) !important;
+        padding: 8px 10px !important;
+      }
+
+      #screen22k .onhandCellLabel {
+        font-size: clamp(17px, 5.2vw, 28px);
+      }
+
+      #screen22k .onhandCellValue {
+        font-size: clamp(15px, 4.45vw, 24px);
+        padding: 6px 4px;
+      }
+
+      #barsCoinsScreen .barsCoinsTable tbody {
+        gap: 5px;
+      }
+
+      #barsCoinsScreen .barsCoinsTable tbody tr {
+        grid-template-columns: minmax(52px, 0.72fr) repeat(5, minmax(0, 1fr));
+        gap: 4px;
+        padding: 5px;
+      }
+
+      #barsCoinsScreen .barsCoinsTable tbody td {
+        font-size: clamp(13px, 4vw, 20px);
+      }
+
+      #barsCoinsScreen .barsCoinsTable tbody td::before {
+        font-size: clamp(6px, 1.9vw, 9px);
+      }
+
+      #barsCoinsScreen .barsCoinsTable tbody td:first-child {
+        font-size: clamp(13px, 3.7vw, 19px);
+        padding-left: 6px !important;
+      }
+    }
+
+    /* ============================
+       FIRST SCREEN RATE TILE REDESIGN
+    ============================ */
+    #screen2 .page {
+      padding-top: 96px;
+      padding-bottom: 10px;
+    }
+
+    #screen2 .topWrap {
+      grid-template-rows: minmax(0, 1fr) minmax(88px, 0.22fr);
+      gap: 10px;
+      min-height: 0;
+    }
+
+    #screen2 .grid {
+      gap: 10px;
+      min-height: 0;
+    }
+
+    #screen2 .quad,
+    #screen2 .silverBox {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      align-items: center;
+      justify-items: center;
+      padding: 13px 12px;
+      min-height: 0;
+      border-radius: 10px;
+    }
+
+    #screen2 .tag,
+    #screen2 .silverTag {
+      position: static;
+      order: 1;
+      justify-self: center;
+      max-width: 100%;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: clamp(12px, 2vw, 22px);
+      line-height: 1;
+      text-align: center;
+      white-space: nowrap;
+      background: rgba(0,0,0,0.34);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+    }
+
+    #screen2 .value,
+    #screen2 .silverValue {
+      order: 2;
+      width: 100%;
+      max-width: 100%;
+      padding: 4px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: nowrap;
+      gap: 0;
+      text-align: center;
+      line-height: 1;
+    }
+
+    #screen2 .value .num,
+    #screen2 .silverValue .num {
+      order: 2;
+      display: block;
+      width: 100%;
+      font-size: clamp(39px, 8.4vw, 92px);
+      line-height: 0.95;
+      text-align: center;
+    }
+
+    #screen2 .unit,
+    #screen2 .unit-silver {
+      order: 3;
+      display: block;
+      width: 100%;
+      margin-top: 0;
+      font-size: clamp(10px, 1.5vw, 16px);
+      line-height: 1;
+      text-align: center;
+      letter-spacing: 0.14em;
+      white-space: nowrap;
+    }
+
+    #screen2 .value {
+      display: contents;
+    }
+
+    #screen2 .silverValue {
+      display: contents;
+    }
+
+    #screen2 .silverGrid {
+      gap: 10px;
+      min-height: 0;
+    }
+
+    #screen2 .silverBox {
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      padding-top: 12px;
+      padding-bottom: 12px;
+    }
+
+    #screen2 .silverValue .num {
+      font-size: clamp(34px, 7vw, 74px);
+      color: #edf4fb !important;
+    }
+
+    @media (max-width: 600px) {
+      #screen2 .page {
+        padding-top: 90px;
+      }
+
+      #screen2 .topWrap {
+        grid-template-rows: minmax(0, 1fr) minmax(86px, 0.18fr);
+        gap: 8px;
+      }
+
+      #screen2 .grid,
+      #screen2 .silverGrid {
+        gap: 8px;
+      }
+
+      #screen2 .quad,
+      #screen2 .silverBox {
+        padding: 10px 8px;
+        border-radius: 9px;
+      }
+
+      #screen2 .tag,
+      #screen2 .silverTag {
+        padding: 6px 9px;
+        font-size: clamp(11px, 3.2vw, 16px);
+      }
+
+      #screen2 .value .num {
+        font-size: clamp(38px, 10vw, 56px);
+      }
+
+      #screen2 .silverValue .num {
+        font-size: clamp(30px, 8.3vw, 46px);
+      }
+
+      #screen2 .unit,
+      #screen2 .unit-silver {
+        font-size: clamp(9px, 2.45vw, 12px);
+      }
+    }
+
+    /* ============================
+       PERSISTENT BOTTOM NAVIGATION
+    ============================ */
+    .screen {
+      inset: var(--phone-top-safe) 0 var(--phone-bottom-nav) 0 !important;
+      height: auto !important;
+    }
+
+    .globalActions {
+      left: 0 !important;
+      right: 0 !important;
+      top: auto !important;
+      bottom: 0 !important;
+      transform: none !important;
+      width: 100vw !important;
+      height: var(--phone-bottom-nav) !important;
+      min-height: 118px;
+      padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+      display: grid !important;
+      grid-template-columns: minmax(0, 1fr) minmax(78px, 0.72fr) minmax(0, 1fr);
+      grid-template-rows: 1fr 1fr;
+      gap: 9px;
+      align-items: stretch;
+      justify-items: stretch;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(4,5,5,0.74), rgba(4,5,5,0.98)),
+        radial-gradient(circle at 50% 0%, rgba(255,224,130,0.16), transparent 48%),
+        #050606;
+      border-top: 1px solid rgba(255,224,130,0.22);
+      box-shadow: 0 -18px 42px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.08);
+      backdrop-filter: blur(16px);
+    }
+
+    .globalActions::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 8px;
+      width: 62px;
+      height: 3px;
+      border-radius: 999px;
+      transform: translateX(-50%);
+      background: rgba(255,255,255,0.22);
+      pointer-events: none;
+    }
+
+    .globalActions > button {
+      width: 100% !important;
+      height: 100% !important;
+      min-width: 0 !important;
+      position: relative !important;
+      left: auto !important;
+      right: auto !important;
+      top: auto !important;
+      bottom: auto !important;
+      transform: none !important;
+      pointer-events: auto;
+      border-radius: 10px !important;
+      padding: 8px 10px !important;
+      font-size: clamp(11px, 2.6vw, 16px) !important;
+      line-height: 1 !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .globalActions .adminBtn {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .globalActions .globalHomeBtn {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      align-self: center;
+      justify-self: center;
+      aspect-ratio: 1;
+      height: min(100%, 104px) !important;
+      width: auto !important;
+      border: 1px solid rgba(255,224,130,0.72);
+      background:
+        linear-gradient(180deg, rgba(255,224,130,0.30), rgba(240,185,58,0.10)),
+        rgba(20,16,7,0.94);
+      box-shadow: 0 18px 38px rgba(0,0,0,0.34), 0 0 24px rgba(255,224,130,0.10), inset 0 1px 0 rgba(255,255,255,0.14);
+    }
+
+    .globalActions .globalHomeBtn span {
+      position: relative;
+      width: 34px;
+      height: 28px;
+      border: 5px solid var(--champagne);
+      border-top: 0;
+      border-radius: 4px;
+      display: block;
+    }
+
+    .globalActions .globalHomeBtn span::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -23px;
+      width: 28px;
+      height: 28px;
+      border-left: 5px solid var(--champagne);
+      border-top: 5px solid var(--champagne);
+      transform: translateX(-50%) rotate(45deg);
+      border-radius: 3px 0 0 0;
+    }
+
+    .globalActions .diaCalcBtn {
+      grid-column: 3;
+      grid-row: 1;
+    }
+
+    .globalActions .attendanceBtn {
+      grid-column: 3;
+      grid-row: 2;
+      transform: none !important;
+    }
+
+    .globalActions .attendanceBtn:hover {
+      transform: translateY(-1px) !important;
+    }
+
+    .globalActions .navIcon {
+      width: min(50%, 42px);
+      height: min(72%, 42px);
+      display: block;
+      overflow: visible;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.35;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 3px 7px rgba(0,0,0,0.45));
+      pointer-events: none;
+    }
+
+    .globalActions .navIcon.fillAccent {
+      fill: color-mix(in srgb, currentColor 16%, transparent);
+    }
+
+    .globalActions .adminBtn::before,
+    .globalActions .diaCalcBtn::before,
+    .globalActions .attendanceBtn::before,
+    .globalActions .globalHomeBtn::before {
+      display: none !important;
+    }
+
+    .globalActions .adminBtn {
+      color: #ff8d86 !important;
+      border-color: rgba(255,90,82,0.58) !important;
+      background:
+        linear-gradient(180deg, rgba(255,90,82,0.22), rgba(255,90,82,0.075)),
+        rgba(24,7,7,0.92) !important;
+    }
+
+    .globalActions .diaCalcBtn {
+      color: #f7f4ea !important;
+      border-color: rgba(255,255,255,0.54) !important;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.055)),
+        rgba(14,15,15,0.92) !important;
+    }
+
+    .globalActions .attendanceBtn {
+      color: #aaffce !important;
+    }
+
+    .globalActions .globalHomeBtn {
+      color: var(--champagne) !important;
+    }
+
+    .globalActions .globalHomeBtn .navIcon {
+      width: min(62%, 58px);
+      height: min(62%, 58px);
+      stroke-width: 2.15;
+    }
+
+    .globalActions .globalHomeBtn span {
+      display: none !important;
+    }
+
+    .homeBtn {
+      display: none !important;
+    }
+
+    #passwordScreen .centerScreenWrap {
+      grid-template-rows: auto 1fr !important;
+      gap: 6px !important;
+      padding-top: 6px !important;
+    }
+
+    #passwordScreen .centerCardWrap {
+      place-items: start center !important;
+      padding-top: min(5vh, 34px);
+      box-sizing: border-box;
+    }
+
+    #passwordScreen .adminCard {
+      width: min(720px, 100%);
+      border-color: rgba(255,90,82,0.48) !important;
+      background:
+        radial-gradient(circle at 14% 8%, rgba(255,90,82,0.16), transparent 36%),
+        linear-gradient(180deg, rgba(255,90,82,0.08), rgba(255,255,255,0.025)),
+        rgba(10,8,8,0.96) !important;
+    }
+
+    #passwordScreen .passwordBtnRow {
+      grid-template-columns: 1fr !important;
+    }
+
+    #passwordScreen .centerTitle,
+    #passwordScreen .passwordLabel {
+      color: #ff8d86 !important;
+    }
+
+    #passwordScreen .centerSub {
+      color: rgba(255,187,183,0.72) !important;
+    }
+
+    #adminPasswordSubmitBtn {
+      min-height: 96px !important;
+      border-color: rgba(255,90,82,0.66) !important;
+      background:
+        linear-gradient(180deg, rgba(255,90,82,0.30), rgba(255,90,82,0.10)),
+        rgba(24,7,7,0.94) !important;
+      color: #ffbbb7 !important;
+      font-size: clamp(20px, 5vw, 38px) !important;
+      border-radius: 12px !important;
+      box-shadow: 0 12px 26px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.10) !important;
+    }
+
+    #adminPasswordCancelBtn {
+      display: none !important;
+    }
+
+    #attendanceScreen .attendanceScreenWrap {
+      width: 100%;
+      height: 100%;
+      padding: 0 !important;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    #attendanceScreen .attendanceStage {
+      width: 100% !important;
+      height: 100% !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
+      aspect-ratio: auto;
+      background-size: 100% 100% !important;
+      background-position: center center !important;
+      background-repeat: no-repeat !important;
+      overflow: hidden;
+    }
+
+    #diaCalcScreen .diaCalcScreenWrap {
+      grid-template-rows: minmax(86px, 0.88fr) minmax(0, 1.15fr) auto !important;
+      gap: 8px !important;
+      padding: 8px !important;
+    }
+
+    #diaCalcScreen .diaCalcTopBar,
+    #diaCalcScreen .diaCalcSub {
+      display: none !important;
+    }
+
+    #diaCalcScreen .diaCalcResultBox {
+      min-height: 0;
+      padding: 10px 12px !important;
+      border-width: 1px !important;
+      border-radius: 10px !important;
+      border-color: rgba(255,255,255,0.28) !important;
+      background:
+        radial-gradient(circle at 14% 10%, rgba(255,255,255,0.14), transparent 38%),
+        linear-gradient(135deg, rgba(255,255,255,0.16), rgba(255,255,255,0.045)),
+        rgba(8,10,10,0.94) !important;
+      box-shadow: 0 14px 30px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.12) !important;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    #diaCalcScreen .diaCalcResultLabel {
+      justify-self: center;
+      border-radius: 8px !important;
+      border-color: rgba(255,255,255,0.18) !important;
+      background: rgba(255,255,255,0.07) !important;
+      color: #f7f4ea !important;
+      font-size: clamp(12px, 2.6vw, 18px) !important;
+      letter-spacing: 0.12em;
+      padding: 7px 10px !important;
+    }
+
+    #diaCalcScreen .diaCalcResultValueWrap {
+      padding: 0 !important;
+      min-height: 0;
+    }
+
+    #diaCalcScreen .diaCalcResultValue {
+      color: #f7f4ea !important;
+      font-size: clamp(42px, 13vw, 92px) !important;
+      text-shadow: 0 10px 24px rgba(0,0,0,0.42);
+      gap: 8px;
+    }
+
+    #diaCalcScreen .diaAed {
+      color: rgba(247,244,234,0.72);
+      font-size: 0.22em;
+    }
+
+    #diaCalcScreen .diaCalcCard {
+      min-height: 0;
+      padding: 8px !important;
+      border-width: 0 !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      display: grid;
+      grid-template-rows: repeat(3, minmax(0, 1fr)) minmax(66px, 0.9fr) !important;
+      gap: 8px !important;
+      overflow: hidden;
+    }
+
+    #diaCalcScreen .inputRow {
+      min-height: 0;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 8px;
+      padding: 9px 10px;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 10px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.09), rgba(255,255,255,0.028)),
+        rgba(8,11,11,0.84);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    #diaCalcScreen .inputLabel {
+      color: var(--champagne);
+      font-size: clamp(12px, 3.4vw, 24px);
+      line-height: 1.05;
+      letter-spacing: 0.08em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #diaCalcScreen .diaInput {
+      height: 100%;
+      min-height: 0;
+      padding: 8px 10px !important;
+      border-width: 1px !important;
+      border-radius: 8px !important;
+      background: rgba(0,0,0,0.32) !important;
+      color: #f7f4ea !important;
+      font-size: clamp(18px, 4.6vw, 34px) !important;
+      text-align: center;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.07);
+    }
+
+    #diaCalcScreen .diaInput::placeholder {
+      color: rgba(247,244,234,0.28);
+      font-size: 0.58em;
+      letter-spacing: 0.04em;
+    }
+
+    #diaCalcScreen .clearBtnWrap {
+      min-height: 0;
+      display: grid;
+    }
+
+    #diaCalcScreen .clearBtn {
+      width: 100%;
+      height: 100%;
+      min-height: 66px;
+      border-radius: 10px !important;
+      border-color: rgba(255,90,82,0.58) !important;
+      background:
+        linear-gradient(180deg, rgba(255,90,82,0.25), rgba(255,90,82,0.08)),
+        rgba(24,7,7,0.92) !important;
+      color: #ffbbb7 !important;
+      font-size: clamp(18px, 5vw, 34px) !important;
+      letter-spacing: 0.16em;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.10);
+    }
+
+    #diaCalcScreen .diaCalcStatus {
+      display: none !important;
+    }
+
+    .luxuryScreenWrap,
+    .page,
+    .xratesScreenWrap,
+    .screenTableWrap,
+    .diaCalcScreenWrap,
+    .centerScreenWrap,
+    .onhandWrap,
+    .barsCoinsWrap {
+      height: 100% !important;
+      padding: 10px 10px 10px 10px !important;
+    }
+
+    #screen2 .page,
+    #screen3 .xratesScreenWrap {
+      padding-top: 10px !important;
+    }
+
+    .status,
+    .hint {
+      display: none !important;
+    }
+
+    @media (max-width: 600px) {
+      .screen {
+        inset: var(--phone-top-safe) 0 var(--phone-bottom-nav) 0 !important;
+      }
+
+      .globalActions {
+        top: auto !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        height: var(--phone-bottom-nav) !important;
+        min-height: 112px;
+        grid-template-columns: minmax(0, 1fr) minmax(74px, 0.7fr) minmax(0, 1fr);
+        gap: 7px;
+        padding: 9px 9px calc(9px + env(safe-area-inset-bottom));
+      }
+
+      .globalActions > button {
+        padding: 7px 6px !important;
+        font-size: clamp(10px, 2.7vw, 13px) !important;
+      }
+
+      .globalActions .globalHomeBtn span {
+        width: 28px;
+        height: 23px;
+        border-width: 4px;
+        border-top: 0;
+      }
+
+      .globalActions .globalHomeBtn span::before {
+        top: -19px;
+        width: 23px;
+        height: 23px;
+        border-left-width: 4px;
+        border-top-width: 4px;
+      }
+
+      .luxuryScreenWrap,
+      .page,
+      .xratesScreenWrap,
+      .screenTableWrap,
+      .diaCalcScreenWrap,
+      .centerScreenWrap,
+      .onhandWrap,
+      .barsCoinsWrap {
+        padding: 8px !important;
+      }
+    }
   </style>
 </head>
 
@@ -2040,14 +3725,54 @@
   <div class="status" id="statusText">Loading…</div>
   <div class="hint" id="hintText">Tap to switch view</div>
   <div class="notif hidden" id="notifText">NOT ALLOWED</div>
+  <div class="globalActions" id="globalActions">
+    <button class="adminBtn" id="adminOpenBtn" type="button" aria-label="Admin">
+      <svg class="navIcon" viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="22" cy="30" r="10"></circle>
+        <circle cx="22" cy="30" r="3"></circle>
+        <path d="M31 30h24"></path>
+        <path d="M45 30v8"></path>
+        <path d="M53 30v6"></path>
+        <path d="M13 20c5-6 15-7 22 0"></path>
+      </svg>
+    </button>
+    <button class="globalHomeBtn" id="globalHomeBtn" type="button" aria-label="Home">
+      <span></span>
+      <svg class="navIcon" viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M10 32 32 13l22 19"></path>
+        <path d="M17 29v24h30V29"></path>
+        <path d="M27 53V39h10v14"></path>
+        <path d="M23 24h18"></path>
+      </svg>
+    </button>
+    <button class="attendanceBtn" id="attendanceOpenBtn" type="button" aria-label="Attendance">
+      <svg class="navIcon" viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="23" cy="20" r="8"></circle>
+        <path d="M10 48c2-11 8-17 13-17s11 6 13 17"></path>
+        <circle cx="45" cy="40" r="12"></circle>
+        <path d="M45 34v7l5 3"></path>
+        <path d="M12 52h22"></path>
+      </svg>
+    </button>
+    <button class="diaCalcBtn" id="diaCalcOpenBtn" type="button" aria-label="Diamond Calculator">
+      <svg class="navIcon" viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M8 22h24l-5-8H13z"></path>
+        <path d="M8 22l12 18 12-18"></path>
+        <path d="M13 14l7 26 7-26"></path>
+        <rect x="36" y="18" width="20" height="30" rx="4"></rect>
+        <path d="M41 25h10"></path>
+        <path d="M41 33h2"></path>
+        <path d="M49 33h2"></path>
+        <path d="M41 40h2"></path>
+        <path d="M49 40h2"></path>
+      </svg>
+    </button>
+  </div>
 
   <!-- SCREEN 1 -->
   <div class="screen" id="screen1">
     <div class="luxuryScreenWrap">
       <div class="luxuryHeader">
-        <button class="adminBtn" id="adminOpenBtn" type="button">Admin</button>
-        <button class="attendanceBtn" id="attendanceOpenBtn" type="button">ATTENDANCE</button>
-        <button class="diaCalcBtn" id="diaCalcOpenBtn" type="button">DIA CALC</button>
         <div class="luxuryTitle">ANVAR LUXURY SELL PRICE</div>
         <div class="luxurySubtitle">LIVE PRICING DASHBOARD</div>
       </div>
@@ -2274,36 +3999,34 @@
         <button class="homeBtn" id="diaCalcHomeBtn" type="button">HOME</button>
       </div>
 
-      <div class="diaCalcSub">Diamond sell price calculator</div>
+      <div class="diaCalcResultBox">
+        <div class="diaCalcResultLabel">Diamond Sell Price</div>
+        <div class="diaCalcResultValueWrap">
+          <div class="diaCalcResultValue">
+            <span id="diamondSellPriceValue">0</span>
+            <span class="diaAed">AED</span>
+          </div>
+        </div>
+      </div>
 
       <div class="diaCalcCard">
         <div class="inputRow">
           <div class="inputLabel">Gold Weight</div>
-          <input class="diaInput" id="goldWeightInput" type="number" inputmode="decimal" step="any" placeholder="Enter gold weight" />
+          <input class="diaInput" id="goldWeightInput" type="tel" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" placeholder="Enter gold weight" />
         </div>
 
         <div class="inputRow">
           <div class="inputLabel">Diamond Weight</div>
-          <input class="diaInput" id="diamondWeightInput" type="number" inputmode="decimal" step="any" placeholder="Enter diamond weight" />
+          <input class="diaInput" id="diamondWeightInput" type="tel" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" placeholder="Enter diamond weight" />
         </div>
 
         <div class="inputRow">
           <div class="inputLabel">Color Stone Weight</div>
-          <input class="diaInput" id="colorStoneWeightInput" type="number" inputmode="decimal" step="any" placeholder="Enter color stone weight" />
+          <input class="diaInput" id="colorStoneWeightInput" type="tel" inputmode="decimal" pattern="[0-9]*[.]?[0-9]*" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" placeholder="Enter color stone weight" />
         </div>
 
         <div class="clearBtnWrap">
           <button class="clearBtn" id="diaCalcClearBtn" type="button">CLEAR</button>
-        </div>
-
-        <div class="diaCalcResultBox">
-          <div class="diaCalcResultLabel">Diamond Sell Price</div>
-          <div class="diaCalcResultValueWrap">
-            <div class="diaCalcResultValue">
-              <span id="diamondSellPriceValue">0</span>
-              <span class="diaAed">AED</span>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -2316,7 +4039,7 @@
     <div class="attendanceScreenWrap">
       <div class="attendanceStatus" id="attendanceStatus">Loading...</div>
 
-      <div class="attendanceStage" id="attendanceStage" aria-label="Attendance" role="button" tabindex="0">
+      <div class="attendanceStage" id="attendanceStage">
         <div class="attendanceValue" id="att_break" style="left:16.35%; top:24.1%;">---</div>
         <div class="attendanceValue" id="att_offduty" style="left:38.15%; top:24.1%;">---</div>
         <div class="attendanceValue" id="att_leave" style="left:60.25%; top:24.1%;">---</div>
@@ -2451,9 +4174,53 @@
     return await r.json();
   }
 
+  const dataCache = new Map();
+  const FAST_CACHE_MS = 45000;
+  const LIVE_CACHE_MS = 12000;
+
+  function updateFromCache(url, renderData, renderError, maxAgeMs = FAST_CACHE_MS) {
+    const now = Date.now();
+    const entry = dataCache.get(url);
+
+    if (entry && entry.data) {
+      renderData(entry.data, true);
+      if (now - entry.ts < maxAgeMs) return Promise.resolve(entry.data);
+    }
+
+    if (entry && entry.promise) {
+      return entry.promise;
+    }
+
+    const promise = fetchJSON(url)
+      .then(data => {
+        dataCache.set(url, { data, ts: Date.now(), promise: null });
+        renderData(data, false);
+        return data;
+      })
+      .catch(ex => {
+        const latest = dataCache.get(url);
+        if (latest) latest.promise = null;
+        if (!(entry && entry.data) && renderError) renderError(ex);
+        return entry && entry.data ? entry.data : null;
+      });
+
+    dataCache.set(url, {
+      data: entry ? entry.data : null,
+      ts: entry ? entry.ts : 0,
+      promise
+    });
+
+    return promise;
+  }
+
   function setText(id, text) {
     const el = document.getElementById(id);
     if (el) el.textContent = text;
+  }
+
+  function setGlobalActionsVisible(visible) {
+    const el = document.getElementById('globalActions');
+    if (el) el.classList.remove('hidden');
   }
 
   function toNumber(x) {
@@ -2486,7 +4253,8 @@
     return '+' + String(Math.abs(v));
   }
 
-  let currentScreen = 1;
+  const FIRST_SCREEN = 2;
+  let currentScreen = FIRST_SCREEN;
   const TOTAL_SCREENS = 7;
   let isDiaCalcOpen = false;
   let isAttendanceOpen = false;
@@ -2494,6 +4262,7 @@
   let isAdminOpen = false;
   let is22kOpen = false;
   let isBarsCoinsOpen = false;
+  let isAdminUnlocked = false;
   const ADMIN_PASSWORD = '8123';
   let notifTimer = null;
 
@@ -2534,6 +4303,7 @@
   function showScreen(n) {
     resetSpecialModes();
     hideAllScreens();
+    setGlobalActionsVisible(true);
 
     const el = document.getElementById('screen' + n);
     if (el) el.classList.remove('hidden');
@@ -2545,6 +4315,7 @@
     resetSpecialModes();
     isDiaCalcOpen = true;
     hideAllScreens();
+    setGlobalActionsVisible(false);
 
     const dia = document.getElementById('diaCalcScreen');
     if (dia) dia.classList.remove('hidden');
@@ -2557,6 +4328,7 @@
     resetSpecialModes();
     isAttendanceOpen = true;
     hideAllScreens();
+    setGlobalActionsVisible(false);
 
     const el = document.getElementById('attendanceScreen');
     if (el) el.classList.remove('hidden');
@@ -2569,34 +4341,34 @@
     resetSpecialModes();
     isPasswordOpen = true;
     hideAllScreens();
+    setGlobalActionsVisible(false);
 
     const el = document.getElementById('passwordScreen');
     if (el) el.classList.remove('hidden');
 
     setText('hintText', '');
+    focusAdminPassword();
+  }
 
+  function focusAdminPassword() {
     const input = document.getElementById('adminPasswordInput');
-    if (input) {
-      input.value = '';
-      setTimeout(() => input.focus(), 20);
-    }
+    if (!input) return;
+
+    input.value = '';
+    input.focus();
+    setTimeout(() => input.focus(), 60);
+    setTimeout(() => input.focus(), 250);
   }
 
   function showAdminScreen() {
-    resetSpecialModes();
-    isAdminOpen = true;
-    hideAllScreens();
-
-    const el = document.getElementById('adminScreen');
-    if (el) el.classList.remove('hidden');
-
-    setText('hintText', '');
+    show22kScreen();
   }
 
   function show22kScreen() {
     resetSpecialModes();
     is22kOpen = true;
     hideAllScreens();
+    setGlobalActionsVisible(false);
 
     const el = document.getElementById('screen22k');
     if (el) el.classList.remove('hidden');
@@ -2609,6 +4381,7 @@
     resetSpecialModes();
     isBarsCoinsOpen = true;
     hideAllScreens();
+    setGlobalActionsVisible(false);
 
     const el = document.getElementById('barsCoinsScreen');
     if (el) el.classList.remove('hidden');
@@ -2618,9 +4391,9 @@
   }
 
   function goHomeWithNotAllowed() {
-    currentScreen = 1;
-    showScreen(1);
-    updateLuxurySell();
+    currentScreen = FIRST_SCREEN;
+    showScreen(FIRST_SCREEN);
+    updateSquaresAndSilver();
     showNotification('NOT ALLOWED');
   }
 
@@ -2629,7 +4402,8 @@
     const value = input ? String(input.value || '').trim() : '';
 
     if (value === ADMIN_PASSWORD) {
-      showAdminScreen();
+      isAdminUnlocked = true;
+      show22kScreen();
     } else {
       goHomeWithNotAllowed();
     }
@@ -2640,18 +4414,16 @@
       '#diaCalcOpenBtn, #diaCalcHomeBtn, #diaCalcClearBtn, ' +
       '#attendanceOpenBtn, #attendanceStage, ' +
       '#adminOpenBtn, #adminPasswordSubmitBtn, #adminPasswordCancelBtn, ' +
-      '#adminHomeBtn, #admin22kBtn, #adminBarsCoinsBtn, #onhand22kHomeBtn, #barsCoinsHomeBtn'
+      '#globalHomeBtn, #globalActions, #adminHomeBtn, #admin22kBtn, #adminBarsCoinsBtn, #onhand22kHomeBtn, #barsCoinsHomeBtn'
     );
 
     if (excluded) return;
     if (isDiaCalcOpen || isAttendanceOpen || isPasswordOpen || isAdminOpen || is22kOpen || isBarsCoinsOpen) return;
 
-    currentScreen = (currentScreen % TOTAL_SCREENS) + 1;
+    currentScreen = currentScreen >= TOTAL_SCREENS ? FIRST_SCREEN : currentScreen + 1;
     showScreen(currentScreen);
 
-    if (currentScreen === 1) {
-      updateLuxurySell();
-    } else if (currentScreen === 2) {
+    if (currentScreen === 2) {
       updateSquaresAndSilver();
     } else if (currentScreen === 3) {
       updateXrates();
@@ -2671,11 +4443,18 @@
     showDiaCalcScreen();
   });
 
+  document.getElementById('globalHomeBtn').addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    currentScreen = FIRST_SCREEN;
+    showScreen(FIRST_SCREEN);
+    updateSquaresAndSilver();
+  });
+
   document.getElementById('diaCalcHomeBtn').addEventListener('click', (ev) => {
     ev.stopPropagation();
-    currentScreen = 1;
-    showScreen(1);
-    updateLuxurySell();
+    currentScreen = FIRST_SCREEN;
+    showScreen(FIRST_SCREEN);
+    updateSquaresAndSilver();
   });
 
   document.getElementById('attendanceOpenBtn').addEventListener('click', (ev) => {
@@ -2685,18 +4464,12 @@
 
   document.getElementById('attendanceStage').addEventListener('click', (ev) => {
     ev.stopPropagation();
-    currentScreen = 1;
-    showScreen(1);
-    updateLuxurySell();
   });
 
   document.getElementById('attendanceStage').addEventListener('keydown', (ev) => {
     if (ev.key === 'Enter' || ev.key === ' ') {
       ev.preventDefault();
       ev.stopPropagation();
-      currentScreen = 1;
-      showScreen(1);
-      updateLuxurySell();
     }
   });
 
@@ -2710,7 +4483,11 @@
 
   document.getElementById('adminOpenBtn').addEventListener('click', (ev) => {
     ev.stopPropagation();
-    showPasswordScreen();
+    if (isAdminUnlocked) {
+      show22kScreen();
+    } else {
+      showPasswordScreen();
+    }
   });
 
   document.getElementById('adminPasswordSubmitBtn').addEventListener('click', (ev) => {
@@ -2720,16 +4497,16 @@
 
   document.getElementById('adminPasswordCancelBtn').addEventListener('click', (ev) => {
     ev.stopPropagation();
-    currentScreen = 1;
-    showScreen(1);
-    updateLuxurySell();
+    currentScreen = FIRST_SCREEN;
+    showScreen(FIRST_SCREEN);
+    updateSquaresAndSilver();
   });
 
   document.getElementById('adminHomeBtn').addEventListener('click', (ev) => {
     ev.stopPropagation();
-    currentScreen = 1;
-    showScreen(1);
-    updateLuxurySell();
+    currentScreen = FIRST_SCREEN;
+    showScreen(FIRST_SCREEN);
+    updateSquaresAndSilver();
   });
 
   document.getElementById('admin22kBtn').addEventListener('click', (ev) => {
@@ -2744,12 +4521,22 @@
 
   document.getElementById('onhand22kHomeBtn').addEventListener('click', (ev) => {
     ev.stopPropagation();
-    showAdminScreen();
+    showBarsCoinsScreen();
   });
 
   document.getElementById('barsCoinsHomeBtn').addEventListener('click', (ev) => {
     ev.stopPropagation();
-    showAdminScreen();
+    show22kScreen();
+  });
+
+  document.getElementById('screen22k').addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    showBarsCoinsScreen();
+  });
+
+  document.getElementById('barsCoinsScreen').addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    show22kScreen();
   });
 
   document.getElementById('adminPasswordInput').addEventListener('keydown', (ev) => {
@@ -2760,24 +4547,22 @@
   });
 
   async function updateLuxurySell() {
-    try {
-      const data = await fetchJSON('/api/values');
+    return updateFromCache('/api/values', data => {
       setText('statusText', data.status || 'OK');
 
       setText('SELL22_value', data.sell_price_22 ?? '—');
       setText('FINAL22_value', data.final_sell_price_22 ?? '—');
       setText('SELL24_value', data.sell_price_24 ?? '—');
-    } catch {
+    }, () => {
       setText('statusText', 'NETWORK ERROR');
       setText('SELL22_value', '—');
       setText('FINAL22_value', '—');
       setText('SELL24_value', '—');
-    }
+    }, LIVE_CACHE_MS);
   }
 
   async function updateSquaresAndSilver() {
-    try {
-      const data = await fetchJSON('/api/values');
+    return updateFromCache('/api/values', data => {
       setText('statusText', data.status || 'OK');
 
       for (const key of ['E18','C18','E21','C21','TL','TR','BL','BR']) {
@@ -2787,36 +4572,30 @@
 
       setText('SILVER_BUY_value', data.silver_buy ?? '—');
       setText('SILVER_SELL_value', data.silver_sell ?? '—');
-    } catch {
+    }, () => {
       setText('statusText', 'NETWORK ERROR');
       for (const key of ['E18','C18','E21','C21','TL','TR','BL','BR']) {
         setText(key + '_value', '—');
       }
       setText('SILVER_BUY_value', '—');
       setText('SILVER_SELL_value', '—');
-    }
+    }, LIVE_CACHE_MS);
   }
 
   async function updateXrates() {
-    try {
-      const data = await fetchJSON('/api/xrates');
+    return updateFromCache('/api/xrates', data => {
       setText('xratesStatus', data.status === 'OK' ? '' : (data.status || ''));
 
       const grid = document.getElementById('xratesGrid');
       grid.innerHTML = '';
 
       const items = Array.isArray(data.items) ? data.items.slice(0, 10) : [];
-      while (items.length < 10) items.push({ rate: "", type: "" });
-
-      const ordered = [];
-      for (let i = 0; i < 5; i++) {
-        ordered.push({ ...items[i], col: 'left' });
-        ordered.push({ ...items[i + 5], col: 'right' });
-      }
+      const ordered = orderXrates(items);
 
       for (const it of ordered) {
         const row = document.createElement('div');
-        row.className = 'xrow ' + it.col;
+        row.className = 'xrow ' + it.col + ((!it.rate && !it.type) ? ' empty' : '');
+        row.style.setProperty('--note-img', `url("${currencyNoteFor(it.type)}")`);
 
         const rate = document.createElement('div');
         rate.className = 'xrate';
@@ -2826,13 +4605,103 @@
         type.className = 'xtype';
         type.textContent = it.type ?? '';
 
-        row.appendChild(rate);
         row.appendChild(type);
+        row.appendChild(rate);
         grid.appendChild(row);
       }
-    } catch {
+    }, () => {
       setText('xratesStatus', 'NETWORK ERROR');
+    }, FAST_CACHE_MS);
+  }
+
+  function currencyNoteFor(type) {
+    const t = currencyKey(type);
+    const base = 'currency_notes/';
+
+    if (isUsdOld100(t)) return base + 'usd_100.jpg';
+    if (isUsdOld50(t)) return base + 'usd_50.jpg';
+    if (isUsdOld20OrLess(t)) return base + 'usd_20.jpg';
+    if (isUsd(t)) return base + 'usd_new_100.jpg';
+    if (t.includes('EUR') || t.includes('EURO')) return base + 'eur_50.jpg';
+    if (t.includes('GBP') || t.includes('POUND') || t.includes('STERLING')) return base + 'gbp_50.jpg';
+    if (t.includes('CAD') || t.includes('CANAD')) return base + 'cad_100.jpg';
+    if (t.includes('INR') || t.includes('INDIA') || t.includes('RUPEE')) return base + 'inr_500.jpg';
+    if (t.includes('OMR') || t.includes('OMAN') || t.includes('RIAL')) return base + 'omr_50.jpg';
+    if (t.includes('SAR') || t.includes('SAUDI') || t.includes('RIYAL')) return base + 'sar_500.webp';
+
+    return base + 'usd_100.jpg';
+  }
+
+  function orderXrates(items) {
+    const source = Array.isArray(items) ? items : [];
+    const used = new Set();
+
+    function take(match) {
+      for (let i = 0; i < source.length; i++) {
+        if (!used.has(i) && match(currencyKey(source[i].type))) {
+          used.add(i);
+          return source[i];
+        }
+      }
+      return { rate: '', type: '' };
     }
+
+    const left = [
+      take(t => t.includes('EUR') || t.includes('EURO')),
+      take(t => t.includes('INR') || t.includes('INDIA') || t.includes('RUPEE')),
+      take(t => t.includes('OMR') || t.includes('OMAN') || t.includes('RIAL')),
+      take(t => t.includes('CAD') || t.includes('CANAD')),
+      take(t => t.includes('SAR') || t.includes('SAUDI') || t.includes('RIYAL')),
+    ].map(item => ({ ...item, col: 'left' }));
+
+    const right = [
+      take(isUsdOld100),
+      take(isUsdOld50),
+      take(isUsdOld20OrLess),
+      take(t => isUsd(t)),
+      take(t => t.includes('GBP') || t.includes('POUND') || t.includes('STERLING')),
+    ].map(item => ({ ...item, col: 'right' }));
+
+    const leftovers = source.filter((_, i) => !used.has(i));
+    for (const side of [left, right]) {
+      for (let i = 0; i < side.length && leftovers.length; i++) {
+        if (!side[i].type && !side[i].rate) side[i] = { ...leftovers.shift(), col: side[i].col };
+      }
+    }
+
+    const ordered = [];
+    for (let i = 0; i < 5; i++) {
+      ordered.push(left[i] || { rate: '', type: '', col: 'left' });
+      ordered.push(right[i] || { rate: '', type: '', col: 'right' });
+    }
+    return ordered;
+  }
+
+  function currencyKey(type) {
+    return String(type || '').toUpperCase().replace(/[_-]/g, ' ');
+  }
+
+  function isUsd(t) {
+    return t.includes('USD') || t.includes('DOLLAR') || t.includes('US ');
+  }
+
+  function isUsdOld100(t) {
+    return isUsd(t) && t.includes('OLD') && t.includes('100');
+  }
+
+  function isUsdOld50(t) {
+    return isUsd(t) && t.includes('OLD') && t.includes('50');
+  }
+
+  function isUsdOld20OrLess(t) {
+    return isUsd(t) && (
+      t.includes('20') ||
+      t.includes('10') ||
+      t.includes('5') ||
+      t.includes('1') ||
+      t.includes('LESS') ||
+      t.includes('SMALL')
+    ) && !t.includes('50') && !t.includes('100');
   }
 
   function renderRows(containerId, rows, padTo) {
@@ -2889,41 +4758,59 @@
       sec === 'VALCAMBI' ? 8 :
       10;
 
-    try {
-      const data = await fetchJSON('/api/discounts/' + encodeURIComponent(sec));
+    return updateFromCache('/api/discounts/' + encodeURIComponent(sec), data => {
       setText(statusId, data.status || 'OK');
       renderRows(rowsId, data.rows || [], padTo);
-    } catch {
+    }, () => {
       setText(statusId, 'NETWORK ERROR');
       renderRows(rowsId, [], padTo);
-    }
+    }, FAST_CACHE_MS);
   }
 
   function getDiaInputValue(id) {
     const el = document.getElementById(id);
     if (!el) return '';
-    return (el.value || '').trim();
+    el.value = cleanDecimalInput(el.value || '');
+    return el.value.trim();
+  }
+
+  function cleanDecimalInput(value) {
+    let s = String(value || '').replace(/[^0-9.]/g, '');
+    const firstDot = s.indexOf('.');
+    if (firstDot !== -1) {
+      s = s.slice(0, firstDot + 1) + s.slice(firstDot + 1).replace(/\./g, '');
+    }
+    return s;
+  }
+
+  function enforceDecimalInput(ev) {
+    const el = ev.target;
+    const cleaned = cleanDecimalInput(el.value);
+    if (el.value !== cleaned) el.value = cleaned;
+  }
+
+  function blockNonDecimalKeys(ev) {
+    if (['e', 'E', '+', '-'].includes(ev.key)) ev.preventDefault();
   }
 
   async function updateDiamondCalc() {
-    try {
-      const goldWeight = getDiaInputValue('goldWeightInput');
-      const diamondWeight = getDiaInputValue('diamondWeightInput');
-      const colorStoneWeight = getDiaInputValue('colorStoneWeightInput');
+    const goldWeight = getDiaInputValue('goldWeightInput');
+    const diamondWeight = getDiaInputValue('diamondWeightInput');
+    const colorStoneWeight = getDiaInputValue('colorStoneWeightInput');
 
-      const params = new URLSearchParams({
-        gold_weight: goldWeight,
-        diamond_weight: diamondWeight,
-        color_stone_weight: colorStoneWeight
-      });
+    const params = new URLSearchParams({
+      gold_weight: goldWeight,
+      diamond_weight: diamondWeight,
+      color_stone_weight: colorStoneWeight
+    });
 
-      const data = await fetchJSON('/api/diamond-calc?' + params.toString());
+    return updateFromCache('/api/diamond-calc?' + params.toString(), data => {
       setText('diaCalcStatus', data.status || 'OK');
       setText('diamondSellPriceValue', data.diamond_sell_price ?? '0');
-    } catch {
+    }, () => {
       setText('diaCalcStatus', 'NETWORK ERROR');
       setText('diamondSellPriceValue', '0');
-    }
+    }, LIVE_CACHE_MS);
   }
 
   const attendanceFieldMap = {
@@ -2960,18 +4847,17 @@
   }
 
   async function updateAttendance() {
-    try {
-      const data = await fetchJSON('/api/attendance');
+    return updateFromCache('/api/attendance', data => {
       setText('attendanceStatus', data.detail ? `${data.status || 'ERROR'} - ${data.detail}` : (data.status || 'OK'));
 
       const values = data.values || {};
       for (const [fieldName, elementId] of Object.entries(attendanceFieldMap)) {
         setText(elementId, fmtAttendanceValue(values[fieldName]));
       }
-    } catch {
+    }, () => {
       setText('attendanceStatus', 'NETWORK ERROR');
       clearAttendanceValues();
-    }
+    }, LIVE_CACHE_MS);
   }
 
   function renderOnhand22kRows(rows) {
@@ -3008,14 +4894,13 @@
   }
 
   async function updateOnhand22k() {
-    try {
-      const data = await fetchJSON('/api/onhand-22k');
+    return updateFromCache('/api/onhand-22k', data => {
       setText('onhand22kStatus', data.status || 'OK');
       renderOnhand22kRows(data.rows || []);
-    } catch {
+    }, () => {
       setText('onhand22kStatus', 'NETWORK ERROR');
       renderOnhand22kRows([]);
-    }
+    }, FAST_CACHE_MS);
   }
 
   function renderBarsCoinsRows(rows) {
@@ -3039,21 +4924,27 @@
       const tr = document.createElement('tr');
 
       const c0 = document.createElement('td');
+      c0.dataset.label = 'SIZE';
       c0.textContent = r.size ?? labels[i];
 
       const c1 = document.createElement('td');
+      c1.dataset.label = 'PAMP';
       c1.textContent = r.PAMP ?? '—';
 
       const c2 = document.createElement('td');
+      c2.dataset.label = 'BAR';
       c2.textContent = r.BAR ?? '—';
 
       const c3 = document.createElement('td');
+      c3.dataset.label = 'COIN';
       c3.textContent = r.COIN ?? '—';
 
       const c4 = document.createElement('td');
+      c4.dataset.label = 'VALCAMBI';
       c4.textContent = r.VALCAMBI ?? '—';
 
       const c5 = document.createElement('td');
+      c5.dataset.label = 'EMIRATES';
       c5.textContent = r.EMIRATES ?? '—';
 
       tr.appendChild(c0);
@@ -3068,39 +4959,33 @@
   }
 
   async function updateBarsCoins() {
-    try {
-      const data = await fetchJSON('/api/onhand-bars-coins');
+    return updateFromCache('/api/onhand-bars-coins', data => {
       setText('barsCoinsStatus', data.status || 'OK');
       renderBarsCoinsRows(data.rows || []);
-    } catch {
+    }, () => {
       setText('barsCoinsStatus', 'NETWORK ERROR');
       renderBarsCoinsRows([]);
-    }
+    }, FAST_CACHE_MS);
   }
 
-  document.getElementById('goldWeightInput').addEventListener('input', updateDiamondCalc);
-  document.getElementById('diamondWeightInput').addEventListener('input', updateDiamondCalc);
-  document.getElementById('colorStoneWeightInput').addEventListener('input', updateDiamondCalc);
+  for (const id of ['goldWeightInput', 'diamondWeightInput', 'colorStoneWeightInput']) {
+    const input = document.getElementById(id);
+    input.addEventListener('input', (ev) => {
+      enforceDecimalInput(ev);
+      updateDiamondCalc();
+    });
+    input.addEventListener('keydown', blockNonDecimalKeys);
+    input.addEventListener('paste', () => {
+      setTimeout(() => {
+        input.value = cleanDecimalInput(input.value);
+        updateDiamondCalc();
+      }, 0);
+    });
+  }
 
-  showScreen(1);
+  showScreen(FIRST_SCREEN);
 
-  updateLuxurySell();
   updateSquaresAndSilver();
-  updateXrates();
-  updateSection('PAMP');
-  updateSection('LOCAL');
-  updateSection('VALCAMBI');
-  updateSection('EMIRATES');
-  updateDiamondCalc();
-  updateAttendance();
-  updateOnhand22k();
-  updateBarsCoins();
-
-  setInterval(() => {
-    if (currentScreen === 1 && !isDiaCalcOpen && !isAttendanceOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) {
-      updateLuxurySell();
-    }
-  }, 5000);
 
   setInterval(() => {
     if (currentScreen === 2 && !isDiaCalcOpen && !isAttendanceOpen && !isPasswordOpen && !isAdminOpen && !is22kOpen && !isBarsCoinsOpen) {

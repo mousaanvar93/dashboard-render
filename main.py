@@ -6,9 +6,13 @@ import requests
 import msal
 import re
 from html import unescape
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+
+BASE_DIR = Path(__file__).resolve().parent
 
 # --------------------------
 # SUCCESSFN / KITCO FALLBACK
@@ -625,17 +629,18 @@ def compute_diamond_sell_price(gold_weight, diamond_weight, color_stone_weight, 
 # FASTAPI
 # --------------------------
 app = FastAPI()
+app.mount("/currency_notes", StaticFiles(directory=BASE_DIR / "currency_notes"), name="currency_notes")
 
 
 @app.get("/", response_class=HTMLResponse)
 def home():
-    with open("index.html", "r", encoding="utf-8") as f:
+    with open(BASE_DIR / "index.html", "r", encoding="utf-8") as f:
         return f.read()
 
 
 @app.get("/ATTENDANCEBACKGROUND.png")
 def attendance_background():
-    return FileResponse("ATTENDANCEBACKGROUND.png", media_type="image/png")
+    return FileResponse(BASE_DIR / "ATTENDANCEBACKGROUND.png", media_type="image/png")
 
 
 # --------------------------

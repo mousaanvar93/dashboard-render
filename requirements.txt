@@ -1,4 +1,4 @@
-fastapi
-uvicorn
-requests
-msal
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+requests==2.32.3
+msal==1.31.1
