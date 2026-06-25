@@ -637,12 +637,21 @@ app.mount("/currency_notes", StaticFiles(directory=BASE_DIR / "currency_notes"),
 @app.get("/", response_class=HTMLResponse)
 def home():
     with open(BASE_DIR / "index.html", "r", encoding="utf-8") as f:
-        return f.read()
+        html = f.read()
+    attendance_bg = BASE_DIR / "ATTENDANCEBACKGROUND.png"
+    if attendance_bg.exists():
+        version = int(attendance_bg.stat().st_mtime)
+        html = html.replace("/ATTENDANCEBACKGROUND.png", f"/ATTENDANCEBACKGROUND.png?v={version}")
+    return html
 
 
 @app.get("/ATTENDANCEBACKGROUND.png")
 def attendance_background():
-    return FileResponse(BASE_DIR / "ATTENDANCEBACKGROUND.png", media_type="image/png")
+    return FileResponse(
+        BASE_DIR / "ATTENDANCEBACKGROUND.png",
+        media_type="image/png",
+        headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
+    )
 
 
 # --------------------------
