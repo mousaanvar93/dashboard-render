@@ -81,13 +81,15 @@ DIAMOND_COLORSTONEVALUE_FIELD = "colorstonevalue"
 DIAMOND_CERTVALUE_FIELD = "certvalue"
 DIAMOND_MAKING_FIELD = "making"
 
-ATTENDANCE_LIST_NAME = os.environ.get("ATTENDANCE_LIST_NAME", "totalstaffdataformainscreen")
+ATTENDANCE_LIST_NAME = os.environ.get("ATTENDANCE_LIST_NAME", "totalstaffdataformainscreenlive")
 ATTENDANCE_ITEM_ID = int(os.environ.get("ATTENDANCE_ITEM_ID", "1"))
 ATTENDANCE_FIELDS = [
     "onduty",
     "offduty",
     "break",
+    "lunchbreak",
     "leave",
+    "outsidedoingwork",
     "sick",
     "ondutyshopone",
     "ondutyshoptwo",
